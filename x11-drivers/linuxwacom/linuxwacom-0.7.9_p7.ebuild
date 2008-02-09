@@ -2,7 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: /var/cvsroot/gentoo-x86/x11-drivers/linuxwacom/linuxwacom-0.7.8_p3.ebuild,v 1.2 2008/01/04 23:03:22 rbu Exp $
 
-inherit eutils autotools linux-mod
+inherit eutils autotools toolchain-funcs linux-mod
 
 DESCRIPTION="Input driver for Wacom tablets and drawing devices"
 HOMEPAGE="http://linuxwacom.sourceforge.net/"
@@ -67,6 +67,12 @@ src_unpack() {
 
 	# Fix multilib-strict error for Tcl/Tk library install
 	sed -i -e "s:WCM_EXECDIR/lib:WCM_EXECDIR/$(get_libdir):" configure.in
+
+	# Remove warning parameters for gcc < 4, bug 205139
+	if [[ $(gcc-major-version) -lt 4 ]]; then
+		sed -i -e "s:-Wno-variadic-macros::" src/xdrv/Makefile.am
+	fi
+
 	epatch "${FILESDIR}"/${P%_p*}-no-tcl.patch
 	epatch "${FILESDIR}"/${P%_p*}-2.6.24.patch
 	eautoreconf
@@ -105,6 +111,10 @@ src_install() {
 
 	insinto /etc/udev/rules.d/
 	newins "${FILESDIR}"/xserver-xorg-input-wacom.udev 60-wacom.rules
+
+	exeinto /lib/udev/
+	doexe "${FILESDIR}"/check_driver
+	doman "${FILESDIR}"/check_driver.1
 
 	dohtml -r docs/*
 	dodoc AUTHORS ChangeLog NEWS README
