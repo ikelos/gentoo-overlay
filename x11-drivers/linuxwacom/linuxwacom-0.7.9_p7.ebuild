@@ -1,6 +1,6 @@
 # Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/x11-drivers/linuxwacom/linuxwacom-0.7.8_p3.ebuild,v 1.2 2008/01/04 23:03:22 rbu Exp $
+# $Header: /var/cvsroot/gentoo-x86/x11-drivers/linuxwacom/linuxwacom-0.7.9_p7.ebuild,v 1.3 2008/02/24 18:45:41 ikelos Exp $
 
 inherit eutils autotools toolchain-funcs linux-mod
 
@@ -58,6 +58,7 @@ wacom_check() {
 pkg_setup() {
 	linux-mod_pkg_setup
 	# echo "kernel version is ${KV} , name is ${KV%%-*}"
+	ewarn "Versions of linuxwacom >= 0.7.9 require gcc >= 4.2 to compile."
 	wacom_check
 }
 
@@ -105,7 +106,7 @@ src_install() {
 
 	# Inelegant attempt to work around a nasty build system
 	if use module; then
-		cp ${S}/src/*/wacom.{o,ko} ${S}/src/
+		cp "${S}"/src/*/wacom.{o,ko} "${S}"/src/
 		linux-mod_src_install
 	fi
 
