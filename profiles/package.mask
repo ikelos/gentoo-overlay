@@ -1,0 +1,2 @@
+# Masked due to lack of support
+net-wireless/blueman
