@@ -24,8 +24,6 @@ src_compile() {
 
 src_install() {
 	emake install DESTDIR=${D} || die "Failed to install."
-	dodir /usr/share/${PN}
-	cp -r examples ${D}/usr/share/${PN}
 }
 
 
