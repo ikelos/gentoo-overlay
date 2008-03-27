@@ -9,12 +9,12 @@ depend() {
 
 start() {
 	ebegin "Starting gypsy"
-	start-stop-daemon --start --quiet --exec /usr/libexec/gypsy
+	start-stop-daemon --start --quiet --exec /usr/libexec/gypsy-daemon
 	eend $?
 }
 
 stop() {
 	ebegin "Stopping gypsy"
-	start-stop-daemon --stop --quiet --exec /usr/libexec/gypsy
+	start-stop-daemon --stop --quiet --exec /usr/libexec/gypsy-daemon
 	eend $?
 }
