@@ -24,6 +24,7 @@ src_compile() {
 
 src_install() {
 	emake install DESTDIR=${D} || die "Failed to install."
+	newinitd ${FILESDIR}/${PN}.rc ${PN}
 }
 
 
