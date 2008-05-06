@@ -2,6 +2,11 @@
 # Copyright 1999-2008 Gentoo Foundation; Distributed under the GPL v2
 # $Header: $
 
+*linuxwacom-0.7.9_p11 (06 May 2008)
+
+  06 May 2008; Mike Auty <ikelos@gentoo.org> +linuxwacom-0.7.9_p11.ebuild:
+  Add in linuxwacom-0.7.9-p11 for a user to test out.
+
   09 Feb 2008; Mike Auty <ikelos@gentoo.org> linuxwacom-0.7.9_p7:
   Include fixes from 0.7.8_p3.
 
