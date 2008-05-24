@@ -1,6 +1,8 @@
 # Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/x11-drivers/linuxwacom/linuxwacom-0.7.9_p7.ebuild,v 1.3 2008/02/24 18:45:41 ikelos Exp $
+# $Header: /var/cvsroot/gentoo-x86/x11-drivers/linuxwacom/linuxwacom-0.7.9_p7.ebuild,v 1.4 2008/02/25 01:39:47 mr_bones_ Exp $
+
+EAPI="1"
 
 inherit eutils autotools toolchain-funcs linux-mod
 
@@ -8,15 +10,14 @@ DESCRIPTION="Input driver for Wacom tablets and drawing devices"
 HOMEPAGE="http://linuxwacom.sourceforge.net/"
 SRC_URI="mirror://sourceforge/${PN}/${P/_p/-}.tar.bz2"
 
-IUSE="gtk tcl tk usb module"
+IUSE="gtk tcl tk usb module +quirks"
 
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~amd64 ~ppc ~ppc64 ~x86"
 
-RDEPEND="|| ( ( x11-proto/inputproto
-		x11-base/xorg-server )
-		  virtual/x11 )
+RDEPEND="x11-proto/inputproto
+	x11-base/xorg-server
 	media-libs/libpixman
 	gtk? ( >=x11-libs/gtk+-2 )
 	tcl? ( dev-lang/tcl )
@@ -74,8 +75,8 @@ src_unpack() {
 		sed -i -e "s:-Wno-variadic-macros::" src/xdrv/Makefile.am
 	fi
 
-	epatch "${FILESDIR}"/${P%_p*}-no-tcl.patch
-	epatch "${FILESDIR}"/${P%_p*}-2.6.24.patch
+#	epatch "${FILESDIR}"/${P%_p*}-no-tcl.patch
+#	epatch "${FILESDIR}"/${P%_p*}-2.6.24.patch
 	eautoreconf
 }
 
@@ -94,6 +95,7 @@ src_compile() {
 	econf ${myconf} \
 		$(use_with tcl tcl) \
 		$(use_with tk tk) \
+		$(use_enable quirks quirk-tablet-rescale) \
 		--enable-wacomdrv --enable-wacdump \
 		--enable-xsetwacom --enable-dlloader || die "econf failed"
 

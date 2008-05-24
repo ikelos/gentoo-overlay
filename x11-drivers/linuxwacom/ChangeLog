@@ -2,6 +2,14 @@
 # Copyright 1999-2008 Gentoo Foundation; Distributed under the GPL v2
 # $Header: $
 
+*linuxwacom-0.8.0_p3 (24 May 2008)
+
+  24 May 2008; Mike Auty <ikelos@gentoo.org>
+  files/xserver-xorg-input-wacom.udev, -linuxwacom-0.7.9_p11.ebuild,
+  -linuxwacom-0.7.9_p7.ebuild, -linuxwacom-0.8.0.ebuild,
+  +linuxwacom-0.8.0_p3.ebuild:
+  Bump linuxwacom and close bugs 220805 and 221117.
+
 *linuxwacom-0.7.9_p11 (06 May 2008)
 
   06 May 2008; Mike Auty <ikelos@gentoo.org> +linuxwacom-0.7.9_p11.ebuild:
