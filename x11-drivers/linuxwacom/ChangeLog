@@ -2,6 +2,17 @@
 # Copyright 1999-2008 Gentoo Foundation; Distributed under the GPL v2
 # $Header: $
 
+*linuxwacom-0.8.1_p2 (02 Aug 2008)
+
+  02 Aug 2008; Mike Auty <ikelos@gentoo.org>
+  -files/linuxwacom-0.7.9-2.6.24.patch,
+  -files/linuxwacom-0.7.9-no-tcl.patch,
+  +files/linuxwacom-0.8.0-xserver-xorg-input-wacom.udev,
+  +files/check_driver, +files/check_driver.1,
+  -files/xserver-xorg-input-wacom.udev, -linuxwacom-0.8.0_p3.ebuild,
+  +linuxwacom-0.8.1_p2.ebuild:
+  Bump thanks to je_fro.
+
 *linuxwacom-0.8.0_p3 (24 May 2008)
 
   24 May 2008; Mike Auty <ikelos@gentoo.org>

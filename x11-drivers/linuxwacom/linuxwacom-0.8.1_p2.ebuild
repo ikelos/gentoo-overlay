@@ -18,7 +18,6 @@ KEYWORDS="~amd64 ~ppc ~ppc64 ~x86"
 
 RDEPEND="x11-proto/inputproto
 	x11-base/xorg-server
-	media-libs/libpixman
 	gtk? ( >=x11-libs/gtk+-2 )
 	tcl? ( dev-lang/tcl )
 	tk?  ( dev-lang/tk )
@@ -44,10 +43,11 @@ wacom_check() {
 			eerror "Enable it in the kernel, found at:"
 			eerror
 			eerror " Device Drivers"
-			eerror "     USB support"
-			eerror "           <M> Wacom Intuos/Graphire tablet support"
+			eerror "    Input device support"
+			eerror "        Tablets"
+			eerror "            <M> Wacom Intuos/Graphire tablet support (USB)"
 			eerror
-			eerror "(in the same page is suggested to include as modules also:"
+			eerror "(in the "USB support" page it is suggested to include also:"
 			eerror "EHCI , OHCI , USB Human Interface Device+HID input layer)"
 			eerror
 			eerror "Then recompile kernel. Otherwise, remove the module USE flag."
@@ -75,8 +75,6 @@ src_unpack() {
 		sed -i -e "s:-Wno-variadic-macros::" src/xdrv/Makefile.am
 	fi
 
-#	epatch "${FILESDIR}"/${P%_p*}-no-tcl.patch
-#	epatch "${FILESDIR}"/${P%_p*}-2.6.24.patch
 	eautoreconf
 }
 
@@ -113,7 +111,7 @@ src_install() {
 	fi
 
 	insinto /etc/udev/rules.d/
-	newins "${FILESDIR}"/xserver-xorg-input-wacom.udev 60-wacom.rules
+	newins "${FILESDIR}"/${P%_p*}-xserver-xorg-input-wacom.udev 60-wacom.rules
 
 	exeinto /lib/udev/
 	doexe "${FILESDIR}"/check_driver

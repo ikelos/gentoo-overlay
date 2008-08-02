@@ -10,6 +10,14 @@
 # Convenience link for the common case of a single tablet.
 KERNEL=="event[0-9]*", ATTRS{idVendor}=="056a", SYMLINK+="input/wacom"
 
+# You probably won't need this IMPORT rule, since an earlier file is
+# likely to have already done it, but the rule that follows it does
+# depend on that having happened to set ID_PATH.
+# IMPORT{program}="path_id %p"
+
+# Port specific link for users of multiple tablets of the same type.
+KERNEL=="event[0-9]*", ATTRS{idVendor}=="056a", ENV{ID_PATH}=="?*", SYMLINK+="input/by-path/$env{ID_PATH}-wacom"
+
 # Type-named links for multiple tablets.  If you want to use multiple
 # tablets of the _same_ type, you will probably need to use the links
 # from /dev/input/by-path to identify which is plugged into what usb
@@ -58,6 +66,11 @@ KERNEL=="event[0-9]*", ATTRS{idVendor}=="056a", ATTRS{idProduct}=="00b4", SYMLIN
 KERNEL=="event[0-9]*", ATTRS{idVendor}=="056a", ATTRS{idProduct}=="00b5", SYMLINK+="input/tablet-intuos3-6x11"
 KERNEL=="event[0-9]*", ATTRS{idVendor}=="056a", ATTRS{idProduct}=="003f", SYMLINK+="input/tablet-cintiq21ux"
 KERNEL=="event[0-9]*", ATTRS{idVendor}=="056a", ATTRS{idProduct}=="0047", SYMLINK+="input/tablet-intuos2-6x8a"
+KERNEL=="event[0-9]*", ATTRS{idVendor}=="056a", ATTRS{idProduct}=="0065", SYMLINK+="input/tablet-bamboo"
+KERNEL=="event[0-9]*", ATTRS{idVendor}=="056a", ATTRS{idProduct}=="00c6", SYMLINK+="input/tablet-cintiq12wx"
+KERNEL=="event[0-9]*", ATTRS{idVendor}=="056a", ATTRS{idProduct}=="0017", SYMLINK+="input/tablet-bamboofun-4x5"
+KERNEL=="event[0-9]*", ATTRS{idVendor}=="056a", ATTRS{idProduct}=="0018", SYMLINK+="input/tablet-bamboofun-6x8"
+KERNEL=="event[0-9]*", ATTRS{idVendor}=="056a", ATTRS{idProduct}=="0069", SYMLINK+="input/tablet-bamboo1"
 
 # Check and repossess the device if a module other than the wacom one
 # is already bound to it.
