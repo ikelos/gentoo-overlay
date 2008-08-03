@@ -2,15 +2,13 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: /var/cvsroot/gentoo-x86/x11-drivers/linuxwacom/linuxwacom-0.7.9_p7.ebuild,v 1.4 2008/02/25 01:39:47 mr_bones_ Exp $
 
-EAPI="1"
-
 inherit eutils autotools toolchain-funcs linux-mod
 
 DESCRIPTION="Input driver for Wacom tablets and drawing devices"
 HOMEPAGE="http://linuxwacom.sourceforge.net/"
 SRC_URI="mirror://sourceforge/${PN}/${P/_p/-}.tar.bz2"
 
-IUSE="gtk tcl tk usb module +quirks"
+IUSE="tcl tk usb module"
 
 LICENSE="GPL-2"
 SLOT="0"
@@ -79,12 +77,6 @@ src_unpack() {
 }
 
 src_compile() {
-	if use gtk; then
-		myconf="--with-gtk=2.0"
-	else
-		myconf="--with-gtk=no"
-	fi
-
 	if use module; then
 		myconf="${myconf} --enable-wacom"
 		myconf="${myconf} --with-kernel=${KV_OUT_DIR}"
