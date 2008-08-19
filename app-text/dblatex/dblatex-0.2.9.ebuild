@@ -1,7 +1,7 @@
 # Copyright 1999-2007 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
-inherit distutils
+inherit distutils eutils
 
 DESCRIPTION="Transform DocBook using TeX macros"
 SRC_URI="mirror://sourceforge/${PN}/${P}.tar.bz2"
@@ -19,6 +19,11 @@ DEPEND="|| ( ( app-text/texlive
 			 )
 			 >=app-text/texlive-3
 		   )"
+
+src_unpack() {
+	distutils_src_unpack
+	epatch ${FILESDIR}/labelid.xsl.patch
+}
 
 src_install() {
 	distutils_src_install
