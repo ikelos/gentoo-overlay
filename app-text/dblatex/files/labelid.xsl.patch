@@ -1,0 +1,12 @@
+--- labelid.xsl	2008-06-07 04:02:40.000000000 +0200
++++ /usr/share/dblatex/xsl/labelid.xsl	2008-06-07 04:03:32.000000000 +0200
+@@ -88,6 +88,9 @@
+   <xsl:param name="inline" select="0"/>
+   <xsl:variable name="id">
+     <xsl:choose>
++      <xsl:when test="$object/@xml:id">
++        <xsl:value-of select="$object/@xml:id"/>
++      </xsl:when>
+       <xsl:when test="$object/@id">
+         <xsl:value-of select="$object/@id"/>
+       </xsl:when>
