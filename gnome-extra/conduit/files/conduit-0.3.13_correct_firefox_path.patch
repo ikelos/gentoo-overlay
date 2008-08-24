@@ -1,0 +1,11 @@
+--- conduit-0.3.13/conduit/conduit.orig	2008-08-05 23:12:49.000000000 +0200
++++ conduit-0.3.13/conduit/conduit	2008-08-05 23:18:03.000000000 +0200
+@@ -8,7 +8,7 @@
+ # Run mozilla takes care of settin up the appropriate environment variables
+ # to run a program using mozilla libs
+ 
+-for d in `ls -d /usr/lib*/firefox* | sort -r`
++for d in `ls -d /usr/lib*/{mozilla-,}firefox* 2> /dev/null | sort -r`
+ do
+     if [ -x $d/run-mozilla.sh ]; then
+         echo INFO: FOUND FIREFOX LIBS AT $d
