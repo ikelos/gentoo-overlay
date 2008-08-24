@@ -65,6 +65,8 @@ src_unpack() {
 	unpack ${A}
 	cd "${S}"
 
+	epatch "${FILESDIR}/${P}-configure.patch"
+
 	# Fix multilib-strict error for Tcl/Tk library install
 	sed -i -e "s:WCM_EXECDIR/lib:WCM_EXECDIR/$(get_libdir):" configure.in
 
