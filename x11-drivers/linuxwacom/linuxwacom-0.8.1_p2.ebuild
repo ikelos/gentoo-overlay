@@ -85,9 +85,10 @@ src_compile() {
 	econf ${myconf} \
 		$(use_with tcl tcl) \
 		$(use_with tk tk) \
-		$(use_enable quirks quirk-tablet-rescale) \
 		--enable-wacomdrv --enable-wacdump \
 		--enable-xsetwacom --enable-dlloader || die "econf failed"
+
+		#$(use_enable quirks quirk-tablet-rescale) \
 
 	unset ARCH
 	emake || die "emake failed."
