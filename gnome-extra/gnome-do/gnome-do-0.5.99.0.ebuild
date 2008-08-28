@@ -9,7 +9,7 @@ inherit gnome2 mono versionator
 
 PVC=$(get_version_component_range 1-3)
 
-DESCRIPTION="GNOME Do allows you to quickly search for many items present in your GNOME desktop environment and perform useful actions on those items"
+DESCRIPTION="GNOME Do allows you to get things done quickly"
 HOMEPAGE="http://do.davebsd.com/"
 SRC_URI="https://launchpad.net/do/trunk/${PVC}/+download/${P}.tar.gz"
 
@@ -19,8 +19,6 @@ KEYWORDS="~x86"
 IUSE=""
 
 RDEPEND="dev-lang/mono
-	dev-libs/glib
-	>=x11-libs/gtk+-2.0
 	>=dev-dotnet/gconf-sharp-2.0
 	>=dev-dotnet/glade-sharp-2.0
 	>=dev-dotnet/gtk-sharp-2.0
