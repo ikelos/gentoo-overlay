@@ -4,11 +4,9 @@
 
 inherit distutils
 
-MY_OFFSET="`expr 47 + ${#P}`"
-
 DESCRIPTION="A Python interactive packet manipulation program for mastering the network"
 HOMEPAGE="http://www.secdev.org/projects/scapy/"
-SRC_URI="http://www.secdev.org/projects/scapy/files/${P}.zip"
+SRC_URI="http://www.secdev.org/projects/scapy/files/${P}.tar.gz"
 
 LICENSE="GPL-2"
 SLOT="0"
@@ -25,14 +23,4 @@ RDEPEND="net-analyzer/tcpdump
 	graphviz? ( media-gfx/graphviz )
 	imagemagick? ( media-gfx/imagemagick )
 	visual? ( dev-python/visual )"
-
-src_unpack() {
-	# Nasty hack, but otherwise it's going to barf on the bad zip files
-	dd if="${DISTDIR}/${A}" of="${WORKDIR}/${A}" bs=1 skip="${MY_OFFSET}"
-	cd "${WORKDIR}"
-	unpack "./${A}"
-
-	cd "${S}"
-	epatch "${FILESDIR}/${PV}-no-docs.patch"
-}
 
