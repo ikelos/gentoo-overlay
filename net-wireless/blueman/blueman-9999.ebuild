@@ -17,7 +17,7 @@ IUSE=""
 
 DEPEND="dev-python/notify-python
 		dev-python/pybluez
-		>=net-wireless/bluez-utils-3
+		|| ( >=net-wireless/bluez-utils-3 >=net-wireless/bluez-libs-4 )
 		net-wireless/gnome-bluetooth
 		gnome-extra/gnome-vfs-obexftp
 		dev-python/dbus-python
