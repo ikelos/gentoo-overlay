@@ -3,6 +3,7 @@
 # $Header: $
 
 GTK_SHARP_REQUIRED_VERSION="2.12"
+GTK_SHARP_MODULE_DIR="gnomepanel"
 
 inherit gtk-sharp-module
 
