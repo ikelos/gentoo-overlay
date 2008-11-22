@@ -8,7 +8,7 @@ GTK_SHARP_MODULE_DIR="gnomedesktop"
 inherit gtk-sharp-module
 
 SLOT="2"
-KEYWORDS="~x86"
+KEYWORDS="~x86 ~amd64"
 IUSE=""
 
 DEPEND="${DEPEND}

@@ -10,7 +10,7 @@ SRC_URI="http://ftp.novell.com/pub/mono/sources/${PN}/${P}.tar.bz2"
 
 LICENSE="as-is"
 SLOT="0"
-KEYWORDS="~x86"
+KEYWORDS="~x86 amd64"
 IUSE="dbus doc"
 
 RDEPEND="dev-lang/mono

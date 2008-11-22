@@ -9,7 +9,7 @@ GTK_SHARP_REQUIRED_VERSION="2.12"
 inherit gtk-sharp-module
 
 SLOT="2"
-KEYWORDS="~x86"
+KEYWORDS="~x86 ~amd64"
 IUSE=""
 
 DEPEND="${DEPEND}
