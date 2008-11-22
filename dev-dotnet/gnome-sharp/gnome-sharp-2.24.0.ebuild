@@ -13,9 +13,9 @@ IUSE=""
 
 DEPEND="${DEPEND}
 	>=gnome-base/libgnomecanvas-2.20
-	>=gnome-base/libgnomeui-2.20
+	>=gnome-base/libgnomeui-2.24
 	>=x11-libs/gtk+-2.12
 	>=gnome-base/libgnomeprintui-2.18
-	>=gnome-base/gnome-panel-2.20
+	>=gnome-base/gnome-panel-2.24
 	~dev-dotnet/gnomevfs-sharp-${PV}
 	~dev-dotnet/art-sharp-${PV}"

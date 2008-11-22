@@ -47,7 +47,7 @@ RESTRICT="test"
 # obsolete.
 gtk_sharp_module_list="glade"
 gnome_sharp_module_list="art gnome gnomevfs"
-gnome_desktop_sharp_module_list="gtkhtml gtksourceview nautilusburn rsvg vte wnck"
+gnome_desktop_sharp_module_list="gnome-print gnome-panel gtkhtml gtksourceview nautilusburn rsvg vte wnck"
 
 if [[ " ${gtk_sharp_module_list} " == *" ${GTK_SHARP_MODULE} "* ]] ; then
 	my_module_list="${gtk_sharp_module_list}"
@@ -56,11 +56,11 @@ elif [[ " ${gnome_sharp_module_list} " == *" ${GTK_SHARP_MODULE} "* ]] ; then
 	my_module_list="${gnome_sharp_module_list}"
 	my_tarball="gnome-sharp"
 
-# While gnomedesktop-sharp is a part of gnome-desktop-sharp (0_o) it is not a
+# While gnome-desktop-sharp is a part of gnome-desktop-sharp (0_o) it is not a
 # configurable component, so we don't want to put it into the module list.
 # Result is that we have to check for it manually here and in src_configure.
 elif [[ " ${gnome_desktop_sharp_module_list} " == *" ${GTK_SHARP_MODULE} "* ||
-		"${GTK_SHARP_MODULE}" == "gnomedesktop" ]] ; then
+		"${GTK_SHARP_MODULE}" == "gnome-desktop" ]] ; then
 	my_module_list="${gnome_desktop_sharp_module_list}"
 	my_tarball="gnome-desktop-sharp"
 else
@@ -151,7 +151,7 @@ gtk-sharp-module_src_configure() {
 	einfo "Configuring to build ${PN} module ..."
 
 	# No bogus configure parameters please.
-	[[ ${GTK_SHARP_MODULE} == "gnomedesktop" ]] && GTK_SHARP_MODULE=
+	[[ ${GTK_SHARP_MODULE} == "gnome-desktop" ]] && GTK_SHARP_MODULE=
 
 	for module in ${GTK_SHARP_MODULE} ${GTK_SHARP_MODULE_DEPS} ; do
 		my_module_list=${my_module_list/${module}/}

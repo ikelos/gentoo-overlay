@@ -22,16 +22,15 @@ IUSE=""
 RDEPEND="dev-lang/mono
 	>=dev-dotnet/gconf-sharp-2.0
 	>=dev-dotnet/glade-sharp-2.0
-	>=dev-dotnet/gtk-sharp-2.0
-	>=dev-dotnet/gnomedesktop-sharp-2.0
+	>=dev-dotnet/gtk-sharp-2.12.6
+	>=dev-dotnet/gnome-desktop-sharp-2.0
 	dev-dotnet/gnome-keyring-sharp
 	>=dev-dotnet/gnome-sharp-2.0
 	>=dev-dotnet/gnomevfs-sharp-2.0
+	>=dev-dotnet/wnck-sharp-2.0
 	dev-dotnet/mono-addins
-	dev-dotnet/dbus-sharp
-	dev-dotnet/dbus-glib-sharp
 	dev-dotnet/notify-sharp
-	!gnome-extra/gnome-do-plugins"
+	!<gnome-extra/gnome-do-plugins-0.6"
 DEPEND="${RDEPEND}
 	>=dev-util/intltool-0.35
 	dev-util/pkgconfig"
