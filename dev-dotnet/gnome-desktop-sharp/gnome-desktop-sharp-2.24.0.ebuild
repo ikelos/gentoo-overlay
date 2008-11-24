@@ -13,4 +13,5 @@ IUSE=""
 
 DEPEND="${DEPEND}
 	=dev-dotnet/gnome-sharp-${PV}*
-	dev-util/pkgconfig"
+	dev-util/pkgconfig
+	!dev-dotnet/gnomedesktop-sharp"
