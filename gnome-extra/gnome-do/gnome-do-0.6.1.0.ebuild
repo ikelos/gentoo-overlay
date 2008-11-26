@@ -21,6 +21,9 @@ IUSE=""
 
 RDEPEND="dev-lang/mono
 	>=dev-dotnet/gconf-sharp-2.0
+	>=dev-dotnet/gtk-sharp-2.8
+	|| ( >=dev-dotnet/gtk-sharp-2.12.6[glade] 
+		 >=dev-dotnet/glade-sharp-2.8 )
 	>=dev-dotnet/gtk-sharp-2.12.6
 	>=dev-dotnet/gnome-desktop-sharp-2.0
 	dev-dotnet/gnome-keyring-sharp
