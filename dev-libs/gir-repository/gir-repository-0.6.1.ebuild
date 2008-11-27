@@ -12,9 +12,8 @@ SLOT="0"
 KEYWORDS="~x86"
 IUSE=""
 
-DEPEND=""
-RDEPEND=""
-PDEPEND="dev-libs/gir-repository"
+DEPEND="dev-libs/gobject-introspection"
+RDEPEND="dev-libs/gobject-introspection"
 
 pkg_setup() {
 	if ! built_with_use sys-devel/gcc libffi; then

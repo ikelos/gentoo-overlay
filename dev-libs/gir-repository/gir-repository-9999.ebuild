@@ -4,7 +4,7 @@
 
 inherit autotools subversion
 
-ESVN_REPO_URI="http://svn.gnome.org/svn/gobject-introspection/trunk"
+ESVN_REPO_URI="http://svn.gnome.org/svn/gir-repository/trunk"
 
 DESCRIPTION="GObject Introspection tools and library"
 HOMEPAGE="http://live.gnome.org/GObjectIntrospection"
@@ -15,9 +15,8 @@ SLOT="0"
 KEYWORDS="-x86"
 IUSE=""
 
-DEPEND=""
-RDEPEND=""
-PDEPEND="dev-libs/gir-repository"
+DEPEND="dev-libs/gobject-introspection"
+RDEPEND="dev-libs/gobject-introspection"
 
 src_unpack() {
 	subversion_src_unpack	
