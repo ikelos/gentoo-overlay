@@ -20,6 +20,13 @@ DEPEND="dev-libs/gobject-introspection
 RDEPEND="dev-libs/gobject-introspection
 		 dev-libs/gir-repository"
 
+src_unpack() {
+	python_version
+	subversion_src_unpack
+	cd ${S}
+	sed -i -e "s/PY_VERSION=.*/PY_VERSION=${PYVER}/" Makefile
+}
+
 src_install() {
 	insinto $(python_get_sitedir)/bank
 	doins ${S}/bank/*.py ${S}/bank/*.so

@@ -15,8 +15,8 @@ SLOT="0"
 KEYWORDS="-x86"
 IUSE=""
 
-DEPEND="dev-libs/gobject-introspection"
-RDEPEND="dev-libs/gobject-introspection"
+DEPEND=">=dev-libs/gobject-introspection-0.6.1"
+RDEPEND=">=dev-libs/gobject-introspection-0.6.1"
 
 src_unpack() {
 	subversion_src_unpack	
