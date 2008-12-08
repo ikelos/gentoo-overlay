@@ -2,13 +2,9 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
-inherit git
-
-EGIT_REPO_URI="http://eigenclass.org/repos/git/gibak/.git"
-
 DESCRIPTION="A backup tool based on git."
 HOMEPAGE="http://eigenclass.org/hiki/gibak-backup-system-introduction/"
-SRC_URI=""
+SRC_URI="http://eigenclass.org/static/gibak/${P}.tar.gz"
 
 LICENSE="LGPL-2.1"
 SLOT="0"
