@@ -14,7 +14,7 @@ SRC_URI="https://launchpad.net/${MY_PN}/${PVC}/${PVC2}/+download/${P}.tar.gz"
 
 LICENSE="GPL-3"
 SLOT="0"
-KEYWORDS="~amd64 ~x86"
+KEYWORDS="-amd64 -x86"
 IUSE="amarok evo"
 
 DEPEND=">=gnome-extra/gnome-do-${PV}
