@@ -8,12 +8,13 @@ DESCRIPTION="Wireless Tools for the mac80211 kernel stack"
 HOMEPAGE="http://wireless.kernel.org/"
 SRC_URI="http://wireless.kernel.org/download/${PN}/${P}.tar.bz2"
 
-LICENSE="GPL-2"
+LICENSE="as-is"
 SLOT="0"
-KEYWORDS="~x86"
+KEYWORDS="~x86 ~amd64"
 IUSE=""
 
-DEPEND="dev-libs/libnl"
+DEPEND="dev-libs/libnl
+		dev-util/pkgconfig"
 RDEPEND="dev-libs/libnl"
 
 src_unpack() {
