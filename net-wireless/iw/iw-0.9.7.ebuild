@@ -23,3 +23,6 @@ src_unpack() {
 	epatch ${FILESDIR}/${P}-makefile.patch
 }
 
+src_install() {
+	emake install DESTDIR=${D} || die "Failed to install"
+}
