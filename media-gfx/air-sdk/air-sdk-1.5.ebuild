@@ -14,6 +14,8 @@ RESTRICT="strip"
 
 DEPEND="dev-libs/nspr
 		dev-libs/nss"
+RDEPEND="${DEPEND}
+		 virtual/jre"
 
 src_unpack() {
 	unpack ${A}
