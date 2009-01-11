@@ -8,7 +8,7 @@ inherit eutils
 
 DESCRIPTION="Network focused portable C++ class library providing high level functions"
 HOMEPAGE="http://www.ekiga.org/"
-SRC_URI="http://www.ekiga.org/admin/downloads/latest/sources/sources/${P}.tar.gz"
+SRC_URI="http://www.ekiga.org/admin/downloads/latest/sources/ekiga_3.0.1/${P}.tar.gz"
 
 LICENSE="MPL-1.0"
 SLOT="0"
@@ -46,7 +46,7 @@ src_unpack() {
 		|| die "Patching make/unix.mak failed"
 
 	# don't break make install if there are no plugins to install
-	epatch "${FILESDIR}"/${P}-instplugins.diff
+	# epatch "${FILESDIR}"/${P}-instplugins.diff
 
 	# this patch fixes bugs: #145424 and #140358
 	epatch "${FILESDIR}"/${P}-asm.patch
