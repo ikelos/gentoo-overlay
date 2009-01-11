@@ -1,0 +1,103 @@
+diff --git a/layman/overlay.py b/layman/overlay.py
+index a9a1980..4cf85da 100644
+--- a/layman/overlay.py
++++ b/layman/overlay.py
+@@ -29,6 +29,7 @@ import sys, codecs, os, os.path, xml.dom.minidom
+ from   layman.overlays.bzr       import BzrOverlay
+ from   layman.overlays.darcs     import DarcsOverlay
+ from   layman.overlays.git       import GitOverlay
++from   layman.overlays.gitsvn    import GitSvnOverlay
+ from   layman.overlays.mercurial import MercurialOverlay
+ from   layman.overlays.cvs       import CvsOverlay
+ from   layman.overlays.svn       import SvnOverlay
+@@ -44,6 +45,7 @@ from   layman.debug              import OUT
+ #-------------------------------------------------------------------------------
+ 
+ OVERLAY_TYPES = {'git'       : GitOverlay,
++                 'git-svn'   : GitSvnOverlay,
+                  'cvs'       : CvsOverlay,
+                  'svn'       : SvnOverlay,
+                  'rsync'     : RsyncOverlay,
+diff --git a/layman/overlays/gitsvn.py b/layman/overlays/gitsvn.py
+new file mode 100644
+index 0000000..0994306
+--- /dev/null
++++ b/layman/overlays/gitsvn.py
+@@ -0,0 +1,77 @@
++#!/usr/bin/python
++# -*- coding: utf-8 -*-
++#################################################################################
++# LAYMAN GIT OVERLAY HANDLER
++#################################################################################
++# File:       git.py
++#
++#             Handles git overlays
++#
++# Copyright:
++#             (c) 2005 - 2008 Gunnar Wrobel, Stefan Schweizer
++#             Distributed under the terms of the GNU General Public License v2
++#
++# Author(s):
++#             Gunnar Wrobel <wrobel@gentoo.org>
++#             Stefan Schweizer <genstef@gentoo.org>
++''' Git-Svn overlay support.'''
++
++__version__ = "$Id: git.py 146 2006-05-27 09:52:36Z wrobel $"
++
++#===============================================================================
++#
++# Dependencies
++#
++#-------------------------------------------------------------------------------
++
++from   layman.utils             import path
++from   layman.overlays.overlay  import Overlay
++
++#===============================================================================
++#
++# Class GitSvnOverlay
++#
++#-------------------------------------------------------------------------------
++
++class GitSvnOverlay(Overlay):
++    ''' Handles git overlays.'''
++
++    type = 'Git-Svn'
++
++    binary_command  = '/usr/bin/git'
++
++    def add(self, base, quiet = False):
++        '''Add overlay.'''
++
++        self.supported()
++
++        if quiet:
++            quiet_option = '-q '
++        else:
++            quiet_option = ''
++ 
++        # http:// should get trailing slash, other protocols shouldn't
++        slash = ''
++        if self.src.split(':')[0] == 'http':
++            slash = '/'
++        return self.cmd(self.binary_command + ' svn clone ' + quiet_option + '"' + self.src + slash
++                        + '" "' + path([base, self.name]) + '"')
++
++    def sync(self, base, quiet = False):
++        '''Sync overlay.'''
++
++        self.supported()
++
++        if quiet:
++            quiet_option = ' -q'
++        else:
++            quiet_option = ''
++ 
++        return self.cmd('cd "' + path([base, self.name]) + '" && '
++                        + self.binary_command + ' svn rebase' + quiet_option)
++
++    def supported(self):
++        '''Overlay type supported?'''
++
++        return Overlay.supported(self, [(self.binary_command,  'git',
++                                         'dev-util/git'),])
