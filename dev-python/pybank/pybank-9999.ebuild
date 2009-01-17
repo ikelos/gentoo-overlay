@@ -24,7 +24,7 @@ src_unpack() {
 	python_version
 	subversion_src_unpack
 	cd ${S}
-	sed -i -e "s/PY_VERSION=.*/PY_VERSION=${PYVER}/" Makefile
+	sed -i -e "s/PY_VERSION=.*/PY_VERSION=${PYVER}/" -e "s/PYTHON=.*/PYTHON=python/" Makefile
 }
 
 src_install() {
