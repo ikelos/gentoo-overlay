@@ -2,7 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
-inherit python git
+inherit gnome2-utils python git
 
 EGIT_REPO_URI="git://github.com/nzjrs/facebook-notify"
 
@@ -21,7 +21,6 @@ RDEPEND="${DEPEND}"
 
 src_unpack() {
 	git_src_unpack
-	sed -i -e "s!os.path.join(os.path.dirname(__file__),'facebook.png')!'/usr/share/facebook-notify/facebook.png'!"	facebook-notify.py
 }
 
 src_install() {
@@ -31,6 +30,15 @@ src_install() {
 	exeinto /usr/share/${PN}
 	insinto /usr/share/${PN}
 	doexe facebook-notify.py
-	doins facebook.png
+	dodir /usr/share/
+	cp -r icons ${D}/usr/share/
 	dosym /usr/share/${PN}/facebook-notify.py /usr/bin/facebook-notify
+}
+
+pkg_preinst() {
+	gnome2_icon_savelist
+}
+
+pkg_postinst() {
+	gnome2_icon_cache_update
 }
