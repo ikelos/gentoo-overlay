@@ -19,6 +19,11 @@ DEPEND="dev-python/pygtk
 		dev-python/pywebkitgtk"
 RDEPEND="${DEPEND}"
 
+src_unpack() {
+	git_src_unpack
+	sed -i -e "s!os.path.join(os.path.dirname(__file__),'facebook.png')!'/usr/share/facebook-notify/facebook.png'!"	facebook-notify.py
+}
+
 src_install() {
 	python_version
 	dodir /usr/lib/python${PYVER}/site-packages/
