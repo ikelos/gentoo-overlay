@@ -16,7 +16,8 @@ KEYWORDS="~x86"
 IUSE=""
 
 DEPEND=""
-RDEPEND=""
+RDEPEND="dev-python/pygtk
+		 dev-util/git"
 
 src_install() {
 	python_version
