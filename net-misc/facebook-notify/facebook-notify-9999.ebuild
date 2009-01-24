@@ -10,7 +10,7 @@ DESCRIPTION="Facebook notification tool"
 HOMEPAGE="http://nzjrs.github.com/facebook-notify/"
 SRC_URI=""
 
-LICENSE="GPL-2"
+LICENSE="GPL-3"
 SLOT="0"
 KEYWORDS="~x86 ~amd64"
 IUSE=""
