@@ -9,7 +9,7 @@ HOMEPAGE="http://www.pygtk.org/"
 
 LICENSE="LGPL-2"
 SLOT="2"
-KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~x86-fbsd"
+KEYWORDS="-amd64 -x86"
 IUSE="doc examples libffi"
 
 RDEPEND=">=dev-lang/python-2.4.4-r5
