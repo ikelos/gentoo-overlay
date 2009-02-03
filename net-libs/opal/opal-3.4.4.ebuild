@@ -6,7 +6,7 @@ inherit eutils
 
 DESCRIPTION="C++ class library normalising numerous telephony protocols"
 HOMEPAGE="http://www.ekiga.org"
-SRC_URI="http://www.ekiga.org/admin/downloads/latest/sources/ekiga_3.0.2/${P}.tar.bz2"
+SRC_URI="mirror://gnome/sources/${PN}/3.4/${P}.tar.bz2"
 
 LICENSE="MPL-1.0"
 SLOT="0"
