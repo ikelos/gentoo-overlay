@@ -14,8 +14,8 @@ LICENSE="GPL-2"
 KEYWORDS="~alpha ~amd64 ~hppa ~ia64 ~ppc ~ppc64 ~sparc ~x86"
 IUSE="avahi dbus debug doc eds gconf gnome ldap libnotify xv"
 
-RDEPEND=">=dev-libs/ptlib-2.4.1
-	>=net-libs/opal-3.4.1
+RDEPEND=">=dev-libs/ptlib-2.4.4
+	>=net-libs/opal-3.4.4
 	>=x11-libs/gtk+-2.12.0:2
 	>=dev-libs/glib-2.8.0:2
 	dev-libs/libsigc++:2

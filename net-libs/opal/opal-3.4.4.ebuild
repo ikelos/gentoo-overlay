@@ -6,14 +6,14 @@ inherit eutils
 
 DESCRIPTION="C++ class library normalising numerous telephony protocols"
 HOMEPAGE="http://www.ekiga.org"
-SRC_URI="http://www.ekiga.org/admin/downloads/latest/sources/ekiga_3.0.1/${P}.tar.gz"
+SRC_URI="http://www.ekiga.org/admin/downloads/latest/sources/ekiga_3.0.2/${P}.tar.bz2"
 
 LICENSE="MPL-1.0"
 SLOT="0"
 KEYWORDS="~alpha ~amd64 ~hppa ~ia64 ~ppc ~ppc64 ~sparc ~x86"
 IUSE="debug doc java"
 
-RDEPEND="~dev-libs/ptlib-2.4.2
+RDEPEND="~dev-libs/ptlib-2.4.4
 	>=media-video/ffmpeg-0.4.7
 	media-libs/speex
 	java? ( virtual/jdk )"
