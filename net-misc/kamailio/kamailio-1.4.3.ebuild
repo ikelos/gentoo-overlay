@@ -28,8 +28,6 @@ DEPEND="${RDEPEND}"
 S=${WORKDIR}/${P}-tls
 
 src_unpack() {
-	local modules
-
 	# unpack ser source
 	unpack ${A}
 	cd ${S}
@@ -40,25 +38,21 @@ src_unpack() {
 	use ssl && \
 		sed -i -e "s:^#\(TLS=1\).*:\1:" Makefile
 
-	use mysql && \
-		modules="${modules} mysql"
+	use mysql && KAMODULES="${KAMODULES} db_mysql mysql"
 
-	use radius && \
-		modules="${modules} auth_radius group_radius uri_radius avp_radius"
+	use radius && KAMODULES="${KAMODULES} auth_radius group_radius uri_radius avp_radius"
 
-	use jabber && \
-		modules="${modules} jabber"
+	use jabber && KAMODULES="${KAMODULES} jabber xmpp pua_xmpp"
 
-	use postgres && \
-		modules="${modules} postgres"
+	use postgres && KAMODULES="${KAMODULES} db_postgres postgres"
 
-	use odbc && \
-		modules="${modules} unixodbc"
+	use odbc && KAMODULES="${KAMODULES} db_unixodbc unixodbc"
 
-	# put list of modules into Makefile, we need the list
-	# during compile and install phase...
-	sed -i -e "s:^\(include_modules.*\):\1 ${modules} ${extmodules}:" \
-		Makefile
+	KAMODULES="${KAMODULES} presence presence_xml presence_mwi pua pua_bla pua_mi pua_usrloc"
+	for i in ${KAMODULES};
+	do
+		EXCMODULES="${EXCMODULES/$i/}"
+	done;
 }
 
 src_compile() {
@@ -68,6 +62,7 @@ src_compile() {
 		CPU_TYPE="$(get-flag march)" \
 		mode="release" \
 		prefix="/usr" \
+		include_modules="${KAMODULES}" \
 		cfg-prefix="" \
 		cfg-target="/etc/${PN}/" \
 		all || die
@@ -78,6 +73,7 @@ src_install () {
 		BASEDIR="${D}" \
 		mode="release" \
 		prefix="/usr" \
+		include_modules="${KAMODULES}" \
 		cfg-prefix="${D}" \
 		cfg-dir="/etc/${PN}/" \
 		cfg-target="/etc/${PN}/" \

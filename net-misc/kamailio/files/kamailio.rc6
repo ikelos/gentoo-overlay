@@ -13,30 +13,30 @@ depend() {
 start() {
 	checkconfig_real || return $?
 
-	ebegin "Starting openser"
-	start-stop-daemon --start --quiet --pidfile /var/run/openser.pid \
-		--exec /usr/sbin/openser -- ${OPENSER_OPTS} -P /var/run/openser.pid >/dev/null
+	ebegin "Starting kamailio"
+	start-stop-daemon --start --quiet --pidfile /var/run/kamailio.pid \
+		--exec /usr/sbin/kamailio -- ${KAMAILIO_OPTS} -P /var/run/kamailio.pid >/dev/null
 	eend $?
 }
 
 stop() {
-	ebegin "Stopping openser"
-	start-stop-daemon --stop --quiet --pidfile /var/run/openser.pid --exec /usr/sbin/openser --retry 10
+	ebegin "Stopping kamailio"
+	start-stop-daemon --stop --quiet --pidfile /var/run/kamailio.pid --exec /usr/sbin/kamailio --retry 10
 	eend $?
 }
 
 checkconfig() {
-	ebegin "Checking openser config file"
+	ebegin "Checking kamailio config file"
 	checkconfig_real
 	eend $?
 }
 
 checkconfig_real() {
-	/usr/sbin/openser ${OPENSER_OPTS} -P /var/run/openser.pid -C >/dev/null 2>&1
+	/usr/sbin/kamailio ${KAMAILIO_OPTS} -P /var/run/kamailio.pid -C >/dev/null 2>&1
 	ret=$?
 	if [ $ret -ne 0 ]; then
-		eerror "OpenSER has detected a syntax error in your configuration file:"
-		/usr/sbin/openser ${OPENSER_OPTS} -P /var/run/openser.pid -C
+		eerror "Kamailio has detected a syntax error in your configuration file:"
+		/usr/sbin/kamailio ${KAMAILIO_OPTS} -P /var/run/kamailio.pid -C
 	fi
 	return $ret
 }

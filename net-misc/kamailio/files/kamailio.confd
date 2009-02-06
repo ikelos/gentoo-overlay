@@ -2,10 +2,10 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
-# Additional options to start OpenSER with
+# Additional options to start Kamailio with
 #
-# see "openser -h" for a list of options
+# see "kamailio -h" for a list of options
 #
-# default: run OpenSER as user:group = openser:openser
+# default: run Kamailio as user:group = kamailio:kamailio
 #
-OPENSER_OPTS="-u openser -g openser"
+KAMAILIO_OPTS="-u kamailio -g kamailio"
