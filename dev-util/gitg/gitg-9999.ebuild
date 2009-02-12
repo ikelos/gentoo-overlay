@@ -24,7 +24,6 @@ RDEPEND=">=dev-libs/glib-2.16
 	dev-util/git"
 
 DEPEND="${RDEPEND}
-	gnome-base/gnome-common
 	sys-devel/gettext
 	>=dev-util/pkgconfig-0.15
 	>=dev-util/intltool-0.35"
