@@ -34,6 +34,7 @@ src_prepare() {
 }
 
 pkg_postinst() {
+	gnome2_pkg_postinst
 	ewarn "This version of gitg is an unstable development snapshot."
 	ewarn "Please report any problems at http://trac.novowork.com/gitg ."
 }
