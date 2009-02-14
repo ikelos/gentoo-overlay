@@ -21,6 +21,7 @@ RDEPEND=">=dev-util/git-1.4.4.3
 		 >=dev-libs/glib-2.12
 		 >=x11-libs/gtk+-2.10
 		 x11-libs/gtksourceview:2.0
+		 gnome-extra/evolution-data-server
 		 >=gnome-base/libglade-2.4"
 DEPEND="${RDEPEND}
 		  sys-devel/gettext
