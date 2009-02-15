@@ -15,13 +15,13 @@ SRC_URI=""
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~amd64 ~ppc ~x86"
-IUSE=""
+IUSE="eds"
 
 RDEPEND=">=dev-util/git-1.4.4.3
 		 >=dev-libs/glib-2.12
 		 >=x11-libs/gtk+-2.10
 		 x11-libs/gtksourceview:2.0
-		 gnome-extra/evolution-data-server
+		 eds? ( gnome-extra/evolution-data-server )
 		 >=gnome-base/libglade-2.4"
 DEPEND="${RDEPEND}
 		  sys-devel/gettext
@@ -30,7 +30,10 @@ DEPEND="${RDEPEND}
 
 S="${WORKDIR}/${PN}"
 
+G2CONF="$(use_enable eds evolution-data-server)"
+
 src_unpack() {
 	git_src_unpack
-	./autogen.sh
+	eautoreconf
+	intltoolize -f
 }
