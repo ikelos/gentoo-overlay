@@ -25,3 +25,11 @@ src_install() {
 	cp -r Gitty ${D}/usr/lib/python${PYVER}/site-packages
 	newbin gitty.py gitty
 }
+
+pkg_postinst() {
+	python_mod_optimize
+}
+
+pkg_postrm() {
+	python_mod_cleanup
+}
