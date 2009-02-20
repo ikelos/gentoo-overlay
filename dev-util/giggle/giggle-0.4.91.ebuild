@@ -1,16 +1,13 @@
 # Copyright 1999-2009 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/dev-util/giggle/giggle-0.4.ebuild,v 1.1 2008/01/27 07:59:19 compnerd Exp $
+# $Header: /var/cvsroot/gentoo-x86/dev-util/giggle/giggle-0.4.90.ebuild,v 1.3 2009/02/15 14:25:01 ikelos Exp $
 
 EAPI="1"
 
-inherit autotools gnome2 git
-
-EGIT_REPO_URI="git://github.com/hasselmm/giggle.git"
+inherit autotools gnome2
 
 DESCRIPTION="GTK+ Frontend for GIT"
 HOMEPAGE="http://live.gnome.org/giggle"
-SRC_URI=""
 
 LICENSE="GPL-2"
 SLOT="0"
@@ -28,12 +25,11 @@ DEPEND="${RDEPEND}
 		>=dev-util/pkgconfig-0.15
 		>=dev-util/intltool-0.35"
 
-S="${WORKDIR}/${PN}"
-
 G2CONF="$(use_enable eds evolution-data-server)"
 
 src_unpack() {
-	git_src_unpack
+	gnome2_src_unpack
+	cd ${S}
+	epatch "${FILESDIR}/${P}-libgiggle.patch"
 	eautoreconf
-	intltoolize -f
 }
