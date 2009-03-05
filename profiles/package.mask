@@ -1,3 +1,3 @@
 # Masked due to lack of support
 media-gfx/mathmap
-net-wireless/blueman
+>=dev-util/gitg-9999
