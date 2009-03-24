@@ -34,6 +34,7 @@ G2CONF="$(use_enable eds evolution-data-server)"
 
 src_unpack() {
 	git_src_unpack
+	cd ${S}
 	eautoreconf
 	intltoolize -f
 }
