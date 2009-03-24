@@ -73,6 +73,8 @@ src_unpack() {
 		sed -i -e "s:-Wno-variadic-macros::" src/xdrv/Makefile.am
 	fi
 
+	epatch "${FILESDIR}/${PN}-0.8.2-kernel-2.6.29.patch"
+
 	eautoreconf
 }
 
