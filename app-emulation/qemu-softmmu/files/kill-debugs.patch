@@ -1,0 +1,58 @@
+---
+ hw/cbus.c    |    2 --
+ hw/omap.h    |    8 ++------
+ hw/onenand.c |    3 +--
+ 3 files changed, 3 insertions(+), 10 deletions(-)
+
+--- qemu.orig/hw/cbus.c
++++ qemu/hw/cbus.c
+@@ -568,12 +568,10 @@ static inline void tahvo_write(struct cb
+         break;
+ 
+     case TAHVO_REG_LEDPWMR:
+         if (s->backlight != (val & 0x7f)) {
+             s->backlight = val & 0x7f;
+-            printf("%s: LCD backlight now at %i / 127\n",
+-                            __FUNCTION__, s->backlight);
+         }
+         break;
+ 
+     case TAHVO_REG_USBR:
+         s->usbr = val;
+--- qemu.orig/hw/omap.h
++++ qemu/hw/omap.h
+@@ -991,16 +991,12 @@ uint32_t omap_badwidth_read32(void *opaq
+ void omap_badwidth_write32(void *opaque, target_phys_addr_t addr,
+                 uint32_t value);
+ 
+ void omap_mpu_wakeup(void *opaque, int irq, int req);
+ 
+-# define OMAP_BAD_REG(paddr)		\
+-        fprintf(stderr, "%s: Bad register " OMAP_FMT_plx "\n",	\
+-                        __FUNCTION__, paddr)
+-# define OMAP_RO_REG(paddr)		\
+-        fprintf(stderr, "%s: Read-only register " OMAP_FMT_plx "\n",	\
+-                        __FUNCTION__, paddr)
++# define OMAP_BAD_REG(paddr)
++# define OMAP_RO_REG(paddr)
+ 
+ /* OMAP-specific Linux bootloader tags for the ATAG_BOARD area
+    (Board-specifc tags are not here)  */
+ #define OMAP_TAG_CLOCK		0x4f01
+ #define OMAP_TAG_MMC		0x4f02
+--- qemu.orig/hw/onenand.c
++++ qemu/hw/onenand.c
+@@ -548,12 +548,11 @@ static void onenand_write(void *opaque, 
+             s->boot[0][1 << s->shift] = (s->id >>  8) & 0xff;
+             s->boot[0][2 << s->shift] = s->wpstatus & 0xff;
+             break;
+ 
+         default:
+-            fprintf(stderr, "%s: unknown OneNAND boot command %x\n",
+-                            __FUNCTION__, value);
++			;
+         }
+         break;
+ 
+     case 0xf100 ... 0xf107:	/* Start addresses */
+         s->addr[offset - 0xf100] = value;
