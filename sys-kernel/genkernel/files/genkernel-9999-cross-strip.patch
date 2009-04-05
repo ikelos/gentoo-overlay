@@ -1,0 +1,90 @@
+diff --git a/gen_compile.sh b/gen_compile.sh
+index 3379b61..a6056a6 100755
+--- a/gen_compile.sh
++++ b/gen_compile.sh
+@@ -38,6 +38,7 @@ compile_utils_args()
+ 		UTILS_CC="${UTILS_CROSS_COMPILE}gcc"
+ 		UTILS_LD="${UTILS_CROSS_COMPILE}ld"
+ 		UTILS_AS="${UTILS_CROSS_COMPILE}as"
++		UTILS_STRIP="${UTILS_CROSS_COMPILE}strip"
+ 	fi
+ 
+ 	if [ "${UTILS_ARCH}" != '' ]
+@@ -56,6 +57,10 @@ compile_utils_args()
+ 	then
+ 		ARGS="${ARGS} AS=\"${UTILS_AS}\""
+ 	fi
++	if [ "${UTILS_STRIP}" != '' ]
++	then
++		ARGS="${ARGS} STRIP=\"${UTILS_STRIP}\""
++	fi
+ 
+ 	echo -n "${ARGS}"
+ }
+@@ -79,6 +84,10 @@ export_utils_args()
+ 	then
+ 		export AS="${UTILS_AS}"
+ 	fi
++	if [ "${UTILS_STRIP}" != '' ]
++	then
++		export STRIP="${UTILS_STRIP}"
++	fi
+ }
+ 
+ unset_utils_args()
+@@ -99,6 +108,10 @@ unset_utils_args()
+ 	then
+ 		unset AS
+ 	fi
++	if [ "${UTILS_STRIP}" != '']
++	then
++		unset STRIP
++	fi
+ 	reset_args
+ }
+ 
+@@ -393,7 +406,7 @@ compile_busybox() {
+ 		print_info 1 'busybox: >> Copying to cache...'
+ 		[ -f "${TEMP}/${BUSYBOX_DIR}/busybox" ] ||
+ 			gen_die 'Busybox executable does not exist!'
+-		strip "${TEMP}/${BUSYBOX_DIR}/busybox" ||
++		${STRIP} "${TEMP}/${BUSYBOX_DIR}/busybox" ||
+ 			gen_die 'Could not strip busybox binary!'
+ 		tar -cj -C "${TEMP}/${BUSYBOX_DIR}" -f "${BUSYBOX_BINCACHE}" busybox .config .config.gk_orig ||
+ 			gen_die 'Could not create the busybox bincache!'
+@@ -432,7 +445,7 @@ compile_lvm() {
+ 
+ 		cd "${TEMP}/lvm"
+ 		print_info 1 '      >> Copying to bincache...'
+-		strip "sbin/lvm.static" ||
++		${STRIP} "sbin/lvm.static" ||
+ 			gen_die 'Could not strip lvm.static!'
+ 		/bin/tar -cjf "${LVM_BINCACHE}" sbin/lvm.static ||
+ 			gen_die 'Could not create binary cache'
+@@ -511,7 +524,7 @@ compile_device_mapper() {
+ 		cd "${TEMP}"
+ 		rm -rf "${TEMP}/device-mapper/man" ||
+ 			gen_die 'Could not remove manual pages!'
+-		strip "${TEMP}/device-mapper/sbin/dmsetup" ||
++		${STRIP} "${TEMP}/device-mapper/sbin/dmsetup" ||
+ 			gen_die 'Could not strip dmsetup binary!'
+ 		/bin/tar -jcpf "${DEVICE_MAPPER_BINCACHE}" device-mapper ||
+ 			gen_die 'Could not tar up the device-mapper binary!'
+@@ -542,7 +555,7 @@ compile_e2fsprogs() {
+ 		print_info 1 'blkid: >> Copying to cache...'
+ 		[ -f "${TEMP}/${E2FSPROGS_DIR}/misc/blkid" ] ||
+ 			gen_die 'Blkid executable does not exist!'
+-		strip "${TEMP}/${E2FSPROGS_DIR}/misc/blkid" ||
++		${STRIP} "${TEMP}/${E2FSPROGS_DIR}/misc/blkid" ||
+ 			gen_die 'Could not strip blkid binary!'
+ 		bzip2 "${TEMP}/${E2FSPROGS_DIR}/misc/blkid" ||
+ 			gen_die 'bzip2 compression of blkid failed!'
+@@ -575,7 +588,7 @@ compile_fuse() {
+ #		print_info 1 'libfuse: >> Copying to cache...'
+ #		[ -f "${TEMP}/${FUSE_DIR}/lib/.libs/libfuse.so" ] ||
+ #			gen_die 'libfuse.so does not exist!'
+-#		strip "${TEMP}/${FUSE_DIR}/lib/.libs/libfuse.so" ||
++#		${STRIP} "${TEMP}/${FUSE_DIR}/lib/.libs/libfuse.so" ||
+ #			gen_die 'Could not strip libfuse.so!'
+ #		cd "${TEMP}/${FUSE_DIR}/lib/.libs"
+ #		tar -cjf "${FUSE_BINCACHE}" libfuse*so* ||
