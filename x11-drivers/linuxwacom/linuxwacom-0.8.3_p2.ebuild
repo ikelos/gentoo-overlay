@@ -112,5 +112,4 @@ src_install() {
 
 	dohtml -r docs/*
 	dodoc AUTHORS ChangeLog NEWS README
-	die "Double check"
 }
