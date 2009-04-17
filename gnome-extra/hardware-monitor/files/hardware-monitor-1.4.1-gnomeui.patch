@@ -1,0 +1,24 @@
+diff --git a/configure.ac b/configure.ac
+index 72a3ea2..645d0ae 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -19,6 +19,7 @@ dnl checks for libraries
+ PKG_CHECK_MODULES(DEPS, gconfmm-2.6 >= 2.6.0 \
+                         gtkmm-2.4 >= 2.6.0 \
+                         libgnomecanvasmm-2.6 >= 2.6.0 \
++			libgnomeui-2.0 >= 2.0.0 \
+ 			libglademm-2.4 >= 2.4.0 \
+ 			libpanelapplet-2.0 >= 2.0.0 \
+                         libgtop-2.0 >= 2.6.0)
+diff --git a/src/main.cpp b/src/main.cpp
+index 73cc528..f7f8a00 100644
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -28,6 +28,7 @@
+ #include <gtkmm/main.h>
+ 
+ #include <libgnomeui/gnome-ui-init.h>
++#include <libgnomeui/gnome-client.h>
+ #include <panel-applet.h>
+ 
+ #include "applet.hpp"
