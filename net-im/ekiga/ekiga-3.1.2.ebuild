@@ -14,8 +14,8 @@ LICENSE="GPL-2"
 KEYWORDS="~alpha ~amd64 ~hppa ~ia64 ~ppc ~ppc64 ~sparc ~x86"
 IUSE="avahi dbus debug doc eds gconf gnome ldap libnotify xv"
 
-RDEPEND=">=dev-libs/ptlib-2.4.4
-	>=net-libs/opal-3.4.4
+RDEPEND=">=dev-libs/ptlib-2.6.1
+	>=net-libs/opal-3.6.1
 	>=x11-libs/gtk+-2.12.0:2
 	>=dev-libs/glib-2.8.0:2
 	dev-libs/libsigc++:2
@@ -40,23 +40,6 @@ DEPEND="${RDEPEND}
 DOCS="AUTHORS ChangeLog FAQ NEWS README"
 
 pkg_setup() {
-	# ekiga has to be built like opal and ptlib but as opal has to be built
-	# like ptlib, it should be possible to check only opal but as ekiga is
-	# linking to both, we are cheking both
-	if use debug && (! built_with_use dev-libs/ptlib debug ||
-		! built_with_use net-libs/opal debug); then
-		eerror "You need to build dev-libs/ptlib and net-libs/opal with\
- USE=debug enabled."
-		die "dev-libs/ptlib and net-libs/opal have to be built with USE=debug"
-	fi
-
-	if ! use debug && (built_with_use dev-libs/ptlib debug ||
-		built_with_use net-libs/opal debug); then
-		eerror "You need to build dev-libs/ptlib and net-libs/opal without\
- USE=debug."
-		die "dev-libs/ptlib and net-libs/opal has not to be built with USE=debug"
-	fi
-
 	# dbus-service is always enable if dbus is enable, no reason to disable it
 	G2CONF="${G2CONF}
 		$(use_enable avahi)
@@ -78,11 +61,6 @@ src_unpack() {
 	# remove call to gconftool-2 --shutdown
 	sed -i -e '/gconftool-2 --shutdown/d' Makefile.in \
 		|| die "Patching Makefile.in failed"
-
-	# fix ekiga-helper dbus service .in file
-	sed -i -e 's/@prefix@\/bin\/@PACKAGE_NAME@/@bindir@\/ekiga/'\
-		src/components/org.ekiga.Helper.service.in \
-		|| die "Patching src/components/org.ekiga.Helper.service.in failed"
 }
 
 pkg_postinst() {

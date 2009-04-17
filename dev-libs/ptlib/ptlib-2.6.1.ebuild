@@ -4,11 +4,10 @@
 
 EAPI="1"
 
-inherit eutils
+inherit gnome2 eutils
 
 DESCRIPTION="Network focused portable C++ class library providing high level functions"
 HOMEPAGE="http://www.ekiga.org/"
-SRC_URI="mirror://gnome/sources/${PN}/2.4/${P}.tar.bz2"
 
 LICENSE="MPL-1.0"
 SLOT="0"
@@ -32,25 +31,6 @@ DEPEND="${RDEPEND}
 	v4l? ( sys-kernel/linux-headers )
 	v4l2? ( sys-kernel/linux-headers )
 	!dev-libs/pwlib"
-
-src_unpack() {
-	unpack ${A}
-	cd "${S}"
-
-	# filter out -O3, -Os and -mcpu embedded compiler flags
-	sed -i \
-		-e "s:-mcpu=\$(CPUTYPE)::" \
-		-e "s:-O3 -DNDEBUG:-DNDEBUG:" \
-		-e "s:-Os::" \
-		make/unix.mak \
-		|| die "Patching make/unix.mak failed"
-
-	# don't break make install if there are no plugins to install
-	# epatch "${FILESDIR}"/${P}-instplugins.diff
-
-	# this patch fixes bugs: #145424 and #140358
-	epatch "${FILESDIR}"/${P}-asm.patch
-}
 
 src_compile() {
 	local myconf=""
@@ -87,23 +67,4 @@ src_compile() {
 	fi
 
 	emake ${makeopts} || die "emake failed"
-}
-
-src_install() {
-	local makeopts
-
-	makeopts="PREFIX=/usr DESTDIR=\"${D}\""
-
-	if use debug; then
-		makeopts="${makeopts} DEBUG=1"
-	fi
-
-	emake ${makeopts} install || die "emake install failed"
-
-	if use doc; then
-		dohtml -r html/* || die "documentation installation failed"
-	fi
-
-	dodoc ReadMe.txt ReadMe_QOS.txt History.txt || die "documentation
- installation failed"
 }

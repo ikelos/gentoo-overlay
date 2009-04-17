@@ -2,40 +2,20 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
-inherit eutils
+inherit versionator eutils gnome2
 
 DESCRIPTION="C++ class library normalising numerous telephony protocols"
 HOMEPAGE="http://www.ekiga.org"
-SRC_URI="mirror://gnome/sources/${PN}/3.4/${P}.tar.bz2"
 
 LICENSE="MPL-1.0"
 SLOT="0"
 KEYWORDS="~alpha ~amd64 ~hppa ~ia64 ~ppc ~ppc64 ~sparc ~x86"
 IUSE="debug doc java"
 
-RDEPEND="~dev-libs/ptlib-2.4.4
+RDEPEND="~dev-libs/ptlib-2.$(get_version_component_range 2-3)
 	>=media-video/ffmpeg-0.4.7
 	media-libs/speex
 	java? ( virtual/jdk )"
-
-pkg_setup() {
-	if use debug && ! built_with_use dev-libs/ptlib debug; then
-		eerror "You need to build dev-libs/ptlib with USE=debug enabled."
-		die "dev-libs/ptlib has to be built with USE=debug"
-	fi
-
-	if ! use debug && built_with_use dev-libs/ptlib debug; then
-		eerror "You need to build dev-libs/ptlib without USE=debug."
-		die "dev-libs/ptlib has not to be built with USE=debug"
-	fi
-}
-
-src_unpack() {
-	unpack ${A}
-	cd "${S}"
-
-	epatch "${FILESDIR}"/${P}-lpcini.patch
-}
 
 src_compile() {
 	local makeopts
@@ -57,12 +37,4 @@ src_compile() {
 	fi
 
 	emake ${makeopts} || die "emake failed"
-}
-
-src_install() {
-	emake PREFIX=/usr DESTDIR="${D}" install || die "emake install failed"
-
-	if use doc; then
-		dohtml -r html/* docs/* || die "documentation installation failed"
-	fi
 }
