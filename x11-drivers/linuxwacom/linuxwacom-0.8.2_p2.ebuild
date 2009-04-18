@@ -12,7 +12,7 @@ IUSE="gtk tcl tk usb module"
 
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="~amd64 ~ppc ~ppc64 ~x86"
+KEYWORDS="~amd64 ~hppa ~ppc ~ppc64 ~x86"
 
 RDEPEND="x11-proto/inputproto
 	x11-base/xorg-server
