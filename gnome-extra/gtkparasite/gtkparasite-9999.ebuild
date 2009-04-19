@@ -20,6 +20,7 @@ RDEPEND=""
 
 src_unpack() {
 	git_src_unpack
+	cd ${S}
 	eautoreconf
 }
 
