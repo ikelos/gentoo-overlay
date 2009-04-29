@@ -30,6 +30,8 @@ DEPEND="${RDEPEND}
 
 S="${WORKDIR}/${PN}"
 
+DOCS="AUTHORS NEWS README"
+
 G2CONF="$(use_enable eds evolution-data-server)"
 
 src_unpack() {

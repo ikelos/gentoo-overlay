@@ -27,6 +27,8 @@ DEPEND="${RDEPEND}
 
 G2CONF="$(use_enable eds evolution-data-server)"
 
+DOCS="AUTHORS NEWS README"
+
 src_unpack() {
 	gnome2_src_unpack
 	cd ${S}
