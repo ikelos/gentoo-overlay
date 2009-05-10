@@ -1,4 +1,4 @@
-diff --git a/src/2.6.27/wacom_sys.c b/src/2.6.27/wacom_sys.c
+diff --git a/src/2.6.28/wacom_sys.c b/src/2.6.28/wacom_sys.c
 index 9e534d1..bc54e9f 100755
 --- a/src/2.6.27/wacom_sys.c
 +++ b/src/2.6.27/wacom_sys.c

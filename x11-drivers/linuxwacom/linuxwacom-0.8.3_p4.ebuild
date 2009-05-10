@@ -12,7 +12,7 @@ IUSE="gtk tcl tk usb module"
 
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="~amd64 ~hppa ~ppc ~ppc64 ~x86"
+KEYWORDS="-amd64 -hppa -ppc -ppc64 -x86"
 
 RDEPEND="x11-proto/inputproto
 	x11-base/xorg-server
@@ -72,8 +72,6 @@ src_unpack() {
 	if [[ $(gcc-major-version) -lt 4 ]]; then
 		sed -i -e "s:-Wno-variadic-macros::" src/xdrv/Makefile.am
 	fi
-
-	epatch "${FILESDIR}/${PN}-0.8.2-kernel-2.6.29.patch"
 
 	eautoreconf
 }
