@@ -21,7 +21,7 @@ RDEPEND=">=dev-cpp/gconfmm-2.6.0
 		>=dev-cpp/libglademm-2.6.0
 		>=gnome-base/gnome-panel-2
 		>=gnome-base/libgtop-2.6.0
-		lm_sensors? ( sys-apps/lm_sensors )"
+		lm_sensors? ( >=sys-apps/lm_sensors-3 )"
 DEPEND="${RDEPEND}
 		dev-util/pkgconfig
 		>=dev-util/intltool-0.29"
@@ -29,9 +29,4 @@ DEPEND="${RDEPEND}
 pkg_setup() {
 	G2CONF="${G2CONF} \
 			$(use_with lm_sensors libsensors)"
-}
-
-src_prepare() {
-	epatch ${FILESDIR}/${P}-gnomeui.patch
-	eautoreconf
 }
