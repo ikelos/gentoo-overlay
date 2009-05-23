@@ -6,7 +6,7 @@
 depend() {
 	before checkfs fsck
 	if [ -e /lib/librc.so.1 ]; then
-	need device-mapper
+		after device-mapper
 	fi
 }
 
