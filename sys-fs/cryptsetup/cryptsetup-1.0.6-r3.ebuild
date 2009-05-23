@@ -19,6 +19,7 @@ DEPEND=">=sys-fs/device-mapper-1.00.07-r1
 	>=dev-libs/popt-1.7
 	>=sys-fs/udev-124
 	sys-libs/e2fsprogs-libs
+	>=sys-apps/baselayout-2.0.0
 	selinux? ( sys-libs/libselinux )
 	!sys-fs/cryptsetup-luks"
 
