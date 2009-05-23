@@ -1,0 +1,294 @@
+#!/sbin/runscript
+# Copyright 1999-2007 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+# $Header: /var/cvsroot/gentoo-x86/sys-fs/cryptsetup/files/1.0.5-dmcrypt.rc,v 1.3 2008/02/01 12:38:44 flameeyes Exp $
+
+depend() {
+	before checkfs fsck
+	if [ -e /lib/librc.so.1 ]; then
+	need device-mapper
+	fi
+}
+
+start() {
+	if [ ! -e /lib/librc.so.1 ]; then
+		eerror "The ${myservice} init script is written for baselayout-2"
+		eerror "Please do not use it with baselayout-1"
+		return 1
+	fi
+
+	# . /lib/rcscripts/addons/dm-crypt-start.sh
+	_start
+}
+
+stop() {
+	if [ ! -e /lib/librc.so ]; then
+		return 0
+	fi
+
+	# . /lib/rcscripts/addons/dm-crypt-stop.sh
+	_stop
+}
+
+# Determine string lengths
+strlen() {
+	if [ -z "$1" ]
+		then
+			echo "usage: strlen <variable_name>"
+			die
+		fi
+	eval echo "\${#${1}}"
+}
+
+# Lookup optional bootparams
+parse_opt() {
+	case "$1" in
+		*\=*)
+			local key_name="`echo "$1" | cut -f1 -d=`"
+			local key_len=`strlen key_name`
+			local value_start=$((key_len+2))
+			echo "$1" | cut -c ${value_start}-
+		;;
+	esac
+}
+
+get_keytimeout() {
+	local CMDLINE="`cat /proc/cmdline`"
+	for x in ${CMDLINE}
+	do
+		case "${x}" in
+			key_timeout\=*)
+				KEY_TIMEOUT=`parse_opt "${x}"`
+			;;
+		esac
+	done
+}
+
+is_in() {
+	for i in ${2};
+	do
+		[ "${i}" = "${1}" ] && return 0
+	done
+	return 1
+}
+
+_start() {
+	local csetup="/sbin/cryptsetup"
+
+	get_keytimeout
+
+	if [ -z "${mount_order}" ];
+	then
+		eerror "No mount names found in mount_order"
+		eerror "Please remove dmcrypt from this runlevel"
+		exit 0
+	fi
+
+	for mount_name in ${mount_order};
+	do
+		eval mount_flags=\$flags_${mount_name}
+		eval mount_source=\$source_${mount_name}
+		eval mount_options=\$options_${mount_name}
+		if [ -z "${mount_source}" ] && [ ! -e "${mount_source}" ]; then
+			ewarn "Crypt name ${mount_name} is missing source \"${mount_source}\", skipping..."
+			continue
+		fi
+		if is_in "swap" "${mount_flags}" ;
+		then
+			einfo "Checking swap is not LUKS"
+			cryptsetup isLuks ${mount_source} 2>/dev/null
+			foo="$?"
+			if [ "${foo}" -eq 0 ]; then
+				ewarn "The ${mnt_name} swap you have defined is a LUKS partition, skipping..."
+				continue
+			fi
+			# swap contents do not need to be preserved between boots, luks not required.
+			# suspend2 users should have initramfs's init handling their swap partition either way.
+			[ -z "${mount_options}" ] && mount_options="-c aes -h sha1 -d /dev/urandom ${mount_options}"
+		fi
+
+		if is_in "loop" ${mount_flags} ; 
+		then
+			ebegin "  Setting up loop device for ${mount_name}"
+			free_loop=""
+			for i in `seq 0 8`;
+			do
+				loopdev="/dev/loop${i}"
+				losetup ${loopdev} 
+				if [ $? -eq 1 ];
+				then
+					free_loop=${loopdev}
+				fi
+			done
+			if [ -z ${free_loop} ];
+			then
+				ewarn "No free loopback devices found, unable to mount ${mount_source}"
+				continue
+			fi
+			/sbin/losetup ${free_loop} ${mount_source}
+			mount_source="${free_loop}"
+		fi
+
+		# cryptsetup:
+		# luksOpen <device> <name>      # <device> is $source
+		# create   <name>   <device>    # <name>   is $target
+		local arg1="create" arg2="${mount_name}" arg3="${mount_source}" luks=0
+
+		cryptsetup isLuks ${mount_source} 2>/dev/null && { arg1="luksOpen"; arg2="${mount_source}"; arg3="${mount_name}"; luks=1; }
+
+		if ${csetup} status ${mount_name} | egrep -q '\<active:' ; then
+			einfo "Crypt name ${mount_name} is already mapped"
+			continue
+		fi
+		splash svc_input_begin ${RC_SVCNAME} >/dev/null 2>&1
+
+		# Handle keys
+		eval key=\$key_${mount_name}
+		eval remdev=\$remdev_${mount_name}
+		if [ -n "$key" ]; 
+		then
+			read_abort() {
+				local ans
+				local prompt=" ${green}*${off}  $1? (${red}yes${off}/${green}No${off}) "
+				shift
+				echo -n -e "${prompt}"
+				if ! read -n 1 $* ans ; then
+					local back=${prompt//?/\\b}
+					echo -n -e "${back}"
+				else
+					echo
+				fi
+				case $ans in
+					[yY]|[yY][eE][sS]) return 0;;
+					*) return 1;;
+				esac
+			}
+	
+			# Notes: sed not used to avoid case where /usr partition is encrypted.
+			# handle key on removable device
+			if [ -n "$remdev" ]; then
+				# temp directory to mount removable device
+				local mntrem="${RC_SVCDIR}/dm-crypt-remdev.$$"
+				if [ ! -d "${mntrem}" ] ; then
+					if ! mkdir -p "${mntrem}" ; then
+						ewarn "${mount_name} will not be decrypted ..."
+						einfo "Reason: Unable to create temporary mount point '${mntrem}'"
+						return
+					fi
+				fi
+				i=0
+				einfo "Please insert removable device for ${target}"
+				while [ ${i} -lt ${dmcrypt_max_timeout:-120} ] ; do
+					local foo=""
+					if mount -n -o ro "${remdev}" "${mntrem}" 2>/dev/null >/dev/null ; then
+						# keyfile exists?
+						if [ ! -e "${mntrem}${key}" ]; then
+							umount -n "${mntrem}"
+							rmdir "${mntrem}"
+							einfo "Cannot find ${key} on removable media."
+							read_abort "Abort" ${read_timeout:--t 1} && return
+						else
+							key="${mntrem}${key}"
+							break
+						fi
+					else
+						[ -e "${remdev}" ] \
+							&& foo="mount failed" \
+							|| foo="mount source not found"
+					fi
+					((++i))
+					read_abort "Stop waiting after $i attempts (${foo})" -t 1 && return
+				done
+			else    # keyfile ! on removable device
+				if [ ! -e "$key" ]; then
+					ewarn "${mount_name} will not be decrypted ..."
+					einfo "Reason: keyfile ${key} does not exist."
+					return
+				fi
+			fi
+		fi
+
+		ebegin "dm-crypt map ${target}"
+		einfo "cryptsetup will be called with : ${mount_options} ${arg1} ${arg2} ${arg3}"
+		if is_in "gpg" ${mount_flags}; 
+		then
+			[ -z "${gpg_options}" ] && gpg_options="-q -d"
+			# gpg available ?
+			if type -p gpg >/dev/null ; then
+				for (( i = 0 ; i < 3 ; i++ ))
+				do
+					# paranoid, don't store key in a variable, pipe it so it stays very little in ram unprotected.
+					# save stdin stdout stderr "values"
+					gpg ${gpg_options} ${key} 2>/dev/null | cryptsetup --key-file - ${mount_options} ${arg1} ${arg2} ${arg3}
+					ret="$?"
+					[ "$ret" -eq 0 ] && break
+				done
+				eend "${ret}" "failure running cryptsetup"
+			else
+				ewarn "${mount_name} will not be decrypted ..."
+				einfo "Reason: cannot find gpg application."
+				einfo "You have to install app-crypt/gnupg first."
+				einfo "If you have /usr on its own partition, try copying gpg to /bin ."
+			fi
+		else
+			if [ -n "${key}" ]; then
+				cryptsetup ${mount_options} -d ${key} ${arg1} ${arg2} ${arg3}
+				ret="$?"
+				eend "${ret}" "failure running cryptsetup"
+			else
+				cryptsetup ${mount_options} ${arg1} ${arg2} ${arg3}
+				ret="$?"
+				eend "${ret}" "failure running cryptsetup"
+			fi
+		fi
+		# Unmount any temporary mounts		
+		if [ -d "$mntrem" ]; 
+		then
+			umount -n ${mntrem} 2>/dev/null >/dev/null
+			rmdir ${mntrem} 2>/dev/null >/dev/null
+		fi
+		splash svc_input_end ${RC_SVCNAME} >/dev/null 2>&1
+	
+		if [[ ${ret} == 0 ]] ; 
+		then
+			# Once everything's done, make swap partitions		
+			if is_in "swap" ${mount_flags};
+			then			
+				ebegin "  Running pre_mount commands for ${mount_name}"
+				# We redirect errors because otherwise it think it's a full disk
+				# refuses to overwrite the first block and prints a warning
+				# Better to ignore errors than force and possibly kill a disk
+				mkswap /dev/mapper/${mount_name} > /dev/null 2>&1
+				ewend $? || cryptfs_status=1
+			fi
+		fi
+
+	done
+}
+
+_stop() {
+	local csetup="/sbin/cryptsetup"
+
+	if [ -z "${unmount_order}" ];
+	then
+		for i in ${mount_order};
+		do
+			unmount_order="${i} ${unmount_order}"
+		done
+	fi
+
+	for mount_name in ${unmount_order};
+	do
+		ebegin "Removing dm-crypt mapping for: ${mount_name}"
+		${csetup} remove ${mount_name}
+		eend $? "Failed to remove dm-crypt mapping for: ${mount_name}"
+	
+		eval source=\$source_${mount_name}
+		if [ -n "${source}" ];
+		then
+			ebegin "   Taking down ${source}"
+			/sbin/losetup -d ${source}
+			eend $? "  Failed to remove loop"
+		fi
+	done
+}

@@ -10,7 +10,7 @@ SRC_URI="http://luks.endorphin.org/source/${P}.tar.bz2"
 
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86"
+KEYWORDS="-*"
 IUSE="dynamic nls selinux"
 
 DEPEND=">=sys-fs/device-mapper-1.00.07-r1
@@ -73,19 +73,18 @@ src_compile() {
 src_install() {
 	emake DESTDIR="${D}" install || die "install failed"
 	rmdir "${D}"/usr/$(get_libdir)/cryptsetup
-	insinto /lib/rcscripts/addons
-	newins "${FILESDIR}"/1.0.6-r2-dm-crypt-start.sh dm-crypt-start.sh || die
-	newins "${FILESDIR}"/1.0.5-dm-crypt-stop.sh dm-crypt-stop.sh || die
-	newconfd "${FILESDIR}"/1.0.6-dmcrypt.confd dmcrypt || die
-	newinitd "${FILESDIR}"/1.0.5-dmcrypt.rc dmcrypt || die
+	newconfd "${FILESDIR}"/1.0.6-r3-dmcrypt.confd dmcrypt || die
+	newinitd "${FILESDIR}"/1.0.6-r3-dmcrypt.rc dmcrypt || die
 }
 
 pkg_postinst() {
 	ewarn "This ebuild introduces a new set of scripts and configuration"
-	ewarn "than the last version. If you are currently using /etc/conf.d/cryptfs"
-	ewarn "then you *MUST* copy your old file to:"
+	ewarn "than the last version.  The syntax of the dmcrypt file has changed."
+	ewarn "You *MUST* configure your new dmcrypt file at:"
 	ewarn "/etc/conf.d/dmcrypt"
 	ewarn "Or your encrypted partitions will *NOT* work."
+	ebeep 5
+	epause 5
 	elog "Please see the example for configuring a LUKS mountpoint"
 	elog "in /etc/conf.d/dmcrypt"
 	elog

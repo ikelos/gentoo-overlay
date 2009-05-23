@@ -1,0 +1,89 @@
+# /etc/conf.d/cryptfs
+
+#--------------------
+# Instructions
+#--------------------
+
+# Note when using gpg keys and /usr on a separate partition, you will
+# have to copy /usr/bin/gpg to /bin/gpg so that it will work properly
+# and ensure that gpg has been compiled statically.
+# See http://bugs.gentoo.org/90482 for more information.
+
+# Note that the init-script which reads this file detects whether your
+# partition is LUKS or not. No mkfs is run unless you specify a makefs
+# option.
+
+# Global options:
+#----------------
+
+# Max number of checks to perform (1 per second)
+#dmcrypt_max_timeout=120
+
+# Global Arguments:
+#------------------
+# mount_order="<name> <name> <name>" == The named sections to mount in order
+# unmount_order="<name> <name>"      == The named sections to unmount in order
+#                                       (defaults to reverse of mount_order)
+
+# Named Arguments:
+#-----------------
+# source_<name>='<dev>'              == Real device/loopback-file for partition.
+# key_<name>='</path/to/keyfile>'    == Fullpath from / or from inside removable media.
+# flags_<name>="swap/gpg/loop"       == List of flags that apply to the mapping
+# remdev_<name>='<dev>'              == Device that will be assigned to removable media.
+# gpg_options_<name>='<opts>'        == Default are --quiet --decrypt
+# options_<name>='<opts>'            == cryptsetup, for LUKS you can only use --readonly
+#-----------------
+
+#--------------------
+# dm-crypt examples
+#--------------------
+
+# No paritions will be processed unless specified in the mount_order
+# including swap paritions
+
+#mount_order="swap home keyed gpged usbkeyed looped tmp"
+mount_order="swap"
+
+# Swap partition
+flags_swap="swap"
+source_swap="/dev/sda2"
+
+# Home directory with passphrase
+source_home="/dev/sda5"
+
+# Home directory with key
+source_keyed="/dev/sda5"
+key_keyed="/full/path/to/key"
+
+# Home directory with gpg key
+source_gpged="/dev/sda5"
+key_keyed="/full/path/to/gpgkey"
+flags_gpged="gpg"
+
+# Home directory with key on removable media (such as usb-stick)
+source_usbkeyed="/dev/sda5"
+key_usbkeyed="/path/under/sda1/to/key"
+remdev_usbkeyed="/dev/sda1"
+
+# Loopback File
+source_looped="/path/to/loopback/file"
+flags_looped="loop"
+
+# Loopback GPGed File
+source_gpglooped="/path/to/gpgloopback/file"
+key_gpglooped="/full/path/to/gpgkey"
+flags_gpglooped="gpg loop"
+
+# /tmp with regular keyfile
+source_tmp='/dev/hda6'
+key_tmp='/full/path/to/tmpkey'
+
+post_start() {
+	if [ -e /dev/mapper/tmp ];
+	then
+		/sbin/mkreiserfs -f -f /dev/mapper/tmp
+	fi
+	# You'll also need to create a post_start in localmount for changing the permissions
+}
+
