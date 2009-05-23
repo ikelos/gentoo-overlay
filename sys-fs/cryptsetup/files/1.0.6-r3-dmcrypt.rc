@@ -30,35 +30,13 @@ stop() {
 	_stop
 }
 
-# Determine string lengths
-strlen() {
-	if [ -z "$1" ]
-		then
-			echo "usage: strlen <variable_name>"
-			die
-		fi
-	eval echo "\${#${1}}"
-}
-
-# Lookup optional bootparams
-parse_opt() {
-	case "$1" in
-		*\=*)
-			local key_name="`echo "$1" | cut -f1 -d=`"
-			local key_len=`strlen key_name`
-			local value_start=$((key_len+2))
-			echo "$1" | cut -c ${value_start}-
-		;;
-	esac
-}
-
 get_keytimeout() {
 	local CMDLINE="`cat /proc/cmdline`"
 	for x in ${CMDLINE}
 	do
 		case "${x}" in
 			key_timeout\=*)
-				KEY_TIMEOUT=`parse_opt "${x}"`
+				KEY_TIMEOUT="${x#*=}"
 			;;
 		esac
 	done
@@ -74,6 +52,7 @@ is_in() {
 
 _start() {
 	local csetup="/sbin/cryptsetup"
+	local red='\033[31;01m' green='\033[32;01m' off='\033[0;0m'
 
 	get_keytimeout
 
@@ -148,18 +127,34 @@ _start() {
 		if [ -n "$key" ]; 
 		then
 			read_abort() {
-				local ans
-				local prompt=" ${green}*${off}  $1? (${red}yes${off}/${green}No${off}) "
+				local ans savestty puretext
+				printf " ${green}*${off}  %s? (${red}yes${off}/${green}No${off}) " "$1"
+				puretext=" *  $1? (yes/No) "
+				local ok=true
 				shift
-				echo -n -e "${prompt}"
-				if ! read -n 1 $* ans ; then
-					local back=${prompt//?/\\b}
-					echo -n -e "${back}"
+				savestty=`stty -g`
+				stty -icanon
+				if [ "$1" = "-t" ] && [ "$2" -gt 0 ];
+				then
+					stty min 0 time "$(( $2 * 10 ))"
+				fi
+				ans=`dd count=1 bs=1 2>/dev/null` || ok=false
+				stty ${savestty}
+				[ -n "${ans}" ] || ok=false
+				if ! $ok;
+				then
+					local back=""
+					ans="$puretest$ans"
+					while [ -n "${ans}" ]; do
+						back="${ack}"'\b'
+						ans=${ans%?}
+					done
+					printf "${back}"
 				else
 					echo
 				fi
 				case $ans in
-					[yY]|[yY][eE][sS]) return 0;;
+					y*|Y*) return 0;;
 					*) return 1;;
 				esac
 			}
@@ -196,7 +191,7 @@ _start() {
 							&& foo="mount failed" \
 							|| foo="mount source not found"
 					fi
-					((++i))
+					i=$(( $i + 1 ))
 					read_abort "Stop waiting after $i attempts (${foo})" -t 1 && return
 				done
 			else    # keyfile ! on removable device
@@ -214,7 +209,7 @@ _start() {
 		then
 			[ -z "${gpg_options}" ] && gpg_options="-q -d"
 			# gpg available ?
-			if type -p gpg >/dev/null ; then
+			if command -v gpg >/dev/null ; then
 				for (( i = 0 ; i < 3 ; i++ ))
 				do
 					# paranoid, don't store key in a variable, pipe it so it stays very little in ram unprotected.
@@ -249,7 +244,7 @@ _start() {
 		fi
 		splash svc_input_end ${RC_SVCNAME} >/dev/null 2>&1
 	
-		if [[ ${ret} == 0 ]] ; 
+		if [ ${ret} -eq 0 ] ; 
 		then
 			# Once everything's done, make swap partitions		
 			if is_in "swap" ${mount_flags};
