@@ -279,11 +279,15 @@ _stop() {
 		eend $? "Failed to remove dm-crypt mapping for: ${mount_name}"
 	
 		eval source=\$source_${mount_name}
-		if [ -n "${source}" ];
+		eval mount_flags=\$flags_${mount_name}
+		if is_in "loop" ${mount_flags};
 		then
-			ebegin "   Taking down ${source}"
-			/sbin/losetup -d ${source}
-			eend $? "  Failed to remove loop"
+			if [ -n "${source}" ];
+			then
+				ebegin "   Taking down ${source}"
+				/sbin/losetup -d ${source}
+				eend $? "  Failed to remove loop"
+			fi
 		fi
 	done
 }
