@@ -8,11 +8,11 @@ DESCRIPTION="Input driver for Wacom tablets and drawing devices"
 HOMEPAGE="http://linuxwacom.sourceforge.net/"
 SRC_URI="mirror://sourceforge/${PN}/${P/_p/-}.tar.bz2"
 
-IUSE="gtk tcl tk usb module"
+IUSE="gtk tcl tk usb"
 
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="-amd64 -hppa -ppc -ppc64 -x86"
+KEYWORDS="~amd64 ~hppa ~ppc ~ppc64 ~x86"
 
 RDEPEND="x11-proto/inputproto
 	x11-base/xorg-server
@@ -73,6 +73,8 @@ src_unpack() {
 		sed -i -e "s:-Wno-variadic-macros::" src/xdrv/Makefile.am
 	fi
 
+	epatch "${FILESDIR}/${P}-xf86config.patch"
+
 	eautoreconf
 }
 
@@ -86,6 +88,7 @@ src_compile() {
 		$(use_with tcl tcl) \
 		$(use_with tk tk) \
 		--enable-wacomdrv --enable-wacdump \
+		--disable-xf86config \
 		--enable-xsetwacom --enable-dlloader || die "econf failed"
 
 	unset ARCH
@@ -102,7 +105,7 @@ src_install() {
 	fi
 
 	insinto /etc/udev/rules.d/
-	newins "${FILESDIR}"/${PN}-0.8.2-xserver-xorg-input-wacom.udev 60-wacom.rules
+	doins "${S}/src/util/60-wacom.rules"
 
 	exeinto /lib/udev/
 	doexe "${FILESDIR}"/check_driver
