@@ -2,19 +2,19 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
-inherit autotools eutils games
+inherit autotools versionator eutils games
 
-MY_P="snes9x-${PV}"
-MY_V="52"
+MY_P="snes9x-$(get_version_component_range 1-2)"
+MY_V="$(get_version_component_range 3)"
 
 DESCRIPTION="GTK port of Super Nintendo Entertainment System (SNES) emulator"
-HOMEPAGE="http://www.snes9x.com/phpbb2/viewtopic.php?t=3703"
-SRC_URI="http://bearoso.googlepages.com/snes9x-${PV}-src-gtk-${MY_V}.tar.bz2"
+HOMEPAGE="http://snes9x-gtk.googlecode.com/"
+SRC_URI="http://snes9x-gtk.googlecode.com/files/${MY_P}-src-gtk-${MY_V}.tar.bz2"
 
 LICENSE="as-is GPL-2 LGPL-2"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
-IUSE="debug dga joystick opengl zlib"
+IUSE="debug dga joystick zlib"
 
 RDEPEND="x11-libs/libXext
    >=x11-libs/gtk+-2.8
@@ -23,9 +23,9 @@ RDEPEND="x11-libs/libXext
    media-libs/libpng   
    dga? ( x11-libs/libXxf86dga
       x11-libs/libXxf86vm )
-   opengl? ( virtual/opengl
-      virtual/glu
-      x11-libs/gtkglext )
+   virtual/opengl
+   virtual/glu
+   x11-libs/gtkglext
    joystick? ( media-libs/libsdl )"
 DEPEND="${RDEPEND}
    x86? ( dev-lang/nasm )
@@ -34,26 +34,11 @@ DEPEND="${RDEPEND}
    dga? ( x11-proto/xf86dgaproto
       x11-proto/xf86vidmodeproto )"
 
-S=${WORKDIR}/${MY_P}-src
-
-src_unpack() {
-	unpack ${A}
-	cd "${S}"
-	sed -i \
-		-e 's:-lXext -lX11::' Makefile.in \
-		|| die "sed failed"
-	epatch \
-		"${FILESDIR}"/${MY_P}-build.patch \
-		"${FILESDIR}"/${MY_P}-config.patch
-		# "${FILESDIR}"/${MY_P}-opengl.patch \
-		# "${FILESDIR}"/${MY_P}-x11.patch
-	eautoconf
-}
+S=${WORKDIR}/${MY_P}-src/gtk
 
 src_compile() {
 	egamesconf \
-		--with-gtk \
-		$(use_with opengl) \
+		--with-opengl \
 		$(use_with x86 assembler) \
 		$(use_with joystick) \
 		$(use_with debug debugger) \
@@ -63,7 +48,9 @@ src_compile() {
 }
 
 src_install() {
-	dogamesbin snes9x-gtk || die "dogamesbin failed"
-	dodoc gtk/README doc/* unix/docs/*
+	emake install DESTDIR="${D}" || die "make install failed"
+	
+	#dogamesbin snes9x-gtk || die "dogamesbin failed"
+	dodoc README
 	prepgamesdirs
 } 
