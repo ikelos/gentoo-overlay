@@ -6,7 +6,6 @@ inherit gnome2
 
 DESCRIPTION="git repository viewer for GNOME"
 HOMEPAGE="http://trac.novowork.com/gitg/"
-SRC_URI="http://trac.novowork.com/gitg/raw-attachment/wiki/Releases/${P}.tar.bz2"
 
 LICENSE="GPL-2"
 SLOT="0"
