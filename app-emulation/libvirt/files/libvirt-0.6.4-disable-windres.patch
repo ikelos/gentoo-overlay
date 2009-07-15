@@ -1,0 +1,13 @@
+diff --git a/configure.in b/configure.in
+index 552c761..dd94b44 100644
+--- a/configure.in
++++ b/configure.in
+@@ -1228,7 +1228,7 @@ AC_SUBST([CYGWIN_EXTRA_PYTHON_LIBADD])
+ AC_SUBST([MINGW_EXTRA_LDFLAGS])
+ 
+ dnl Look for windres to build a Windows icon resource.
+-AC_CHECK_TOOL([WINDRES], [windres], [no])
++AC_CHECK_TOOL([WINDRES], [disable-windres], [no])
+ AM_CONDITIONAL([WITH_WIN_ICON], [test "$WINDRES" != "no"])
+ 
+ 
