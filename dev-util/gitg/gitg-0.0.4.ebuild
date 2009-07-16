@@ -2,6 +2,8 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
+EAPI="2"
+
 inherit gnome2
 
 DESCRIPTION="git repository viewer for GNOME"
@@ -25,6 +27,12 @@ DEPEND="${RDEPEND}
 
 DOCS="AUTHORS ChangeLog NEWS README"
 
+src_prepare() {
+	# Fix intltoolize broken file, see upstream #577133
+	sed "s:'\^\$\$lang\$\$':\^\$\$lang\$\$:g" -i "${S}/po/Makefile.in.in" || die "sed failed"
+}
+
+
 pkg_setup() {
-        G2CONF="${G2CONF} --disable-bundle"
+	G2CONF="${G2CONF} --disable-bundle"
 }
