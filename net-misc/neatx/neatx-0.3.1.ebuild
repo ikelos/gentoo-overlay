@@ -17,8 +17,9 @@ SLOT="0"
 KEYWORDS="~x86 ~amd64"
 IUSE=""
 
-DEPEND=""
-RDEPEND=""
+DEPEND="${RDEPEND}
+        dev-python/docutils"
+RDEPEND="dev-lang/python"
 
 S=${WORKDIR}/${PN}
 
