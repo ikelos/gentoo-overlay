@@ -4,14 +4,11 @@
 
 EAPI=2
 
-inherit autotools bzr eutils gnome2 mono
-
-EBZR_REPO_URI="http://download.gna.org/bless/"
-EBZR_BRANCH="dump-pixmaps"
+inherit autotools eutils gnome2 mono
 
 DESCRIPTION="GTK# Hex Editor"
 HOMEPAGE="http://home.gna.org/bless/"
-SRC_URI=""
+SRC_URI="http://download.gna.org/bless/${P}.tar.gz"
 
 LICENSE="GPL-2"
 SLOT="0"
@@ -37,12 +34,11 @@ pkg_setup() {
 }
 
 src_unpack() {
-	bzr_src_unpack
+	gnome2_src_unpack
 
-	cd ${S}
-	./autogen.sh
 	einfo "Running gettextize -f --no-changelog..."
 	( "${T}/gettextize" -f --no-changelog > /dev/null ) || die "gettexize failed"
+	epatch "${FILESDIR}/${P}-pixmap.patch"
 	eautoreconf
 }
 
