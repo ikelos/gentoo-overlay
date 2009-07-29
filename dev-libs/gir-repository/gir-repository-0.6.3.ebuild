@@ -15,13 +15,6 @@ IUSE=""
 DEPEND="dev-libs/gobject-introspection"
 RDEPEND="dev-libs/gobject-introspection"
 
-pkg_setup() {
-	if ! built_with_use sys-devel/gcc libffi; then
-		eerror "Please rebuild gcc with USE=\"libffi\" enabled."
-		die "GCC not build with libffi support"
-	fi
-}
-
 src_unpack() {
 	gnome2_src_unpack
 	eautoreconf
