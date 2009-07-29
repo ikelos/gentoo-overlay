@@ -2,9 +2,9 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
-inherit autotools subversion
+inherit autotools git
 
-ESVN_REPO_URI="http://svn.gnome.org/svn/gir-repository/trunk"
+EGIT_REPO_URI="git://git.gnome.org/gir-repository"
 
 DESCRIPTION="GObject Introspection tools and library"
 HOMEPAGE="http://live.gnome.org/GObjectIntrospection"
@@ -19,7 +19,8 @@ DEPEND=">=dev-libs/gobject-introspection-0.6.1"
 RDEPEND=">=dev-libs/gobject-introspection-0.6.1"
 
 src_unpack() {
-	subversion_src_unpack	
+	git_src_unpack	
+	cd ${S}
 	eautoreconf
 }
 
