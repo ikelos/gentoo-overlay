@@ -6,7 +6,7 @@ EAPI="2"
 
 inherit autotools subversion
 
-ESVN_REPO_URI="http://libnfc.googlecode.com/svn/branches/portability"
+ESVN_REPO_URI="http://libnfc.googlecode.com/svn/trunk"
 
 DESCRIPTION="Near Field Communications (NFC) library"
 HOMEPAGE="http://www.libnfc.org/"
