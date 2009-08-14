@@ -25,7 +25,8 @@ RDEPEND="${CDEPEND}
 		 dev-python/simplejson
 		 >=dev-python/pygtk-2.14
 		 >=dev-python/pygobject-2.14
-		 net-analyzer/netcat"
+		 net-analyzer/netcat
+		 net-misc/nx"
 
 S=${WORKDIR}/${PN}
 
