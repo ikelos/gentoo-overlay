@@ -4,7 +4,7 @@
 
 EAPI="2"
 
-inherit autotools distutils subversion
+inherit eutils autotools distutils subversion
 
 ESVN_REPO_URI="http://neatx.googlecode.com/svn/tags/neatx/${P}/"
 
