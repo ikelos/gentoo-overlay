@@ -62,6 +62,10 @@ src_install() {
 
 pkg_postinst () {
 	distutils_pkg_postinst
+
+	elog "If you want to use su authentication (rather than ssh)"
+	elog "you must ensure that the nx user is a member of the wheel group."
+
 	# Other NX servers ebuilds may have already created the nx account
 	# However they use different login shell/home directory paths
 	if [[ ${ROOT} == "/" ]]; then
