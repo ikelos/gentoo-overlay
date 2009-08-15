@@ -1,0 +1,24 @@
+diff --git a/lib/constants.py b/lib/constants.py
+index 4d71adf..75145b3 100644
+--- a/lib/constants.py
++++ b/lib/constants.py
+@@ -25,7 +25,7 @@
+ from neatx import _autoconf
+ 
+ 
+-NXDIR = "/usr/lib/nx"
++NXDIR = "/usr/bin"
+ 
+ SYSLOG_ADDRESS = "/dev/log"
+ BASH = "/bin/bash"
+@@ -52,8 +52,8 @@ FDCOPY = _autoconf.PKGLIBDIR + "/fdcopy"
+ TTYSETUP = _autoconf.PKGLIBDIR + "/ttysetup"
+ 
+ # Extract nxagent version using the following command.
+-NXAGENT_VERSION_COMMAND = ("dpkg-query -W --showformat='${Version}' %s" %
+-                           NXAGENT_PKGNAME)
++NXAGENT_VERSION_COMMAND = "qfile -eq /usr/bin/nxagent | cut -d- -f3"
++
+ NXAGENT_VERSION_SEP = ".-~"
+ 
+ PROTOCOL_VERSION_DIGITS = [2, 2, 4]

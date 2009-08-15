@@ -31,9 +31,9 @@ RDEPEND="${CDEPEND}
 S=${WORKDIR}/${PN}
 
 src_prepare() {
+	cd ${S}
 	sed -i -e "s/rst2html]/rst2html.py]/" ${S}/configure.ac
-	sed -i -e 's@NXAGENT_VERSION_COMMAND.*@NXAGENT_VERSION_COMMAND = "qfile -eq /usr/bin/nxagent | cut -d- -f3"@' ${S}/lib/constants.py
-	sed -i -e 's@NXAGENT_PKGNAME)@@' ${S}/lib/constants.py
+	epatch ${FILESDIR}/${P}-paths.patch
 	eautoreconf
 	# This is for bug 215944, so .pyo/.pyc files don't get into the
 	# file system
