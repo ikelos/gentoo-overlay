@@ -58,6 +58,7 @@ src_compile() {
 
 src_install() {
 	emake install DESTDIR="${D}" || die "Failed to install"
+	chmod a+rwx ${D}/var/lib/neatx/sessions
 }
 
 pkg_postinst () {
