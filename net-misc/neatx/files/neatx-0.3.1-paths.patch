@@ -1,8 +1,8 @@
 diff --git a/lib/constants.py b/lib/constants.py
-index 4d71adf..75145b3 100644
+index 4d71adf..d70e5c0 100644
 --- a/lib/constants.py
 +++ b/lib/constants.py
-@@ -25,7 +25,7 @@
+@@ -25,11 +25,11 @@
  from neatx import _autoconf
  
  
@@ -11,6 +11,11 @@ index 4d71adf..75145b3 100644
  
  SYSLOG_ADDRESS = "/dev/log"
  BASH = "/bin/bash"
+-NETCAT = "/bin/netcat"
++NETCAT = "/usr/bin/nc"
+ XRDB = "/usr/bin/xrdb"
+ SU = "/bin/su"
+ SSH = "/usr/bin/ssh"
 @@ -52,8 +52,8 @@ FDCOPY = _autoconf.PKGLIBDIR + "/fdcopy"
  TTYSETUP = _autoconf.PKGLIBDIR + "/ttysetup"
  
