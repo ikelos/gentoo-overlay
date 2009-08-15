@@ -25,6 +25,7 @@ RDEPEND="${CDEPEND}
 		 dev-python/simplejson
 		 >=dev-python/pygtk-2.14
 		 >=dev-python/pygobject-2.14
+		 app-portage/portage-utils
 		 net-analyzer/netcat
 		 net-misc/nx"
 

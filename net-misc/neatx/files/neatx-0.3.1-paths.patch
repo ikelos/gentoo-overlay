@@ -1,8 +1,8 @@
 diff --git a/lib/constants.py b/lib/constants.py
-index 4d71adf..d70e5c0 100644
+index 4d71adf..bfe4736 100644
 --- a/lib/constants.py
 +++ b/lib/constants.py
-@@ -25,11 +25,11 @@
+@@ -25,16 +25,16 @@
  from neatx import _autoconf
  
  
@@ -16,6 +16,12 @@ index 4d71adf..d70e5c0 100644
  XRDB = "/usr/bin/xrdb"
  SU = "/bin/su"
  SSH = "/usr/bin/ssh"
+ XAUTH = "/usr/bin/xauth"
+-XSESSION = "/etc/X11/Xsession"
++XSESSION = "/etc/X11/Sessions/Xsession"
+ 
+ START_CONSOLE_COMMAND = "/usr/bin/xterm"
+ START_KDE_COMMAND = XSESSION + " startkde"
 @@ -52,8 +52,8 @@ FDCOPY = _autoconf.PKGLIBDIR + "/fdcopy"
  TTYSETUP = _autoconf.PKGLIBDIR + "/ttysetup"
  
