@@ -1,8 +1,8 @@
 diff --git a/lib/constants.py b/lib/constants.py
-index 4d71adf..bfe4736 100644
+index 4d71adf..1b3ce32 100644
 --- a/lib/constants.py
 +++ b/lib/constants.py
-@@ -25,16 +25,16 @@
+@@ -25,20 +25,20 @@
  from neatx import _autoconf
  
  
@@ -22,6 +22,11 @@ index 4d71adf..bfe4736 100644
  
  START_CONSOLE_COMMAND = "/usr/bin/xterm"
  START_KDE_COMMAND = XSESSION + " startkde"
+-START_GNOME_COMMAND = XSESSION + " gnome-session"
++START_GNOME_COMMAND = "/etc/X11/Sessions/Gnome"
+ 
+ NXUSER = "nx"
+ NXSERVER = _autoconf.PKGLIBDIR + "/nxserver"
 @@ -52,8 +52,8 @@ FDCOPY = _autoconf.PKGLIBDIR + "/fdcopy"
  TTYSETUP = _autoconf.PKGLIBDIR + "/ttysetup"
  

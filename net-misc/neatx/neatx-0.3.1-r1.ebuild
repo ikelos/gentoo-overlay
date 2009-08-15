@@ -26,6 +26,8 @@ RDEPEND="${CDEPEND}
 		 >=dev-python/pygtk-2.14
 		 >=dev-python/pygobject-2.14
 		 app-portage/portage-utils
+		 media-fonts/font-misc-misc
+		 media-fonts/font-cursor-misc
 		 net-analyzer/netcat
 		 net-misc/nx"
 
