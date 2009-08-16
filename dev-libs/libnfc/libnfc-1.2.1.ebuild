@@ -14,12 +14,8 @@ KEYWORDS="~x86 ~amd64"
 IUSE=""
 
 DEPEND="sys-apps/pcsc-lite
-		dev-libs/libusb"
+		virtual/libusb:0"
 RDEPEND="${DEPEND}"
-
-src_prepare() {
-	cp ${FILESDIR}/Makefile ${S}
-}
 
 src_install() {
 	emake install DESTDIR=${D} || die "Failed to install."
