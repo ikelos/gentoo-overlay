@@ -4,7 +4,7 @@
 
 EAPI="2"
 
-inherit autotools subversion
+inherit eutils autotools subversion
 
 ESVN_REPO_URI="http://libnfc.googlecode.com/svn/trunk"
 
@@ -24,6 +24,7 @@ RDEPEND="${DEPEND}"
 
 src_prepare() {
 	# sed -i -e "s/ -std=c99//" ${S}/configure.ac
+	epatch "${FILESDIR}/${PN}-parity-fix.patch"
 	eautoreconf
 }
 
