@@ -1,6 +1,6 @@
 # Copyright 1999-2009 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/x11-drivers/linuxwacom/linuxwacom-0.8.3_p2.ebuild,v 1.2 2009/04/28 09:22:51 ikelos Exp $
+# $Header: /var/cvsroot/gentoo-x86/x11-drivers/linuxwacom/linuxwacom-0.8.3_p6.ebuild,v 1.1 2009/07/28 15:50:06 ikelos Exp $
 
 inherit eutils autotools toolchain-funcs linux-mod
 
@@ -8,7 +8,7 @@ DESCRIPTION="Input driver for Wacom tablets and drawing devices"
 HOMEPAGE="http://linuxwacom.sourceforge.net/"
 SRC_URI="mirror://sourceforge/${PN}/${P/_p/-}.tar.bz2"
 
-IUSE="gtk tcl tk usb"
+IUSE="gtk tcl tk usb modules"
 
 LICENSE="GPL-2"
 SLOT="0"
@@ -30,7 +30,7 @@ S=${WORKDIR}/${P/_p/-}
 MODULE_NAMES="wacom(input:${S}/src:${S}/src)"
 
 wacom_check() {
-	if use module ; then
+	if use modules ; then
 		ebegin "Checking for wacom module"
 		linux_chkconfig_module TABLET_USB_WACOM
 		eend $?
@@ -73,13 +73,13 @@ src_unpack() {
 		sed -i -e "s:-Wno-variadic-macros::" src/xdrv/Makefile.am
 	fi
 
-	epatch "${FILESDIR}/${P}-xf86config.patch"
+	epatch "${FILESDIR}/${PN}-0.8.3_p6-xf86config.patch"
 
 	eautoreconf
 }
 
 src_compile() {
-	if use module; then
+	if use modules; then
 		myconf="${myconf} --enable-wacom"
 		myconf="${myconf} --with-kernel=${KV_OUT_DIR}"
 	fi
@@ -99,7 +99,7 @@ src_install() {
 	emake DESTDIR="${D}" install || die "Install failed."
 
 	# Inelegant attempt to work around a nasty build system
-	if use module; then
+	if use modules; then
 		cp "${S}"/src/*/wacom.{o,ko} "${S}"/src/
 		linux-mod_src_install
 	fi
@@ -111,8 +111,7 @@ src_install() {
 	doexe "${FILESDIR}"/check_driver
 	doman "${FILESDIR}"/check_driver.1
 
-	dohtml -r docs/*
-	dodoc AUTHORS ChangeLog NEWS README
+	dodoc AUTHORS ChangeLog README
 
 	ewarn "Please remove any HAL .FDI files you may"
 	ewarn "previously have installed fr linuxwacom."
