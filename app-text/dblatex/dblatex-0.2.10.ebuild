@@ -1,4 +1,4 @@
-# Copyright 1999-2007 Gentoo Foundation
+# Copyright 1999-2009 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 inherit distutils eutils
@@ -18,20 +18,11 @@ DEPEND="|| ( ( app-text/texlive
 			   dev-texlive/texlive-xetex
 			 )
 			 >=app-text/texlive-3
-		   )"
+		   )
+		 !<app-text/tex4ht-20090611_p1038-r1"
 
 src_unpack() {
 	distutils_src_unpack
-	epatch ${FILESDIR}/labelid.xsl.patch
-}
-
-src_install() {
-	distutils_src_install
-	mv ${D}/usr/bin/dblatex ${D}/usr/bin/docbook2latex
-	mv ${D}/usr/share/man/man1/dblatex.1.gz ${D}/usr/share/man/man1/docbook2latex.1.gz
-
-	einfo "This package installs its main binary as"
-	einfo "  docbook2latex"
-	einfo "to avoid collisions with other latex packages."
+	epatch "${FILESDIR}/labelid.xsl.patch"
 }
 
