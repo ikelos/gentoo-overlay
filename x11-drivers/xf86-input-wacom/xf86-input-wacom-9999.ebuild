@@ -2,7 +2,9 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
-inherit x-modular
+EAPI="2"
+
+inherit x-modular eutils
 
 DESCRIPTION="Driver for Wacom tablets and drawing devices"
 LICENSE="GPL-2"
@@ -16,3 +18,10 @@ RDEPEND=">=x11-base/xorg-server-1.6"
 DEPEND="${RDEPEND}
 	x11-proto/inputproto
 	x11-proto/xproto"
+
+src_prepare() {
+	cd "${S}"
+	epatch "${FILESDIR}/${PN}-hal.patch"
+	x-modular_src_prepare
+}
+
