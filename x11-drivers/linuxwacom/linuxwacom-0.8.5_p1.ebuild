@@ -15,7 +15,7 @@ SLOT="0"
 KEYWORDS="~amd64 ~hppa ~ppc ~ppc64 ~x86"
 
 RDEPEND="x11-proto/inputproto
-	x11-base/xorg-server
+	<x11-base/xorg-server-1.7
 	gtk? ( >=x11-libs/gtk+-2 )
 	tcl? ( dev-lang/tcl )
 	tk?  ( dev-lang/tk )
