@@ -23,8 +23,6 @@ DEPEND="sys-apps/pcsc-lite
 RDEPEND="${DEPEND}"
 
 src_prepare() {
-	# sed -i -e "s/ -std=c99//" ${S}/configure.ac
-	epatch "${FILESDIR}/${PN}-parity-fix.patch"
 	eautoreconf
 }
 

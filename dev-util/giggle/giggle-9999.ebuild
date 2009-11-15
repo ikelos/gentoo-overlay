@@ -6,7 +6,10 @@ EAPI="1"
 
 inherit autotools gnome2 git
 
-EGIT_REPO_URI="git://github.com/hasselmm/giggle.git"
+# EGIT_REPO_URI="git://github.com/hasselmm/giggle.git"
+EGIT_REPO_URI="git://github.com/guyou/giggle.git"
+EGIT_BRANCH="fixes"
+EGIT_TREE="fixes"
 
 DESCRIPTION="GTK+ Frontend for GIT"
 HOMEPAGE="http://live.gnome.org/giggle"
