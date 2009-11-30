@@ -1,22 +1,22 @@
-# Copyright 1999-2008 Gentoo Foundation
+# Copyright 1999-2009 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Header: /var/cvsroot/gentoo-x86/sys-fs/cryptsetup/cryptsetup-1.0.6-r2.ebuild,v 1.3 2008/12/07 03:11:17 vapier Exp $
+
+EAPI=2
 
 inherit linux-info eutils flag-o-matic multilib
 
 DESCRIPTION="Tool to setup encrypted devices with dm-crypt"
 HOMEPAGE="http://luks.endorphin.org/ http://code.google.com/p/cryptsetup/"
-SRC_URI="http://luks.endorphin.org/source/${P}.tar.bz2"
+SRC_URI="http://cryptsetup.googlecode.com/files/${P}.tar.bz2"
 
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="-*"
 IUSE="dynamic nls selinux"
 
-DEPEND="|| (
-		>=sys-fs/lvm2-2.02.45
-		>=sys-fs/device-mapper-1.00.07-r1
-	)
+DEPEND="
+	>=sys-fs/lvm2-2.02.56-r1
 	>=dev-libs/libgcrypt-1.1.42
 	>=dev-libs/libgpg-error-1.0-r1
 	>=dev-libs/popt-1.7
@@ -56,23 +56,17 @@ pkg_setup() {
 	fi
 }
 
-src_unpack() {
-	unpack ${A}
-	cd "${S}"
-
-	# fix for bug #236481, use udevadm instead of udevsettle
-	epatch "${FILESDIR}"/${PN}-1.0.6-udevsettle.patch
-}
-
-src_compile() {
+src_configure() {
+	use selinux || export ac_cv_lib_selinux_is_selinux_enabled=no
 	econf \
 		--sbindir=/sbin \
 		$(use_enable !dynamic static) \
+		--enable-libgcrypt \
+		--enable-libdevmapper \
 		--libdir=/usr/$(get_libdir) \
 		$(use_enable nls) \
 		$(use_enable selinux) \
 		|| die
-	emake || die
 }
 
 src_install() {
