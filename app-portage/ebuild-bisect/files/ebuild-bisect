@@ -72,7 +72,7 @@ scm_git_setrev() {
 scm_git_bisect() {
 	local good=${1}
 	local bad=${2}
-	gitdir=$(cat `portageq vdb_path`/${cpv}/environment.bz2 | bunzip2 | grep ^GIT_DIR= | cut -d= -f2)
+	gitdir=$(cat `portageq vdb_path`/${cpv}/environment.bz2 | bunzip2 > /tmp/ebuild-bisect-git-env; source /tmp/ebuild-bisect-git-env; echo ${EGIT_STORE_DIR}/${EGIT_PROJECT})
 	if ! cd ${gitdir} ;
 	then
 		echo "! Git support requires the git ebuild to have been compiled successfully once."
