@@ -1,0 +1,63 @@
+# ChangeLog for dev-python/httplib2
+# Copyright 1999-2009 Gentoo Foundation; Distributed under the GPL v2
+# $Header: /var/cvsroot/gentoo-x86/dev-python/httplib2/ChangeLog,v 1.14 2009/10/07 17:36:14 nixnut Exp $
+
+  07 Oct 2009; nixnut <nixnut@gentoo.org> httplib2-0.5.0.ebuild:
+  ppc stable #286968
+
+  03 Oct 2009; Markus Meier <maekke@gentoo.org> httplib2-0.5.0.ebuild:
+  amd64/x86 stable, bug #286968
+
+*httplib2-0.5.0 (29 Aug 2009)
+
+  29 Aug 2009; Arfrever Frehtes Taifersar Arahesis <arfrever@gentoo.org>
+  -httplib2-0.3.0.ebuild, -httplib2-0.4.0.ebuild, +httplib2-0.5.0.ebuild:
+  Version bump. Set SUPPORT_PYTHON_ABIS.
+
+  21 May 2009; Brent Baude <ranger@gentoo.org> httplib2-0.4.0-r1.ebuild:
+  stable ppc, bug 269398
+
+  14 May 2009; Markus Meier <maekke@gentoo.org> httplib2-0.4.0-r1.ebuild:
+  amd64/x86 stable, bug #269398
+
+*httplib2-0.4.0-r1 (23 Apr 2009)
+
+  23 Apr 2009; Patrick Lauer <patrick@gentoo.org>
+  +files/compat-2.6-0.4.0.patch, +httplib2-0.4.0-r1.ebuild:
+  Py 2.6 deprecation fix. Thanks to djc for pointing it out, thanks to
+  Benoit Chesneau for the patch. Fixes #267184
+
+  14 Apr 2009; Raúl Porcel <armin76@gentoo.org> httplib2-0.4.0.ebuild:
+  x86 stable wrt #264496
+
+  03 Apr 2009; Tiago Cunha <tcunha@gentoo.org> httplib2-0.4.0.ebuild:
+  stable amd64, bug 264496
+
+  02 Apr 2009; Joseph Jezak <josejx@gentoo.org> httplib2-0.4.0.ebuild:
+  Marked ppc stable for bug #264496.
+
+  20 Mar 2009; Joseph Jezak <josejx@gentoo.org> httplib2-0.3.0.ebuild,
+  httplib2-0.4.0.ebuild:
+  Marked ~ppc for bug #255626.
+
+*httplib2-0.4.0 (31 Mar 2008)
+
+  31 Mar 2008; Piotr Jaroszyński <peper@gentoo.org> +httplib2-0.4.0.ebuild:
+  Add 0.4.0.
+
+  01 Sep 2007; Lukasz Strzygowski <lucass@gentoo.org>
+  -httplib2-0.2.0.ebuild, httplib2-0.3.0.ebuild:
+  Fixed HOMEPAGE and SRC_URI (bug #190942). Added NEED_PYTHON. Dropped old
+  version.
+
+*httplib2-0.3.0 (21 Mar 2007)
+
+  21 Mar 2007; Piotr Jaroszyński <peper@gentoo.org> +httplib2-0.3.0.ebuild:
+  Version bump.
+
+*httplib2-0.2.0 (23 Oct 2006)
+
+  23 Oct 2006; Piotr Jaroszyński <peper@gentoo.org> +metadata.xml,
+  +httplib2-0.2.0.ebuild:
+  New package. Thanks to Tim Cera <timcera@earthlink.net>. bug #150691.
+
