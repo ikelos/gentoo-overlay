@@ -1,6 +1,9 @@
 # Copyright 1999-2009 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/app-portage/layman/layman-1.2.3.ebuild,v 1.1 2009/01/01 07:54:04 wrobel Exp $
+# $Header: /var/cvsroot/gentoo-x86/app-portage/layman/layman-1.2.4.ebuild,v 1.2 2009/12/05 00:44:07 arfrever Exp $
+
+EAPI="2"
+SUPPORT_PYTHON_ABIS="1"
 
 inherit eutils distutils
 
@@ -15,15 +18,17 @@ IUSE="git subversion test"
 
 DEPEND="dev-python/pyxml
 	test? ( dev-util/subversion )"
-RDEPEND="git? ( dev-util/git )
-	subversion? ( dev-util/subversion )"
+RDEPEND=">=dev-lang/python-2.5
+	git? ( dev-util/git )
+	subversion? (
+		|| (
+			>=dev-util/subversion-1.5.4[webdav-neon]
+			>=dev-util/subversion-1.5.4[webdav-serf]
+		)
+	)"
+RESTRICT_PYTHON_ABIS="2.4 3.*"
 
 pkg_setup() {
-	if has_version dev-util/subversion && \
-	(! built_with_use --missing true dev-util/subversion webdav || built_with_use --missing false dev-util/subversion nowebdav); then
-		eerror "You must rebuild your Subversion with support for WebDAV."
-		die "You must rebuild your Subversion with support for WebDAV"
-	fi
 	if ! has_version dev-util/subversion; then
 		ewarn "You do not have dev-util/subversion installed!"
 		ewarn "While layman does not exactly depend on this"
@@ -35,14 +40,18 @@ pkg_setup() {
 	fi
 }
 
-src_unpack() {
-	unpack ${A}
-	cd ${S}
+src_prepare() {
 	epatch ${FILESDIR}/${P}-gitsvn.patch
 }
 
-src_install() {
+src_test() {
+	testing() {
+		PYTHONPATH="." "$(PYTHON)" layman/tests/dtest.py
+	}
+	python_execute_function testing
+}
 
+src_install() {
 	distutils_src_install
 
 	dodir /etc/layman
@@ -55,16 +64,9 @@ src_install() {
 	keepdir /usr/local/portage/layman
 }
 
-src_test() {
-	einfo "Running layman doctests..."
-	echo
-	if ! PYTHONPATH="." ${python} layman/tests/dtest.py; then
-		eerror "DocTests failed - please submit a bug report"
-		die "DocTesting failed!"
-	fi
-}
-
 pkg_postinst() {
+	distutils_pkg_postinst
+
 	einfo "You are now ready to add overlays into your system."
 	einfo
 	einfo "layman -L"
