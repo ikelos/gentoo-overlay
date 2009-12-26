@@ -14,16 +14,21 @@ determine_ebuild() {
 	local p=""
 	local v=""
 
+	source /etc/make.conf
+
 	if [ ! -z "${cpv}" ];
 	then
 		# TODO: Find ebuilds in overlays
 		c=$(qatom ${cpv} | cut -d" " -f1)
 		p=$(qatom ${cpv} | cut -d" " -f2)
 		v=${cpv#"${c}/${p}-"}
-		if ls "/usr/portage/${c}/${p}/${p}-${v}.ebuild" ;
-		then
-			result="/usr/portage/${c}/${p}/${p}-${v}.ebuild"
-		fi
+		for i in "/usr/portage" ${PORTDIR_OVERLAY};
+		do
+			if ls "${i}/${c}/${p}/${p}-${v}.ebuild" 2>/dev/null;
+			then
+				result="${i}/${c}/${p}/${p}-${v}.ebuild"
+			fi
+		done
 	fi
 	echo ${result}
 }
@@ -66,7 +71,7 @@ build_current() {
 }
 
 scm_git_setrev() {
-	export EGIT_TREE="${1}"
+	export EGIT_COMMIT="${1}"
 }
 
 scm_git_bisect() {
