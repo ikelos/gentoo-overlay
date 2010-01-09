@@ -14,16 +14,14 @@ diff --git a/layman/config.py b/layman/config.py
 index b00d2ac..926abd2 100644
 --- a/layman/config.py
 +++ b/layman/config.py
-@@ -71,7 +71,8 @@ class Config(object):
+@@ -71,6 +71,7 @@ class Config(object):
                           'cvs_command': '/usr/bin/cvs',
                           'darcs_command': '/usr/bin/darcs',
                           'git_command': '/usr/bin/git',
--                         'mercurial_command': '/usr/bin/hg',
-+                         'git-svn_commdn': '/usr/bin/git',
-+			 'mercurial_command': '/usr/bin/hg',
++                         'git-svn_command': '/usr/bin/git',
+                          'mercurial_command': '/usr/bin/hg',
                           'rsync_command': '/usr/bin/rsync',
                           'svn_command': '/usr/bin/svn',
-                          'tar_command': '/bin/tar', }
 diff --git a/layman/overlay.py b/layman/overlay.py
 index 643e652..9d980bc 100644
 --- a/layman/overlay.py
