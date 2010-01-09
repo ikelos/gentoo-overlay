@@ -1,8 +1,9 @@
-# Copyright 1999-2009 Gentoo Foundation
+# Copyright 1999-2010 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Header: /var/cvsroot/gentoo-x86/app-portage/layman/layman-1.2.4.ebuild,v 1.2 2009/12/05 00:44:07 arfrever Exp $
 
 EAPI="2"
+NEED_PYTHON=2.5
 SUPPORT_PYTHON_ABIS="1"
 
 inherit eutils distutils
@@ -16,9 +17,10 @@ SLOT="0"
 KEYWORDS="-x86"
 IUSE="git subversion test"
 
-DEPEND="dev-python/pyxml
+COMMON_DEPS="dev-lang/python[xml]"
+DEPEND="${COMMON_DEPS}
 	test? ( dev-util/subversion )"
-RDEPEND=">=dev-lang/python-2.5
+RDEPEND="${COMMON_DEPS}
 	git? ( dev-util/git )
 	subversion? (
 		|| (
@@ -27,6 +29,10 @@ RDEPEND=">=dev-lang/python-2.5
 		)
 	)"
 RESTRICT_PYTHON_ABIS="2.4 3.*"
+
+src_prepare() {
+	epatch "${FILESDIR}"/${P}-gitsvn.patch
+}
 
 pkg_setup() {
 	if ! has_version dev-util/subversion; then
@@ -40,13 +46,13 @@ pkg_setup() {
 	fi
 }
 
-src_prepare() {
-	epatch ${FILESDIR}/${P}-gitsvn.patch
-}
-
 src_test() {
 	testing() {
-		PYTHONPATH="." "$(PYTHON)" layman/tests/dtest.py
+		# external.py missing in 1.2.5 release tarball ..
+		for suite in layman/tests/dtest.py ; do
+			PYTHONPATH="." "$(PYTHON)" ${suite} \
+					|| die "test suite '${suite}' failed"
+		done
 	}
 	python_execute_function testing
 }

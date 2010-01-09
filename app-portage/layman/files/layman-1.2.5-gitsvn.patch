@@ -1,8 +1,34 @@
+diff --git a/etc/layman.cfg b/etc/layman.cfg
+index 53c9d2c..0c7a753 100644
+--- a/etc/layman.cfg
++++ b/etc/layman.cfg
+@@ -74,6 +74,7 @@ nocheck  : yes
+ #cvs_command        : /usr/bin/cvs
+ #darcs_command      : /usr/bin/darcs
+ #git_command        : /usr/bin/git
++#git-svn_command    : /usr/bin/git
+ #mercurial_command  : /usr/bin/hg
+ #rsync_command      : /usr/bin/rsync
+ #svn_command        : /usr/bin/svn
+diff --git a/layman/config.py b/layman/config.py
+index b00d2ac..926abd2 100644
+--- a/layman/config.py
++++ b/layman/config.py
+@@ -71,7 +71,8 @@ class Config(object):
+                          'cvs_command': '/usr/bin/cvs',
+                          'darcs_command': '/usr/bin/darcs',
+                          'git_command': '/usr/bin/git',
+-                         'mercurial_command': '/usr/bin/hg',
++                         'git-svn_commdn': '/usr/bin/git',
++			 'mercurial_command': '/usr/bin/hg',
+                          'rsync_command': '/usr/bin/rsync',
+                          'svn_command': '/usr/bin/svn',
+                          'tar_command': '/bin/tar', }
 diff --git a/layman/overlay.py b/layman/overlay.py
-index a9a1980..4cf85da 100644
+index 643e652..9d980bc 100644
 --- a/layman/overlay.py
 +++ b/layman/overlay.py
-@@ -29,6 +29,7 @@ import sys, codecs, os, os.path, xml.dom.minidom
+@@ -34,6 +34,7 @@ import xml.etree.ElementTree as ET # Python 2.5
  from   layman.overlays.bzr       import BzrOverlay
  from   layman.overlays.darcs     import DarcsOverlay
  from   layman.overlays.git       import GitOverlay
@@ -10,20 +36,20 @@ index a9a1980..4cf85da 100644
  from   layman.overlays.mercurial import MercurialOverlay
  from   layman.overlays.cvs       import CvsOverlay
  from   layman.overlays.svn       import SvnOverlay
-@@ -44,6 +45,7 @@ from   layman.debug              import OUT
- #-------------------------------------------------------------------------------
+@@ -51,6 +52,7 @@ from   layman.utils              import indent
  
- OVERLAY_TYPES = {'git'       : GitOverlay,
-+                 'git-svn'   : GitSvnOverlay,
-                  'cvs'       : CvsOverlay,
-                  'svn'       : SvnOverlay,
-                  'rsync'     : RsyncOverlay,
+ OVERLAY_TYPES = dict((e.type_key, e) for e in (
+     GitOverlay,
++    GitSvnOverlay,
+     CvsOverlay,
+     SvnOverlay,
+     RsyncOverlay,
 diff --git a/layman/overlays/gitsvn.py b/layman/overlays/gitsvn.py
 new file mode 100644
-index 0000000..0994306
+index 0000000..c5d91b1
 --- /dev/null
 +++ b/layman/overlays/gitsvn.py
-@@ -0,0 +1,77 @@
+@@ -0,0 +1,79 @@
 +#!/usr/bin/python
 +# -*- coding: utf-8 -*-
 +#################################################################################
@@ -63,8 +89,10 @@ index 0000000..0994306
 +    ''' Handles git overlays.'''
 +
 +    type = 'Git-Svn'
++    type_key = 'git-svn'
 +
-+    binary_command  = '/usr/bin/git'
++    def __init__(self, xml, config, ignore = 0, quiet = False):
++        Overlay.__init__(self, xml, config, ignore)
 +
 +    def add(self, base, quiet = False):
 +        '''Add overlay.'''
@@ -80,7 +108,7 @@ index 0000000..0994306
 +        slash = ''
 +        if self.src.split(':')[0] == 'http':
 +            slash = '/'
-+        return self.cmd(self.binary_command + ' svn clone ' + quiet_option + '"' + self.src + slash
++        return self.cmd(self.command() + ' svn clone ' + quiet_option + '"' + self.src + slash
 +                        + '" "' + path([base, self.name]) + '"')
 +
 +    def sync(self, base, quiet = False):
@@ -94,10 +122,10 @@ index 0000000..0994306
 +            quiet_option = ''
 + 
 +        return self.cmd('cd "' + path([base, self.name]) + '" && '
-+                        + self.binary_command + ' svn rebase' + quiet_option)
++                        + self.command() + ' svn rebase' + quiet_option)
 +
 +    def supported(self):
 +        '''Overlay type supported?'''
 +
-+        return Overlay.supported(self, [(self.binary_command,  'git',
++        return Overlay.supported(self, [(self.command(), 'git',
 +                                         'dev-util/git'),])
