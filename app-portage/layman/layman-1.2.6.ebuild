@@ -48,8 +48,7 @@ pkg_setup() {
 
 src_test() {
 	testing() {
-		# external.py missing in 1.2.5 release tarball ..
-		for suite in layman/tests/dtest.py ; do
+		for suite in layman/tests/{dtest,external}.py ; do
 			PYTHONPATH="." "$(PYTHON)" ${suite} \
 					|| die "test suite '${suite}' failed"
 		done
