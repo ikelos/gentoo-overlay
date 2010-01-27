@@ -15,10 +15,9 @@ SLOT="0"
 KEYWORDS="~x86"
 IUSE=""
 
-DEPEND="dev-libs/gobject-introspection
-		dev-libs/gir-repository"
-RDEPEND="dev-libs/gobject-introspection
-		 dev-libs/gir-repository"
+CDEPEND="dev-libs/gobject-introspection"
+DEPEND="${CDEPEND}"
+RDEPEND="${CDEPEND}"
 
 src_unpack() {
 	python_version
