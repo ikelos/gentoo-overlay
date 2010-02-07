@@ -24,6 +24,7 @@ DEPEND="${RDEPEND}
 		  sys-devel/gettext
 		>=dev-util/pkgconfig-0.15
 		>=dev-util/intltool-0.35
+		>=sys-devel/autoconf-2.64
 		>=sys-devel/libtool-2"
 
 DOCS="AUTHORS ChangeLog NEWS README"
