@@ -17,7 +17,7 @@ IUSE="eds"
 RDEPEND=">=dev-util/git-1.4.4.3
 		 >=dev-libs/glib-2.18
 		 >=x11-libs/gtk+-2.10
-		 x11-libs/gtksourceview:2.0
+		 >=x11-libs/gtksourceview-2.8
 		 eds? ( gnome-extra/evolution-data-server )
 		 >=gnome-base/libglade-2.4"
 DEPEND="${RDEPEND}
