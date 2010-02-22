@@ -1,4 +1,4 @@
-# Copyright 1999-2009 Gentoo Foundation
+# Copyright 1999-2010 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Header: /var/cvsroot/gentoo-x86/sys-fs/cryptsetup/cryptsetup-1.0.6-r2.ebuild,v 1.3 2008/12/07 03:11:17 vapier Exp $
 
@@ -6,17 +6,19 @@ EAPI=2
 
 inherit linux-info eutils flag-o-matic multilib
 
+MY_P=${P/_rc/-rc}
 DESCRIPTION="Tool to setup encrypted devices with dm-crypt"
-HOMEPAGE="http://luks.endorphin.org/ http://code.google.com/p/cryptsetup/"
-SRC_URI="http://cryptsetup.googlecode.com/files/${P}.tar.bz2"
+HOMEPAGE="http://code.google.com/p/cryptsetup/"
+SRC_URI="http://cryptsetup.googlecode.com/files/${MY_P}.tar.bz2"
 
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="-*"
 IUSE="dynamic nls selinux"
 
-DEPEND="
-	>=sys-fs/lvm2-2.02.56-r1
+S=${WORKDIR}/${MY_P}
+
+DEPEND=">=sys-fs/lvm2-2.02.56-r1
 	>=dev-libs/libgcrypt-1.1.42
 	>=dev-libs/libgpg-error-1.0-r1
 	>=dev-libs/popt-1.7
@@ -26,28 +28,12 @@ DEPEND="
 	selinux? ( sys-libs/libselinux )
 	!sys-fs/cryptsetup-luks"
 
-dm-crypt_check() {
-	local CONFIG_CHECK="~DM_CRYPT"
+pkg_setup() {
+	local CONFIG_CHECK="~DM_CRYPT ~CRYPTO ~CRYPTO_CBC"
 	local WARNING_DM_CRYPT="CONFIG_DM_CRYPT:\tis not set (required for cryptsetup)\n"
-	check_extra_config
-}
-
-crypto_check() {
-	local CONFIG_CHECK="~CRYPTO"
+	local WARNING_CRYPTO_CBC="CONFIG_CRYPTO_CBC:\tis not set (required for kernel 2.6.19)\n"
 	local WARNING_CRYPTO="CONFIG_CRYPTO:\tis not set (required for cryptsetup)\n"
 	check_extra_config
-}
-
-cbc_check() {
-	local CONFIG_CHECK="~CRYPTO_CBC"
-	local WARNING_CRYPTO_CBC="CONFIG_CRYPTO_CBC:\tis not set (required for kernel 2.6.19)\n"
-	check_extra_config
-}
-
-pkg_setup() {
-	dm-crypt_check
-	crypto_check
-	cbc_check
 
 	if use dynamic ; then
 		ewarn "If you need cryptsetup for an initrd or initramfs then you"
@@ -82,8 +68,6 @@ pkg_postinst() {
 	ewarn "You *MUST* configure your new dmcrypt file at:"
 	ewarn "/etc/conf.d/dmcrypt"
 	ewarn "Or your encrypted partitions will *NOT* work."
-	ebeep 5
-	epause 5
 	elog "Please see the example for configuring a LUKS mountpoint"
 	elog "in /etc/conf.d/dmcrypt"
 	elog
