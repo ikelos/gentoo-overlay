@@ -18,7 +18,7 @@ KEYWORDS="~x86 ~amd64"
 IUSE=""
 
 DEPEND="dev-lang/python
-		>=dev-python/pygtk-2.16.0
+		>=dev-python/pygtk-2.14.1
 		>=dev-python/pygtksourceview-2.8.0"
 RDEPEND="${DEPEND}"
 
