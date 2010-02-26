@@ -19,6 +19,6 @@ IUSE=""
 
 DEPEND="dev-lang/python
 		>=dev-python/pygtk-2.14.1
-		>=dev-python/pygtksourceview-2.8.0"
+		>=dev-python/pygtksourceview-2.6.0"
 RDEPEND="${DEPEND}"
 
