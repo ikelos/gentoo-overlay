@@ -17,7 +17,7 @@ IUSE=""
 
 DEPEND=""
 RDEPEND="dev-python/pygtk
-		 dev-util/git"
+		 dev-vcs/git"
 
 src_install() {
 	python_version

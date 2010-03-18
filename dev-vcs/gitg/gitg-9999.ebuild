@@ -21,7 +21,7 @@ RDEPEND=">=dev-libs/glib-2.16
 	>=x11-libs/gtk+-2.16
 	>=x11-libs/gtksourceview-2.2
 	>=gnome-base/gconf-2.10
-	dev-util/git"
+	dev-vcs/git"
 
 DEPEND="${RDEPEND}
 	sys-devel/gettext

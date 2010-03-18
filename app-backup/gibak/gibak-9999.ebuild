@@ -17,7 +17,7 @@ IUSE="xattr"
 
 DEPEND=">=dev-lang/ocaml-3.10
 	dev-util/omake"
-RDEPEND=">=dev-util/git-1.5.4.2
+RDEPEND=">=dev-vcs/git-1.5.4.2
 	 net-misc/rsync"
 
 src_compile() {

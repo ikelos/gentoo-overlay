@@ -31,8 +31,8 @@ DEPEND="${RDEPEND}
 		sys-devel/autoconf
 		dev-libs/glib
 		dev-libs/openssl
-		dev-util/subversion
-		dev-util/git"
+		dev-vcs/subversion
+		dev-vcs/git"
 
 pkg_setup() {
 	if useq mysql && useq postgres; then

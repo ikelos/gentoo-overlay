@@ -18,7 +18,7 @@ KEYWORDS="-x86 -amd64"
 IUSE=""
 
 DEPEND="dev-lang/python
-		dev-util/git"
+		dev-vcs/git"
 RDEPEND="${DEPEND}"
 
 S=${WORKDIR}/${MY_PN}-${PV}

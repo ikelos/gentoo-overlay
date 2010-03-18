@@ -1,3 +1,3 @@
 # Masked due to lack of support
 media-gfx/mathmap
->=dev-util/gitg-9999
+>=dev-vcs/gitg-9999
