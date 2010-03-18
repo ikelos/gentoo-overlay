@@ -9,7 +9,8 @@ MY_V="$(get_version_component_range 3)"
 
 DESCRIPTION="GTK port of Super Nintendo Entertainment System (SNES) emulator"
 HOMEPAGE="http://snes9x-gtk.googlecode.com/"
-SRC_URI="http://snes9x-gtk.googlecode.com/files/${MY_P}-src-gtk-${MY_V}.tar.bz2"
+# SRC_URI="http://snes9x-gtk.googlecode.com/files/${MY_P}-src-gtk-${MY_V}.tar.bz2"
+SRC_URI="http://snes9x-gtk.googlecode.com/files/${MY_P}-src.tar.bz2"
 
 LICENSE="as-is GPL-2 LGPL-2"
 SLOT="0"
