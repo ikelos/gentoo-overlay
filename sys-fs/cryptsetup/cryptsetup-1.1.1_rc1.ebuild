@@ -18,7 +18,7 @@ IUSE="dynamic nls selinux"
 
 S=${WORKDIR}/${MY_P}
 
-DEPEND=">=sys-fs/lvm2-2.02.56-r1
+DEPEND=">=sys-fs/lvm2-2.02.64
 	>=dev-libs/libgcrypt-1.1.42
 	>=dev-libs/libgpg-error-1.0-r1
 	>=dev-libs/popt-1.7
@@ -46,13 +46,16 @@ src_configure() {
 	use selinux || export ac_cv_lib_selinux_is_selinux_enabled=no
 	econf \
 		--sbindir=/sbin \
+		--enable-shared \
 		$(use_enable !dynamic static) \
-		--enable-libgcrypt \
-		--enable-libdevmapper \
 		--libdir=/usr/$(get_libdir) \
 		$(use_enable nls) \
 		$(use_enable selinux) \
 		|| die
+}
+
+src_compile() {
+	emake || die
 }
 
 src_install() {
