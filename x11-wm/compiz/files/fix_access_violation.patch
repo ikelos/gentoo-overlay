@@ -1,0 +1,80 @@
+diff --git a/cmake/CompizGconf.cmake b/cmake/CompizGconf.cmake
+index c7c235c..9489ebf 100644
+--- a/cmake/CompizGconf.cmake
++++ b/cmake/CompizGconf.cmake
+@@ -10,23 +10,6 @@ set (
+ )
+ 
+ function (compiz_install_gconf_schema _src _dst)
+-    find_program (GCONFTOOL_EXECUTABLE gconftool-2)
+-    mark_as_advanced (FORCE GCONFTOOL_EXECUTABLE)
+-
+-    if (GCONFTOOL_EXECUTABLE AND NOT COMPIZ_DISABLE_SCHEMAS_INSTALL)
+-	install (CODE "
+-		if (\"\$ENV{USER}\" STREQUAL \"root\")
+-		    exec_program (${GCONFTOOL_EXECUTABLE}
+-			ARGS \"--get-default-source\"
+-			OUTPUT_VARIABLE ENV{GCONF_CONFIG_SOURCE})
+-		    exec_program (${GCONFTOOL_EXECUTABLE}
+-			ARGS \"--makefile-install-rule ${_src} > /dev/null\")
+-		else (\"\$ENV{USER}\" STREQUAL \"root\")
+-		    exec_program (${GCONFTOOL_EXECUTABLE}
+-			ARGS \"--install-schema-file=${_src} > /dev/null\")
+-		endif (\"\$ENV{USER}\" STREQUAL \"root\")
+-		")
+-    endif ()
+     install (
+ 	FILES "${_src}"
+ 	DESTINATION "${COMPIZ_DESTDIR}${_dst}"
+diff --git a/gtk/gnome/CMakeLists.txt b/gtk/gnome/CMakeLists.txt
+index 5fe60b6..83c0b47 100644
+--- a/gtk/gnome/CMakeLists.txt
++++ b/gtk/gnome/CMakeLists.txt
+@@ -30,9 +30,9 @@ if (USE_GNOME)
+         ${CMAKE_CURRENT_SOURCE_DIR}/compiz-wm.desktop.in
+         ${wmproperties_file}
+     )
+-    compiz_opt_install_file (
+-	${wmproperties_file}
+-	${windowsettingsdatadir}/gnome/wm-properties/compiz-wm.desktop
++    install (
++	FILES ${wmproperties_file}
++	DESTINATION ${COMPIZ_DESTDIR}${windowsettingsdatadir}/gnome/wm-properties/
+     )
+ 
+ 
+@@ -49,14 +49,14 @@ if (USE_GNOME)
+ 	    ${CMAKE_CURRENT_BINARY_DIR}/50-compiz-desktop-key.xml
+ 	    ${CMAKE_CURRENT_BINARY_DIR}/50-compiz-key.xml
+ 	)
+-	compiz_opt_install_file (
+-	    ${CMAKE_CURRENT_BINARY_DIR}/50-compiz-desktop-key.xml
+-	    ${keybindingsdir}/50-compiz-desktop-key.xml
+-	)
+-	compiz_opt_install_file (
+-	    ${CMAKE_CURRENT_BINARY_DIR}/50-compiz-key.xml
+-	    ${keybindingsdir}/50-compiz-key.xml
+-	)
++	install (
++	    FILES ${CMAKE_CURRENT_BINARY_DIR}/50-compiz-desktop-key.xml
++	    DESTINATION ${COMPIZ_DESTDIR}${keybindingsdir}
++ 	)
++	install (
++	    FILES ${CMAKE_CURRENT_BINARY_DIR}/50-compiz-key.xml
++	    DESTINATION ${COMPIZ_DESTDIR}${keybindingsdir}
++ 	)
+     endif (USE_GNOME_KEYBINDINGS)
+ 
+     add_library (gnome-compiz MODULE
+@@ -82,8 +82,8 @@ if (USE_GNOME)
+ 	DESTINATION ${COMPIZ_DESTDIR}${windowsettingslibdir}/window-manager-settings
+     )
+ 
+-    compiz_opt_install_file (
+-	${CMAKE_CURRENT_BINARY_DIR}/libcompiz.so
+-	${windowsettingslibdir}/window-manager-settings/libcompiz.so
++    install (
++	FILES ${CMAKE_CURRENT_BINARY_DIR}/libcompiz.so
++	DESTINATION ${COMPIZ_DESTDIR}${windowsettingslibdir}/window-manager-settings
+     )
+ endif (USE_GNOME)
