@@ -22,6 +22,7 @@ RDEPEND=">=dev-vcs/git-1.5
 		 >=dev-libs/glib-2.18
 		 >=x11-libs/gtk+-2.10
 		 >=x11-libs/gtksourceview-2.8
+		 gnome-base/gnome-common
 		 eds? ( gnome-extra/evolution-data-server )
 		 >=gnome-base/libglade-2.4"
 DEPEND="${RDEPEND}
