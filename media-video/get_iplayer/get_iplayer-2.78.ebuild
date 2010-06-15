@@ -6,7 +6,7 @@ EAPI="2"
 
 DESCRIPTION="BBC Iplayer downloading application"
 HOMEPAGE="http://linuxcentre.net/get_iplayer/"
-SRC_URI="http://linuxcentre.net/${PN}/packages/${P}.tar.gz"
+SRC_URI="ftp://ftp.infradead.org/pub/get_iplayer/${P}.tar.gz"
 
 LICENSE="GPL-3"
 SLOT="0"
