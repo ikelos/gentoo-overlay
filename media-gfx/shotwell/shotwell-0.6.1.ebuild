@@ -28,7 +28,8 @@ RDEPEND=">=dev-db/sqlite-3.5.9:3
 	>=net-libs/libsoup-2.26.0
 	>=net-libs/webkit-gtk-1.1.5
 	>=sys-fs/udev-145[extras]
-	>=x11-libs/gtk+-2.14.4:2"
+	>=x11-libs/gtk+-2.14.4:2
+	>=media-gfx/libgexiv2-0.1.0"
 DEPEND="${RDEPEND}
 	>dev-lang/vala-0.8"
 
