@@ -29,7 +29,8 @@ RDEPEND=">=dev-db/sqlite-3.5.9:3
 	>=net-libs/webkit-gtk-1.1.5
 	>=sys-fs/udev-145[extras]
 	>=x11-libs/gtk+-2.14.4:2
-	>=media-gfx/libgexiv2-0.1.0"
+	>=media-gfx/libgexiv2-0.1.0
+	>=media-gfx/libraw-0.9"
 DEPEND="${RDEPEND}
 	>dev-lang/vala-0.8"
 
