@@ -22,6 +22,6 @@ src_install() {
 	distutils_src_install
 	mkdir ${D}/usr/share/${PN}
 	mv ${D}/usr/plugins ${D}/usr/share/${PN}
-	dosym /usr/bin/volatility.py volatility
+	mv ${D}/usr/bin/volatility.py ${D}/usr/bin/volatility
 }
 
