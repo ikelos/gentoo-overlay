@@ -7,11 +7,11 @@ EAPI=3
 inherit eutils distutils cmake-utils git
 
 DESCRIPTION="Library for carrying out memory forensics using firewire/ieee1394."
-HOMEPAGE="http://gitweb.freddie.witherden.org/?p=forensic1394.git;a=summary"
+HOMEPAGE="http://freddie.witherden.org/tools/libforensic1394/"
 SRC_URI=""
 EGIT_REPO_URI="git://git.freddie.witherden.org/forensic1394.git"
 
-LICENSE="GPL-3 LGPL-3"
+LICENSE="LGPL-3"
 SLOT="0"
 KEYWORDS="~x86 ~amd64"
 IUSE="python"
