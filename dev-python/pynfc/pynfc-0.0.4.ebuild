@@ -16,6 +16,7 @@ KEYWORDS="~x86 ~amd64"
 IUSE=""
 
 DEPEND=">=dev-libs/libnfc-1.3.1
+		<dev-libs/libnfc-1.3.9
 		>=dev-lang/swig-2.0.0"
 RDEPEND="${DEPEND}"
 
