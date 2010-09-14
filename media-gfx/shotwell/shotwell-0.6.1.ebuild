@@ -24,7 +24,7 @@ RDEPEND=">=dev-db/sqlite-3.5.9:3
 	>=dev-libs/libxml2-2.6.32
 	>=gnome-base/gconf-2.22.0
 	>=media-libs/libexif-0.6.16
-	>=media-libs/libgexiv2-0.1.0
+	>=media-libs/gexiv2-0.1.0
 	>=media-libs/libgphoto2-2.4.2
 	>=media-libs/libraw-0.9.0
 	>=net-libs/libsoup-2.26.0
