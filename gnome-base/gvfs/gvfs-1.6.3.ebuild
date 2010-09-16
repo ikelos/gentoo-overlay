@@ -91,7 +91,7 @@ src_prepare() {
 
 	epatch "${FILESDIR}/${PN}-1.6.3-openssh-5.6.patch"
 
-	use gphoto2 || use archive && eautoreconf
+	eautoreconf
 }
 
 src_install() {
