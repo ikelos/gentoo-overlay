@@ -2,9 +2,9 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: /var/cvsroot/gentoo-x86/sys-fs/cryptsetup/cryptsetup-1.1.2.ebuild,v 1.1 2010/06/17 19:09:41 robbat2 Exp $
 
-EAPI=2
+EAPI="2"
 
-inherit linux-info eutils flag-o-matic multilib autotools
+inherit linux-info eutils multilib libtool
 
 MY_P=${P/_rc/-rc}
 DESCRIPTION="Tool to setup encrypted devices with dm-crypt"
@@ -42,10 +42,7 @@ pkg_setup() {
 }
 
 src_prepare() {
-	# Both merged upstream
-	#epatch "${FILESDIR}"/1.1.0_rc3-static-no-selinux.patch
-	#epatch "${FILESDIR}"/1.1.0-libudev.patch
-	eautoreconf
+	elibtoolize
 }
 
 src_configure() {
@@ -55,16 +52,13 @@ src_configure() {
 		$(use_enable !dynamic static) \
 		--libdir=/usr/$(get_libdir) \
 		$(use_enable nls) \
-		$(use_enable selinux) \
-		|| die
-}
-
-src_compile() {
-	emake || die
+		$(use_enable selinux)
 }
 
 src_install() {
-	emake DESTDIR="${D}" install || die "install failed"
+	emake DESTDIR="${D}" install || die
+	dodoc TODO ChangeLog # README NEWS # last ones are empty
+
 	rmdir "${D}"/usr/$(get_libdir)/cryptsetup
 	newconfd "${FILESDIR}"/1.0.6-r3-dmcrypt.confd dmcrypt || die
 	newinitd "${FILESDIR}"/1.0.6-r3-dmcrypt.rc dmcrypt || die
@@ -86,4 +80,10 @@ pkg_postinst() {
 	elog "after 10 seconds add the following to your bootloader config:"
 	elog "key_timeout=10"
 	elog "A timeout of 0 will mean it will wait indefinitely."
+	elog
+	elog "Users using cryptsetup-1.0.x (dm-crypt plain) volumes must use"
+	elog "a compatibility mode when using cryptsetup-1.1.x. This can be"
+	elog "done by specifying the cipher (-c), key size (-s) and hash (-h)."
+	elog "For more info, see http://code.google.com/p/cryptsetup/wiki/FrequentlyAskedQuestions#6._Issues_with_Specific_Versions_of_cryptsetup"
+
 }
