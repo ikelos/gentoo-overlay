@@ -19,6 +19,10 @@ IUSE="python"
 DEPEND="python? ( =dev-lang/python-2.6* )"
 RDEPEND="${DEPEND}"
 
+src_prepare() {
+	epatch "${FILESDIR}/request-pipeline.patch"
+}
+
 src_compile() {
 	cmake-utils_src_compile
 	if $(use python); then
