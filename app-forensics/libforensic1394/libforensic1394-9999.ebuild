@@ -13,7 +13,7 @@ EGIT_REPO_URI="git://git.freddie.witherden.org/forensic1394.git"
 
 LICENSE="LGPL-3"
 SLOT="0"
-KEYWORDS="~x86 ~amd64"
+KEYWORDS="-x86 -amd64"
 IUSE="python"
 
 DEPEND="python? ( =dev-lang/python-2.6* )"
