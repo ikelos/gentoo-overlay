@@ -1,0 +1,20 @@
+--- gdm-2.30.0/daemon/simple-slave-main.c	2010-03-29 23:42:03.000000000 +0200
++++ gdm-2.30.0/daemon/simple-slave-main.c	2010-04-04 04:13:12.000000000 +0200
+@@ -49,6 +49,7 @@
+ #include "gdm-settings.h"
+ #include "gdm-settings-direct.h"
+ #include "gdm-settings-keys.h"
++#include "common/gdm-settings-client.h"
+ 
+ static GdmSettings     *settings        = NULL;
+ static int              gdm_return_code = 0;
+--- gdm-2.30.0/gui/user-switch-applet/applet.c	2010-03-29 23:42:03.000000000 +0200
++++ gdm-2.30.0/gui/user-switch-applet/applet.c	2010-04-04 04:16:41.000000000 +0200
+@@ -22,6 +22,7 @@
+ 
+ #include <string.h>
+ #include <unistd.h>
++#include <stdlib.h>
+ #include <sys/types.h>
+ 
+ #include <glib/gi18n.h>

@@ -80,6 +80,7 @@ pkg_setup() {
 	G2CONF="${G2CONF}
 		--disable-schemas-install
 		--localstatedir=/var
+		--enable-console-helper
 		--with-xdmcp=yes
 		--enable-authentication-scheme=pam
 		--with-pam-prefix=/etc
@@ -101,19 +102,19 @@ src_prepare() {
 	gnome2_src_prepare
 
 	# remove unneeded linker directive for selinux (#41022)
-	#epatch "${WORKDIR}/${PN}-2.26.1-selinux-remove-attr.patch"
+	epatch "${WORKDIR}/${PN}-2.26.1-selinux-remove-attr.patch"
 
 	# Make it daemonize so that the boot process can continue (#236701)
-	#epatch "${WORKDIR}/${PN}-2.26.1-fix-daemonize-regression.patch"
+	epatch "${FILESDIR}/${PN}-2.31.1-fix-daemonize-regression.patch"
 
 	# Fix VT grab problem causing GDM to grab VT2 instead of 7 (#261339)
-	#epatch "${WORKDIR}/${PN}-2.26.1-broken-VT-detection.patch"
+	epatch "${FILESDIR}/${PN}-2.30.0-MinimalVT-detection.patch"
 
 	# Make custom session work, bug #.
-	#epatch "${WORKDIR}/${PN}-2.26.1-custom-session.patch"
+	epatch "${FILESDIR}/${PN}-2.29.92-custom-session.patch"
 
 	# ssh-agent handling must be done at xinitrc.d
-	#epatch "${WORKDIR}/${PN}-2.26.1-xinitrc-ssh-agent.patch"
+	epatch "${WORKDIR}/${PN}-2.26.1-xinitrc-ssh-agent.patch"
 
 	# Fix libxklavier automagic support
 	# epatch "${WORKDIR}/${PN}-2.26.1-automagic-libxklavier-support.patch"
@@ -123,7 +124,7 @@ src_prepare() {
 	# rm -vf "${S}/daemon/test-hal-seats.c"
 
 	# intltoolize --force --copy --automake || die "intltoolize failed"
-	# eautoreconf
+	eautoreconf
 }
 
 src_install() {
