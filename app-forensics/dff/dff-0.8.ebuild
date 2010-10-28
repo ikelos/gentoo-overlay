@@ -3,6 +3,7 @@
 # $Header: $
 
 EAPI=3
+PYTHON_DEPEND="2:2.6"
 
 inherit cmake-utils python
 
@@ -15,8 +16,6 @@ LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~x86 ~amd64"
 IUSE="phonon"
-
-PYTHON_DEPEND="2:5"
 
 DEPEND=">=dev-lang/swig-1.3.38
 		dev-python/sip
