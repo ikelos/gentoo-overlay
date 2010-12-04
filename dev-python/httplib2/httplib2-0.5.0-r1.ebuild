@@ -4,7 +4,7 @@
 
 EAPI="2"
 
-NEED_PYTHON="2.3"
+PYTHON_DEPEND="2 3"
 SUPPORT_PYTHON_ABIS="1"
 
 inherit distutils
