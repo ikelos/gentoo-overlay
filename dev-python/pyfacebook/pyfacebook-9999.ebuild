@@ -13,7 +13,8 @@ SLOT="0"
 KEYWORDS="~amd64 ~ia64 ~ppc ~ppc64 ~x86"
 IUSE="examples test"
 
-RDEPEND="dev-lang/python"
+RDEPEND="dev-lang/python
+         dev-python/simplejson"
 DEPEND="${RDEPEND}"
 
 S="${WORKDIR}"
