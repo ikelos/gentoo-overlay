@@ -25,6 +25,7 @@ S="${WORKDIR}/lib${P}"
 
 src_prepare() {
 	sed -e "s/libtool/libtool --tag=CC/" -i Makefile
+	epatch "${FILESDIR}/${P}-exiv2-0.21.patch"
 }
 
 src_install() {
