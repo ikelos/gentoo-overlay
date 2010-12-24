@@ -5,13 +5,13 @@
 EAPI="2"
 GCONF_DEBUG="no"
 
-inherit gnome2 versionator eutils subversion
+inherit gnome2 versionator eutils
 
 MY_PV=$(get_version_component_range 1-2)
 DESCRIPTION="Open source photo manager for GNOME"
 HOMEPAGE="http://www.yorba.org/shotwell/"
-SRC_URI="" # http://www.yorba.org/download/${PN}/${MY_PV}/${P}.tar.bz2"
-ESVN_REPO_URI="svn://svn.yorba.org/shotwell/trunk"
+SRC_URI="http://www.yorba.org/download/${PN}/${MY_PV}/${P}.tar.bz2"
+# ESVN_REPO_URI="svn://svn.yorba.org/shotwell/trunk"
 
 LICENSE="LGPL-2.1"
 SLOT="0"
