@@ -15,7 +15,7 @@ SRC_URI=""
 LICENSE="LGPL-3"
 SLOT="0"
 KEYWORDS="-x86 -amd64"
-IUSE=""
+IUSE="lua +python"
 
 DEPEND="dev-python/docutils"
 RDEPEND=""
@@ -26,10 +26,9 @@ src_prepare() {
 
 src_configure() {
 	# Dummy function to do nothing
-	${S}/waf configure --prefix="/usr" --bindings="python"
+	local bindings=""
+	use lua && bindings="lua"
+	use python && bindings="python"
+	use lua && use python && bindings="lua,python"
+	${S}/waf configure --prefix="/usr" --bindings="${bindings}"
 }
-
-#src_install() {
-#	waf-utils_src_install
-#	die
-#}

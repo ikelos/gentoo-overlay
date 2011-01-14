@@ -50,7 +50,7 @@ index 17e733a..437ad3e 100644
  )
  bld.install_files('${PREFIX}/share/doc/libbls-${LIBBLS_VERSION_NO_PATCH}', ['user_guide.txt', 'user_guide.css'])
 diff --git a/wscript b/wscript
-index 4369638..b496758 100644
+index 4369638..d451832 100644
 --- a/wscript
 +++ b/wscript
 @@ -31,6 +31,7 @@ def set_options(opt):
@@ -61,6 +61,15 @@ index 4369638..b496758 100644
  	conf.check_tool('misc')
  	
  	# Check required headers
+@@ -57,7 +58,7 @@ def configure(conf):
+ 			conf.env.append_unique('CCDEFINES', ('HAVE_%s' % func).upper())
+ 			
+ 	# Check optional packages
+-	opt_pkgs = [('lua5.1', 'lua')]
++	opt_pkgs = [('lua', 'lua5.1')]
+ 	for pkg, uselib in opt_pkgs:
+ 		conf.check_cfg(package = pkg, uselib_store = uselib, args = '--cflags --libs',
+ 				mandatory = 'lua' in Options.options.bindings)
 @@ -89,6 +90,10 @@ def configure(conf):
  	(conf.env.LIBBLS_VERSION_MAJOR, conf.env.LIBBLS_VERSION_MINOR, conf.env.LIBBLS_VERSION_PATCH) = VERSION.split('.')
  	conf.env.LIBBLS_VERSION_NO_PATCH = '%s.%s' % (conf.env.LIBBLS_VERSION_MAJOR, conf.env.LIBBLS_VERSION_MINOR)
