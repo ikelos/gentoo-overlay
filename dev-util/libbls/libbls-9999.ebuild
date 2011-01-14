@@ -2,7 +2,9 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
-inherit bzr
+EAPI="3"
+
+inherit eutils waf-utils bzr
 
 EBZR_REPO_URI="lp:libbls"
 
@@ -15,15 +17,19 @@ SLOT="0"
 KEYWORDS="-x86 -amd64"
 IUSE=""
 
-DEPEND="dev-util/scons"
+DEPEND="dev-python/docutils"
 RDEPEND=""
 
-src_compile() {
-	cd ${S}
-	scons || die "Failed to compile"
+src_prepare() {
+	epatch "${FILESDIR}/libbls-9999-python-fixes.patch"
 }
 
-src_install() {
-	cd ${S}
-	scons prefix=/usr destdir="${D}" install || die "Failed to install"
+src_configure() {
+	# Dummy function to do nothing
+	${S}/waf configure --prefix="/usr" --bindings="python"
 }
+
+#src_install() {
+#	waf-utils_src_install
+#	die
+#}
