@@ -10,7 +10,7 @@ SRC_URI="${MY_P}.tar.gz"
 
 RESTRICT="fetch"
 
-LICENSE="GPL-2"
+LICENSE=""
 SLOT="0"
 KEYWORDS="~x86"
 IUSE=""
