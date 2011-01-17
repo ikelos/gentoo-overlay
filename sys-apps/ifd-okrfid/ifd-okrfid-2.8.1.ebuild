@@ -8,9 +8,9 @@ DESCRIPTION="Omnikey Cardman 5x2x PC/SC RFID drivers"
 HOMEPAGE="http://omnikey.aaitg.com/index.php?id=69"
 SRC_URI="${MY_P}.tar.gz" # http://www.hidglobal.com/drivers/omnikey/${MY_P}.tar.gz"
 
-RESTRICT=""
+RESTRICT="fetch"
 
-LICENSE="GPL-2"
+LICENSE=""
 SLOT="0"
 KEYWORDS="~x86"
 IUSE=""
