@@ -16,7 +16,7 @@ SRC_URI=""
 LICENSE="LGPL-3"
 SLOT="0"
 KEYWORDS="-x86 -amd64"
-IUSE=""
+IUSE="debug"
 
 DEPEND="sys-apps/pcsc-lite
 		dev-libs/libusb"
@@ -24,6 +24,10 @@ RDEPEND="${DEPEND}"
 
 src_prepare() {
 	eautoreconf
+}
+
+src_configure() {
+	econf $(use_enable debug) || die "Failed to configure."
 }
 
 src_install() {
