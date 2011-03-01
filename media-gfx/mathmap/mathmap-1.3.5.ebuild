@@ -23,13 +23,6 @@ RDEPEND=">=media-gfx/gimp-2.2
 DEPEND="${RDEPEND}
 		app-doc/doxygen"
 
-src_prepare() {
-	#sed -i -e 's/GIMPDATADIR := /GIMPDATADIR := $(DESTDIR)/' Makefile
-	#sed -i -e 's/--install-admin-bin/--prefix=$(DESTDIR) --install-admin-bin/' Makefile
-	#sed -i -e 's/mkdir/mkdir -p/' Makefile
-	true
-}
-
 src_compile() {
 	emake -j1 || die "Failed to compile"
 }
