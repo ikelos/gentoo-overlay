@@ -30,7 +30,7 @@ RDEPEND="${DEPEND}
 S="${WORKDIR}/${PN}-src-${PV}"
 
 src_prepare() {
-	epatch "${FILESDIR}/${PN}-0.9-disable-qtassistant.patch"
+	epatch "${FILESDIR}/${PN}-1.0.0-disable-qtassistant.patch"
 }
 
 src_configure() {
