@@ -20,22 +20,22 @@ IUSE=""
 
 RDEPEND=">=dev-db/sqlite-3.5.9:3
 	>=dev-libs/dbus-glib-0.80
-	>=dev-libs/json-glib-0.10.2
 	>=dev-libs/libgee-0.5.0
-	>=dev-libs/libunique-1.0.0
-	>=dev-libs/libxml2-2.6.32
-	>=gnome-base/gconf-2.22.0
+	>=dev-libs/libunique-1:1
+	>=dev-libs/libxml2-2.6.32:2
+	>=gnome-base/gconf-2.22.0:2
 	>=media-libs/libexif-0.6.16
 	>=media-libs/libgphoto2-2.4.2
-	>=net-libs/libsoup-2.26.0
-	>=net-libs/webkit-gtk-1.1.5
+	>=net-libs/libsoup-2.26.0:2.4
+	>=net-libs/webkit-gtk-1.1.5:2
 	>=sys-fs/udev-145[extras]
-	>=x11-libs/gtk+-2.14.4:2
+	>=x11-libs/gtk+-2.18.0:2
 	>=media-libs/libraw-0.9.0
-	>=media-libs/gexiv2-0.2.1
+	>=media-libs/gexiv2-0.2.0
+	>=dev-libs/json-glib-0.7.6
 	media-libs/lcms:2"
 DEPEND="${RDEPEND}
-	>=dev-lang/vala-0.9.5:0.10"
+	>=dev-lang/vala-0.11.7:0.12"
 
 DOCS="AUTHORS MAINTAINERS NEWS README THANKS"
 
@@ -49,7 +49,7 @@ pkg_setup() {
 src_prepare() {
 	gnome2_src_prepare
 
-	sed -e 's/valac/valac-0.10/' -i Makefile || die
+	sed -e 's/valac/valac-0.12/' -i Makefile plugins/Makefile.plugin.mk || die
 }
 
 src_install() {
