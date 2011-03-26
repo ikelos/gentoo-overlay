@@ -21,7 +21,6 @@ DEPEND=">=dev-lang/swig-1.3.38
 		dev-python/sip
 		doc? ( >=dev-python/PyQt4-4.4.0[phonon?,webkit,assistant] )
 		!doc? ( >=dev-python/PyQt4-4.4.0[phonon?] )
-		>=dev-python/qscintilla-python-2.4
 		>=sys-apps/file-4.26[python]
 		"
 RDEPEND="${DEPEND}
