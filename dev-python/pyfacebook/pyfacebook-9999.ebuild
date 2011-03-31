@@ -14,6 +14,7 @@ KEYWORDS="~amd64 ~ia64 ~ppc ~ppc64 ~x86"
 IUSE="examples test"
 
 RDEPEND="dev-lang/python
+		 dev-python/django
          dev-python/simplejson"
 DEPEND="${RDEPEND}"
 
