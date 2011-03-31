@@ -26,8 +26,6 @@ DEPEND=">=dev-lang/swig-1.3.38
 RDEPEND="${DEPEND}
 		 ewf? ( >=app-forensics/libewf-20100226 )"
 
-S="${WORKDIR}/${PN}-src-${PV}"
-
 src_prepare() {
 	epatch "${FILESDIR}/${PN}-1.0.0-disable-qtassistant.patch"
 }
