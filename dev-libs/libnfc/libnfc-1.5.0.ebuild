@@ -1,8 +1,8 @@
-# Copyright 1999-2009 Gentoo Foundation
+# Copyright 1999-2011 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/dev-libs/libnfc/libnfc-1.2.1.ebuild,v 1.1 2009/08/16 14:18:29 ikelos Exp $
+# $Header: /var/cvsroot/gentoo-x86/dev-libs/libnfc/libnfc-1.4.2.ebuild,v 1.2 2011/03/20 18:11:44 ssuominen Exp $
 
-EAPI="2"
+EAPI="4"
 
 inherit eutils
 
@@ -15,10 +15,10 @@ SLOT="0"
 KEYWORDS="~x86 ~amd64"
 IUSE="doc"
 
-DEPEND="sys-apps/pcsc-lite
-		dev-libs/libusb
-		doc? ( app-doc/doxygen )"
-RDEPEND="${DEPEND}"
+RDEPEND="sys-apps/pcsc-lite
+	virtual/libusb:0"
+DEPEND="${RDEPEND}
+	doc? ( app-doc/doxygen )"
 
 src_compile() {
 	emake || die "Failed to compile."
@@ -27,5 +27,5 @@ src_compile() {
 
 src_install() {
 	emake install DESTDIR="${D}" || die "Failed to install properly."
-	use doc && dohtml ${S}/doc/html/*
+	use doc && dohtml "${S}"/doc/html/*
 }
