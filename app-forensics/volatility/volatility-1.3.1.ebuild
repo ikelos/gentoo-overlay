@@ -2,6 +2,8 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
+EAPI="3"
+
 inherit distutils subversion
 
 ESVN_REPO_URI="http://volatility.googlecode.com/svn/tags/${PN/v/V}-${PV}/"
