@@ -4,6 +4,8 @@
 
 EAPI="3"
 
+PYTHON_DEPEND="2:2.6"
+
 inherit distutils subversion
 
 ESVN_REPO_URI="http://volatility.googlecode.com/svn/branches/${P/v/V}"
