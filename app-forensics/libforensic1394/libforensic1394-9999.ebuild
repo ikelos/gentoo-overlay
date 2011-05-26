@@ -3,6 +3,7 @@
 # $Header: $
 
 EAPI=3
+PYTHON_DEPEND="2:2.6"
 
 inherit eutils distutils cmake-utils git
 
@@ -16,7 +17,7 @@ SLOT="0"
 KEYWORDS="-x86 -amd64"
 IUSE="python"
 
-DEPEND="python? ( =dev-lang/python-2.6* )"
+DEPEND="python? ( dev-lang/python )"
 RDEPEND="${DEPEND}"
 
 src_prepare() {
