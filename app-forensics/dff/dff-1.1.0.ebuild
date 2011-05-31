@@ -15,12 +15,12 @@ SRC_URI="http://www.digital-forensic.org/${PN}-src-${PV}.tar.gz"
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~x86 ~amd64"
-IUSE="phonon doc ewf +aff +pff"
+IUSE="doc ewf +aff +pff"
 
 DEPEND=">=dev-lang/swig-1.3.38
 		dev-python/sip
-		doc? ( >=dev-python/PyQt4-4.4.0[phonon?,webkit,assistant] )
-		!doc? ( >=dev-python/PyQt4-4.4.0[phonon?] )
+		doc? ( >=dev-python/PyQt4-4.4.0[webkit,assistant] )
+		!doc? ( >=dev-python/PyQt4-4.4.0 )
 		>=sys-apps/file-4.26[python]
 		"
 RDEPEND="${DEPEND}
