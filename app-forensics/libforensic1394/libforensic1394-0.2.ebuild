@@ -19,9 +19,11 @@ IUSE="python"
 DEPEND="python? ( dev-lang/python )"
 RDEPEND="${DEPEND}"
 
-#src_prepare() {
-#	epatch "${FILESDIR}/request-pipeline.patch"
-#}
+src_prepare() {
+	# epatch "${FILESDIR}/request-pipeline.patch"
+	sed -e "s#DESTINATION lib#DESTINATION $(get_libdir)#" \
+	    -i "${S}/CMakeLists.txt"
+}
 
 src_compile() {
 	cmake-utils_src_compile

@@ -7,7 +7,7 @@ index 03f014c..e7daf76 100644
   *  current kernels (at least up to 2.6.35) this is currently limited to 1.
   */
 -#define REQUEST_PIPELINE_SZ 1
-+#define REQUEST_PIPELINE_SZ 2
++#define REQUEST_PIPELINE_SZ 4
  
  struct _platform_bus
  {
