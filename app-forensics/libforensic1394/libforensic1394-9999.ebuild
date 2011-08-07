@@ -23,7 +23,7 @@ RDEPEND="${DEPEND}"
 src_prepare() {
 	sed -e "s#DESTINATION lib#DESTINATION $(get_libdir)#" \
 		-i "${S}/CMakeLists.txt"
-	epatch "${FILESDIR}/request-pipeline.patch"
+	# epatch "${FILESDIR}/request-pipeline.patch"
 }
 
 src_compile() {
