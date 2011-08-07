@@ -11,7 +11,7 @@ MY_PV=$(replace_version_separator 3 '-')
 MY_P=${PN}-${MY_PV}
 
 DESCRIPTION="PE File analysis module"
-HOMEPAGE="http://dkbza.org/pefile.html"
+HOMEPAGE="http://code.google.com/p/pefile/"
 SRC_URI="http://${PN}.googlecode.com/files/${MY_P}.tar.gz"
 
 LICENSE="MIT"
