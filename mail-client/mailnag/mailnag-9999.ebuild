@@ -10,7 +10,7 @@ DESCRIPTION="Mail nagger for gnome-shell (port of popper for unity)"
 HOMEPAGE="http://launchpad.net/mailnag"
 SRC_URI=""
 
-EGIT_REPO_URI="https://github.com/pulb/mailnag.git"
+EGIT_REPO_URI="http://github.com/pulb/mailnag.git"
 
 LICENSE=""
 SLOT="0"
