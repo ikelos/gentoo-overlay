@@ -1,0 +1,58 @@
+diff --git a/rwimg/rwpng.c b/rwimg/rwpng.c
+index 840d13f..b54cff3 100644
+--- a/rwimg/rwpng.c
++++ b/rwimg/rwpng.c
+@@ -58,7 +58,7 @@ open_png_file_reading (const char *filename, int *width, int *height)
+     data->end_info = png_create_info_struct(data->png_ptr);
+     assert(data->end_info != 0);
+ 
+-    if (setjmp(data->png_ptr->jmpbuf))
++    if (setjmp(png_jmpbuf(data->png_ptr)))
+ 	assert(0);
+ 
+     png_init_io(data->png_ptr, data->file);
+@@ -105,7 +105,7 @@ png_read_lines (void *_data, unsigned char *lines, int num_lines)
+     int bps, spp;
+     unsigned char *row;
+ 
+-    if (setjmp(data->png_ptr->jmpbuf))
++    if (setjmp(png_jmpbuf(data->png_ptr)))
+ 	assert(0);
+ 
+     if (data->info_ptr->color_type == PNG_COLOR_TYPE_GRAY)
+@@ -151,7 +151,7 @@ png_free_reader_data (void *_data)
+ {
+     png_data_t *data = (png_data_t*)_data;
+ 
+-    if (setjmp(data->png_ptr->jmpbuf))
++    if (setjmp(png_jmpbuf(data->png_ptr)))
+ 	assert(0);
+ 
+     if (data->have_read)
+@@ -180,7 +180,7 @@ open_png_file_writing (const char *filename, int width, int height, int pixel_st
+     data->info_ptr = png_create_info_struct(data->png_ptr);
+     assert(data->info_ptr != 0);
+ 
+-    if (setjmp(data->png_ptr->jmpbuf))
++    if (setjmp(png_jmpbuf(data->png_ptr)))
+ 	assert(0);
+ 
+     if (pixel_stride == 4)
+@@ -216,7 +216,7 @@ png_write_lines (void *_data, unsigned char *lines, int num_lines)
+     unsigned char *packed_line;
+     int i;
+ 
+-    if (setjmp(data->png_ptr->jmpbuf))
++    if (setjmp(png_jmpbuf(data->png_ptr)))
+ 	assert(0);
+ 
+     if (data->pixel_stride != 3)
+@@ -257,7 +257,7 @@ png_free_writer_data (void *_data)
+ {
+     png_data_t *data = (png_data_t*)_data;
+ 
+-    if (setjmp(data->png_ptr->jmpbuf))
++    if (setjmp(png_jmpbuf(data->png_ptr)))
+ 	assert(0);
+ 
+     png_write_end(data->png_ptr, data->info_ptr);

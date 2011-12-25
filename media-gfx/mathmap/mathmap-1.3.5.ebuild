@@ -23,6 +23,10 @@ RDEPEND=">=media-gfx/gimp-2.2
 DEPEND="${RDEPEND}
 		app-doc/doxygen"
 
+src_prepare() {
+	epatch "${FILESDIR}/${PN}-libpng15.patch"
+}
+
 src_compile() {
 	emake -j1 || die "Failed to compile"
 }
