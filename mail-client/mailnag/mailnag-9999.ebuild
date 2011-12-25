@@ -17,7 +17,8 @@ SLOT="0"
 KEYWORDS="~amd64 ~x86"
 IUSE=""
 
-DEPEND=""
+DEPEND="dev-python/pygobject:3
+		dev-python/gnome-keyring-python"
 RDEPEND="${DEPEND}"
 
 src_prepare() {
