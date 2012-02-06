@@ -4,7 +4,7 @@
 
 EAPI="2"
 
-inherit git
+inherit git-2
 
 DESCRIPTION="BBC Iplayer downloading application"
 HOMEPAGE="http://linuxcentre.net/get_iplayer/"
