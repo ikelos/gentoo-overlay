@@ -1,0 +1,34 @@
+diff --git a/gen_bootloader.sh b/gen_bootloader.sh
+index 79531d4..45c3742 100755
+--- a/gen_bootloader.sh
++++ b/gen_bootloader.sh
+@@ -5,6 +5,9 @@ set_bootloader() {
+ 		grub)
+ 			set_bootloader_grub
+ 			;;
++        grub2)
++            set_bootloader_grub2
++            ;;
+ 		*)
+ 			print_warning "Bootloader ${BOOTLOADER} is not currently supported"
+ 			;;
+@@ -28,6 +31,19 @@ set_bootloader_grub_read_device_map() {
+ 	echo "${TEMP}/grub.map"
+ }
+ 
++set_bootloader_grub2() {
++    local GRUB_CONF="${BOOTDIR}/grub2/grub.cfg"
++
++    if [ ! -e ${GRUB_CONF} ]
++    then
++		print_error 1 "Error! ${GRUB_CONF} does not exist, please ensure grub2 is correctly setup first."
++        return 0
++    fi
++
++    print_info 1 "Running grub2-mkconfig to create ${GRUB_CONF}..."
++    grub2-mkconfig > ${GRUB_CONF}
++}
++
+ set_bootloader_grub() {
+ 	local GRUB_CONF="${BOOTDIR}/grub/grub.conf"
+ 
