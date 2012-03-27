@@ -21,6 +21,7 @@ RDEPEND="${DEPEND}"
 
 src_prepare() {
 	# epatch "${FILESDIR}/request-pipeline.patch"
+	epatch "${FILESDIR}/libforensic-exception.patch"
 	sed -e "s#DESTINATION lib#DESTINATION $(get_libdir)#" \
 	    -i "${S}/CMakeLists.txt"
 }
