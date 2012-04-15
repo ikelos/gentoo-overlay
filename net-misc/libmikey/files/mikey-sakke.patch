@@ -1,0 +1,1562 @@
+diff --git a/Makefile.am b/Makefile.am
+index d8ddfcf..f3d5280 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -10,7 +10,7 @@ lib_LTLIBRARIES = libmikey.la
+ libmikey_la_CXXFLAGS = $(MINISIP_CFLAGS)
+ libmikey_la_LDFLAGS = $(MINISIP_LIBRARY_LDFLAGS)
+ 
+-libmikey_la_LIBADD =  $(MINISIP_LIBS)
++libmikey_la_LIBADD =  $(MINISIP_LIBS) -lsakke
+ 
+ libmikey_la_SOURCES = $(mikey_src) $(ka_src)
+ 
+@@ -31,7 +31,8 @@ mikey_src = \
+                      mikey/MikeyMessagePSK.cxx \
+                      mikey/MikeyMessageDHHMAC.h \
+                      mikey/MikeyMessageDHHMAC.cxx \
+-                     mikey/MikeyMessagePKE.h \
++                     mikey/MikeyMessageSakke.cxx \
++		     mikey/MikeyMessagePKE.h \
+                      mikey/MikeyMessagePKE.cxx \
+                      mikey/MikeyMessageRSAR.h \
+                      mikey/MikeyMessageRSAR.cxx \
+@@ -47,7 +48,8 @@ mikey_src = \
+                      mikey/MikeyPayloadKeyData.cxx \
+                      mikey/MikeyPayloadPKE.cxx \
+                      mikey/MikeyPayloadRAND.cxx \
+-                     mikey/MikeyPayloadSIGN.cxx \
++                     mikey/MikeyPayloadSakke.cxx \
++		     mikey/MikeyPayloadSIGN.cxx \
+                      mikey/MikeyPayloadSP.cxx \
+ 		     mikey/MikeyPayloadT.cxx \
+ 		     mikey/MikeyPayloadV.cxx
+@@ -58,6 +60,7 @@ ka_src =             keyagreement/KeyAgreement.cxx \
+ 	             keyagreement/KeyAgreementPKE.cxx \
+ 	             keyagreement/KeyAgreementDHHMAC.cxx \
+ 	             keyagreement/KeyAgreementRSAR.cxx \
++		     keyagreement/KeyAgreementSakke.cxx \
+ 		     keyagreement/KeyValidity.cxx
+ 
+ # maintainer rules
+diff --git a/include/libmikey/KeyAgreement.h b/include/libmikey/KeyAgreement.h
+index 9def9af..3e89bd2 100644
+--- a/include/libmikey/KeyAgreement.h
++++ b/include/libmikey/KeyAgreement.h
+@@ -53,6 +53,11 @@
+ #define KEY_AGREEMENT_TYPE_DHHMAC 3
+ #define KEY_AGREEMENT_TYPE_RSA_R 4
+ 
++// MWR
++#define KEY_AGREEMENT_TYPE_SAKKE 5
++// MWR
++
++
+ class MikeyMessage;
+ 
+ // Class to hold Security Policy (SP) info
+diff --git a/include/libmikey/KeyAgreementSakke.h b/include/libmikey/KeyAgreementSakke.h
+new file mode 100644
+index 0000000..7599e53
+--- /dev/null
++++ b/include/libmikey/KeyAgreementSakke.h
+@@ -0,0 +1,52 @@
++/* KeyagreementSakke.h
++ *
++ * Crown Copyright (c) 2012
++ *
++ * Authors: MWR InfoSecurity (Nils)
++ *
++ */
++
++#ifndef KEYAGREEMENTSAKKE_H
++#define KEYAGREEMENTSAKKE_H
++
++#include <libmikey/KeyAgreement.h>
++#include <libmcrypto/cert.h>
++
++char * generateUsingKA(unsigned char* KPAK, unsigned char * SSK, unsigned char * PVT, unsigned char * Z, unsigned char * RSKi, char* uri, char* peeruri);
++
++/**
++ * Instances of this class are used to store the necessary information about
++ * the keys used in the security protocol SRTP
++ * It contains the necessary methods to derive the keys used
++ */
++class LIBMIKEY_API KeyAgreementSakke : public KeyAgreement {
++	public:
++	
++		KeyAgreementSakke( ); 
++		KeyAgreementSakke(unsigned char * KPAK, unsigned char * SSK, unsigned char * PVT, unsigned char * Z, unsigned char * RSK);
++		/**
++		 * Destructor deletes some objects to prevent memory leaks
++		 */
++		~KeyAgreementSakke();
++
++		unsigned char* getKPAK( );
++		unsigned char* getZ();
++		unsigned char* getSSK();
++		unsigned char* getPVT();
++		unsigned char* getRSK();
++
++	void setTSent( uint64_t tSent );
++	    
++		MikeyMessage* createMessage();
++
++		int32_t type();
++
++		uint64_t tSentValue;
++		
++		unsigned char *KPAK;
++		unsigned char *SSK;
++		unsigned char *PVT;
++		unsigned char *Z;
++		unsigned char *RSK;
++};
++#endif //KEYAGREEMENTSAKKE_H
+diff --git a/include/libmikey/Mikey.h b/include/libmikey/Mikey.h
+index 3838fb9..cc1f0d3 100644
+--- a/include/libmikey/Mikey.h
++++ b/include/libmikey/Mikey.h
+@@ -31,6 +31,10 @@
+ #include<libmutil/MemObject.h>
+ #include<libmikey/KeyAgreement.h>
+ 
++// MWR
++int read_keys(char *fn, char **sipname, char **kms, char **rsk, char **kpak, char **pvt, char **ssk);
++// MWR
++
+ class SipSim;
+ 
+ class LIBMIKEY_API IMikeyConfig: public virtual MObject{
+@@ -49,6 +53,58 @@ class LIBMIKEY_API IMikeyConfig: public virtual MObject{
+ 		virtual bool isCertCheckEnabled() const=0;
+ };
+ 
++// MWR
++class MikeySakkeConfig: public IMikeyConfig{
++        public:
++                const std::string getUri() const{
++                        return this->sakkeUri;
++                }
++
++		void setSakkeUri(char *uri) {
++			this->sakkeUri = std::string((char *)uri);
++		}
++
++                MRef<SipSim*> getSim() const{
++                        return sim;
++                }
++
++		void setSim(SipSim* sim) {
++			this->sim = sim;
++		}		
++
++                MRef<CertificateChain*> getPeerCertificate() const{
++                        return NULL;
++                }
++                size_t getPskLength() const{
++                        return 0;
++                }
++
++                const byte_t* getPsk() const{
++                        return (byte_t*)"";
++                }
++
++                bool isMethodEnabled( int kaType ) const{
++                        switch( kaType ){
++                                case KEY_AGREEMENT_TYPE_SAKKE:
++					return 1;
++                                default:
++                                        return 0;
++                        }
++                }
++
++                bool isCertCheckEnabled() const{
++                        return false;
++                }
++
++		char *kms, *rsk, *kpak, *pvt, *ssk;
++		
++			
++        private:
++		std::string sakkeUri;
++		SipSim * sim;
++};
++// MWR
++
+ class LIBMIKEY_API Mikey: public MObject{
+ 	public:
+ 		enum State {
+diff --git a/include/libmikey/MikeyMessage.h b/include/libmikey/MikeyMessage.h
+index b5588f0..76b97a0 100644
+--- a/include/libmikey/MikeyMessage.h
++++ b/include/libmikey/MikeyMessage.h
+@@ -55,6 +55,10 @@
+ #define MIKEY_TYPE_DHHMAC_RESP 8
+ #define MIKEY_TYPE_RSA_R_INIT  9
+ #define MIKEY_TYPE_RSA_R_RESP 10
++// MWR
++#define MIKEY_TYPE_SAKKE_INIT  11
++#define MIKEY_TYPE_SAKKE_RESP 12
++// MWR
+ 
+ #define MIKEY_ENCR_NULL       0
+ #define MIKEY_ENCR_AES_CM_128 1
+@@ -75,6 +79,10 @@ class KeyAgreementDHHMAC;
+ class KeyAgreementPKE;
+ class KeyAgreementPSK;
+ class KeyAgreementRSAR;
++// MWR
++class KeyAgreementSakke;
++//class MikeyPayloadSakke;
++// MWR
+ class MikeyPayloadID;
+ class MikeyMessage;
+ 
+@@ -90,6 +98,10 @@ class LIBMIKEY_API MikeyPayloads: public MObject{
+ 					  bool addIdsAndT = false );
+ 		void addSignaturePayload( MRef<Certificate *> cert,
+ 					  bool addIdsAndT = false );
++
++		// MWR
++                void addSignaturePayload( const char *id, unsigned char* pvt, unsigned char *ssk, unsigned char *kpak, bool addIdsAndT = false );
++		// MWR
+ 		bool verifySignature( MRef<Certificate*> cert,
+ 				      bool addIdsAndT = false );
+ 
+@@ -195,6 +207,10 @@ class LIBMIKEY_API MikeyMessage: public MikeyPayloads{
+ 					    int macAlg = MIKEY_MAC_HMAC_SHA1_160 );
+ 		static MikeyMessage* create(KeyAgreementRSAR* ka);
+ 
++		// MWR
++		static MikeyMessage* create(KeyAgreementSakke* ka);
++		// MWR
++
+ 		/**
+ 		 * Parse MIKEY message from binary representation
+ 		 * @arg message is owned by this object,
+diff --git a/include/libmikey/MikeyPayloadHDR.h b/include/libmikey/MikeyPayloadHDR.h
+index 724fe0d..cbb6a75 100644
+--- a/include/libmikey/MikeyPayloadHDR.h
++++ b/include/libmikey/MikeyPayloadHDR.h
+@@ -45,6 +45,11 @@
+ #define HDR_DATA_TYPE_RSA_R_INIT  9
+ #define HDR_DATA_TYPE_RSA_R_RESP 10
+ 
++// MWR
++#define HDR_DATA_TYPE_SAKKE_INIT  11
++#define HDR_DATA_TYPE_SAKKE_RESP 12
++// MWR
++
+ #define HDR_PRF_MIKEY_1   0
+ #define HDR_PRF_MIKEY_256 1
+ #define HDR_PRF_MIKEY_384 2
+diff --git a/include/libmikey/MikeyPayloadSIGN.h b/include/libmikey/MikeyPayloadSIGN.h
+index dcff479..26c6090 100644
+--- a/include/libmikey/MikeyPayloadSIGN.h
++++ b/include/libmikey/MikeyPayloadSIGN.h
+@@ -34,6 +34,10 @@
+ #define MIKEYPAYLOAD_SIGN_TYPE_RSA_PKCS 0
+ #define MIKEYPAYLOAD_SIGN_TYPE_RSA_PSS 1
+ 
++// MWR
++#define MIKEYPAYLOAD_SIGN_TYPE_SAKKE 2
++// MWR
++
+ /**
+  * @author Erik Eliasson, Johan Bilien
+ */
+diff --git a/include/libmikey/MikeyPayloadSakke.h b/include/libmikey/MikeyPayloadSakke.h
+new file mode 100644
+index 0000000..b9c9958
+--- /dev/null
++++ b/include/libmikey/MikeyPayloadSakke.h
+@@ -0,0 +1,49 @@
++/* MikeyPayloadSakke.h
++ *
++ * Crown Copyright (c) 2012
++ *
++ * Authors: MWR InfoSecurity (Nils)
++ *
++ */
++
++#ifndef MIKEYPAYLOADSAKKE_H
++#define MIKEYPAYLOADSAKKE_H
++
++#include<libmikey/libmikey_config.h>
++
++#include<libmikey/MikeyPayload.h>
++
++#include <libmikey/KeyAgreementSakke.h>
++
++#define MIKEYPAYLOAD_SAKKE_PAYLOAD_TYPE 13
++
++
++/**
++ * @author Erik Eliasson, Johan Bilien
++*/
++class LIBMIKEY_API MikeyPayloadSakke : public MikeyPayload{
++	public:
++		MikeyPayloadSakke(KeyAgreementSakke *ka); // computes a 128 bits random value
++		// FIXME almost same prototype, leads to mistake!!
++		MikeyPayloadSakke( int sakkelen, byte_t * sakke_data );
++		MikeyPayloadSakke( byte_t * start, int lengthLimit );
++		//MikeyPayloadRAND(MRef<SipSim *> sim);
++		~MikeyPayloadSakke();
++
++		virtual int length();
++		virtual void writeData( byte_t * start, int expectedLength );
++		virtual std::string debugDump();
++
++		int sakkeLength();
++		byte_t * sakkeData();
++
++	private:
++		int sakkeLengthValue;
++		byte_t * sakkeDataPtr;
++		byte_t idscheme;
++		byte_t params;
++		
++};
++
++
++#endif
+diff --git a/include/libmikey/transport_mikey.h b/include/libmikey/transport_mikey.h
+new file mode 100644
+index 0000000..00a1b15
+--- /dev/null
++++ b/include/libmikey/transport_mikey.h
+@@ -0,0 +1,18 @@
++/* transport_mikey.h
++ *
++ * Crown Copyright (c) 2012
++ *
++ * Authors: MWR InfoSecurity (Nils)
++ *
++ */
++
++
++#ifdef __cplusplus
++ extern "C" {
++extern char* mikey_initiator(char* fn, unsigned char *key, unsigned int keylen);
++extern void mikey_responder(char *message, char *fn, unsigned char *key, unsigned int keylen);
++}
++#else
++char* mikey_initiator(char* fn, unsigned char *key, unsigned int keylen);
++void mikey_responder(char *message, char *fn, unsigned char *key, unsigned int keylen);
++#endif
+diff --git a/keyagreement/KeyAgreementSakke.cxx b/keyagreement/KeyAgreementSakke.cxx
+new file mode 100644
+index 0000000..eede54d
+--- /dev/null
++++ b/keyagreement/KeyAgreementSakke.cxx
+@@ -0,0 +1,130 @@
++/* KeyAgreementSakke
++ *
++ * Crown Copyright (c) 2012
++ *
++ * Authors: MWR InfoSecurity (Nils)
++ *
++ */
++
++#include <config.h>
++#include <stdio.h>
++
++#include <libmikey/KeyAgreementSakke.h>
++#include <libmikey/MikeyMessage.h>
++
++
++extern "C" {
++#include <libsakke/util.h>
++}
++
++KeyAgreementSakke::KeyAgreementSakke():
++	KeyAgreement()
++        {
++	std::cout << "correct sakke constructor\n";
++	// Using hard-coded value, TODO: load from config file instead
++	unsigned char z[] = "045958EF1B1679BF099B3A030DF255AA6A23C1D8F143D4D23F753E69BD27A832F38CB4AD53DDEF4260B0FE8BB45C4C1FF510EFFE300367A37B61F701D914AEF09724825FA0707D61A6DFF4FBD7273566CDDE352A0B04B7C16A78309BE640697DE747613A5FC195E8B9F328852A579DB8F99B1D0034479EA9C5595F47C4B2F54FF21508D37514DCF7A8E143A6058C09A6BF2C9858CA37C258065AE6BF7532BC8B5B63383866E0753C5AC0E72709F8445F2E6178E065857E0EDA10F68206B63505ED87E534FB2831FF957FB7DC619DAE61301EEACC2FDA3680EA4999258A833CEA8FC67C6D19487FB449059F26CC8AAB655AB58B7CC796E24E9A394095754F5F8BAE";
++        unsigned char kpak[] = "0450D4670BDE75244F28D2838A0D25558A7A72686D4522D4C8273FB6442AEBFA93DBDD37551AFD263B5DFD617F3960C65A8C298850FF99F20366DCE7D4367217F4";
++        unsigned char ssk[] = "23F374AE1F4033F3E9DBDDAAEF20F4CF0B86BBD5A138A5AE9E7E006B34489A0D";
++        unsigned char rsk[] = "0493AF67E5007BA6E6A80DA793DA300FA4B52D0A74E25E6E7B2B3D6EE9D18A9B5C5023597BD82D8062D34019563BA1D25C0DC56B7B979D74AA50F29FBF11CC2C93F5DFCA615E609279F6175CEADB00B58C6BEE1E7A2A47C4F0C456F05259A6FA94A634A40DAE1DF593D4FECF688D5FC678BE7EFC6DF3D6835325B83B2C6E69036B155F0A27241094B04BFB0BDFAC6C670A65C325D39A069F03659D44CA27D3BE8DF311172B554160181CBE94A2A783320CED590BC42644702CF371271E496BF20F588B78A1BC01ECBB6559934BDD2FB65D2884318A33D1A42ADF5E33CC5800280B28356497F87135BAB9612A17260424409AC15FEE996B744C332151235DECB0F5";
++        unsigned char pvt[] = "04758A142779BE89E829E71984CB40EF758CC4AD775FC5B9A3E1C8ED52F6FA36D9A79D247692F4EDA3A6BDAB77D6AA6474A464AE4934663C5265BA7018BA091F79";
++
++	this->KPAK = (unsigned char *)strdup((char *)kpak);
++	this->SSK = (unsigned char *)strdup((char *)ssk);
++	this->PVT = (unsigned char *)strdup((char *)pvt);
++	this->Z = (unsigned char *)strdup((char *)z);
++	this->RSK = (unsigned char*) strdup((char *)rsk);
++
++}
++
++KeyAgreementSakke::KeyAgreementSakke(unsigned char * KPAK, unsigned char * SSK, unsigned char * PVT, unsigned char * Z, unsigned char * RSK):
++        KeyAgreement(){
++
++    this->KPAK = KPAK;
++    this->SSK = SSK;
++    this->PVT = PVT;
++    // Used for SAKKE encryption
++    this->Z = Z;
++    this->RSK = RSK;
++}
++
++unsigned char *KeyAgreementSakke::getZ() {
++	return this->Z;
++}
++
++unsigned char *KeyAgreementSakke::getPVT() {
++	return this->PVT;
++}
++
++unsigned char *KeyAgreementSakke::getSSK() {
++	return this->SSK;
++}
++
++unsigned char *KeyAgreementSakke::getRSK() {
++	return this->RSK;
++}
++// Takes Sakke input value and generates a b64 mikey-sakke message
++char * generateUsingKA(unsigned char* KPAK, unsigned char * SSK, unsigned char * PVT, unsigned char * Z, unsigned char * RSK, char * uri, char *peeruri) {
++	printf("creating keyagreement\n");
++	KeyAgreementSakke *ka = new KeyAgreementSakke(KPAK, SSK, PVT, Z, RSK);
++	char sakkeUri[256+2];
++	char sakkePeerUri[256+2];
++	convert_id(sakkeUri, uri);
++	convert_id(sakkePeerUri, peeruri);
++	printf("sakkeUri: %s\n", sakkeUri);
++	printf("sakkePeerUri: %s\n", sakkePeerUri);
++	std::string uriStr(sakkeUri);
++	std::string peerUriStr(sakkePeerUri);
++	ka->setUri(uriStr);
++	ka->setPeerUri(peerUriStr);
++	printf("ka created\n");	
++	ka->setCsIdMapType(0);
++	ka->addSrtpStream(0,0,0,0);
++	MikeyMessage *message = MikeyMessage::create(ka);
++	printf("message has been created\n");
++
++	printf("generating encryption key\n");
++	byte_t key[64];
++	ka->genEncr(0, key, 64);
++	int c=0;
++	printf("key: "); 
++	for(c=0; c<64; c++) printf("%02X", key[c]);
++	printf("\n");
++
++	std::string str = message->debugDump();
++	std::cout << str;
++	std::string out = message->b64Message();
++	std::cout << "\n";
++	std::cout << out;
++	std::cout << "\n";
++	char *b64ret = (char *)malloc(strlen(out.c_str())+1);
++	strcpy(b64ret, out.c_str());
++	return b64ret;
++}
++
++void keyFromMessage(unsigned char *b64message) {
++	
++}
++
++
++KeyAgreementSakke::~KeyAgreementSakke(){
++}
++
++MikeyMessage* KeyAgreementSakke::createMessage(){
++	return MikeyMessage::create( this );
++}
++
++void KeyAgreementSakke::setTSent( uint64_t tSent ){
++        this->tSentValue = tSent;
++}
++
++//...
++unsigned char* KeyAgreementSakke::getKPAK(){
++        return this->KPAK;
++}
++
++//...
++
++int32_t KeyAgreementSakke::type(){
++        return KEY_AGREEMENT_TYPE_SAKKE;
++}
++
+diff --git a/mikey/Mikey.cxx b/mikey/Mikey.cxx
+index 08a1911..e92b802 100644
+--- a/mikey/Mikey.cxx
++++ b/mikey/Mikey.cxx
+@@ -1,16 +1,16 @@
+ /*
+  Copyright (C) 2004-2007 the Minisip Team
+- 
++
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 2.1 of the License, or (at your option) any later version.
+- 
++
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
+- 
++
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+@@ -20,7 +20,7 @@
+  *
+  * Authors: Erik Eliasson <ere@kth.se>
+  *          Johan Bilien <jobi@via.ecp.fr>
+- *	    Joachim Orrblad <joachim@orrblad.com>
++ *          Joachim Orrblad <joachim@orrblad.com>
+  *          Mikael Magnusson <mikma@users.sourceforge.net>
+ */
+ 
+@@ -30,7 +30,6 @@
+ 
+ #include<libmutil/Timestamp.h>
+ #include<libmutil/dbg.h>
+-
+ #include<libmcrypto/SipSim.h>
+ 
+ #include<libmikey/KeyAgreement.h>
+@@ -42,6 +41,10 @@
+ #include<libmikey/MikeyException.h>
+ #include<libmikey/MikeyMessage.h>
+ 
++// MWR
++#include<libmikey/KeyAgreementSakke.h>
++// MWR
++
+ #ifdef _WIN32_WCE
+ #	include"../include/minisip_wce_extra_includes.h"
+ #endif
+@@ -467,17 +470,21 @@ void Mikey::createKeyAgreement( int type )
+ 		throw MikeyException( "Cannot handle key agreement method" );
+ 	}
+ 
++	/*
+ 	MRef<SipSim*> sim = config->getSim();
+ 	MRef<CertificateChain*> cert_chain =
+ 		sim->getCertificateChain();
+ 	MRef<CertificateChain*> peer_chain;
+-// 		config->getPeerCertificate();
++ 		config->getPeerCertificate();
+ 	MRef<CertificateSet*> cert_db =
+ 		sim->getCAs();
++	*/
++	MikeySakkeConfig* mcfg = dynamic_cast<MikeySakkeConfig *>( *config );
+ 	const byte_t* psk = config->getPsk();
+ 	size_t psk_len = config->getPskLength();
+ 
+ 	switch( type ){
++		/*
+ 		case KEY_AGREEMENT_TYPE_DH:{
+ 			if ( cert_chain.isNull() ){
+ 				throw MikeyException( "No certificate provided for DH key agreement" );
+@@ -522,6 +529,13 @@ void Mikey::createKeyAgreement( int type )
+ 
+ 			ka = new KeyAgreementRSAR( cert_chain, cert_db );
+ 			break;
++		*/
++		// MWR
++                case KEY_AGREEMENT_TYPE_SAKKE:
++                        ka = new KeyAgreementSakke( (unsigned char*)mcfg->kpak, (unsigned char*) mcfg->ssk, (unsigned char*)mcfg->pvt, (unsigned char*)mcfg->kms, (unsigned char*)mcfg->rsk );
++			break;
++
++		// MWR
+ 		case KEY_AGREEMENT_TYPE_PSK:
+ 		case KEY_AGREEMENT_TYPE_DHHMAC:
+ 			if (!psk || psk_len <= 0) {
+@@ -545,7 +559,7 @@ void Mikey::createKeyAgreement( int type )
+ 			throw MikeyExceptionUnimplemented( "Unsupported type of KA" );
+ 	}
+ 
+-	if( ka->type() != KEY_AGREEMENT_TYPE_DHHMAC ){
++	if( ka->type() != KEY_AGREEMENT_TYPE_DHHMAC || ka->type() != KEY_AGREEMENT_TYPE_SAKKE){
+ 		// Generate TGK for PSK, PK and RSA-R
+ 		KeyAgreementPSK* pskKa =
+ 			dynamic_cast<KeyAgreementPSK*>(*ka);
+diff --git a/mikey/MikeyMessage.cxx b/mikey/MikeyMessage.cxx
+index 2a53fd6..e3c4639 100644
+--- a/mikey/MikeyMessage.cxx
++++ b/mikey/MikeyMessage.cxx
+@@ -43,7 +43,6 @@
+ #include<libmikey/MikeyPayloadKeyData.h>
+ #include<libmikey/MikeyPayloadGeneralExtension.h>
+ #include<libmikey/MikeyException.h>
+-
+ #include<libmcrypto/aes.h>
+ #include<libmcrypto/base64.h>
+ #include<libmcrypto/hmac.h>
+@@ -59,6 +58,21 @@
+ #include"MikeyMessageDHHMAC.h"
+ #include"MikeyMessageRSAR.h"
+ 
++// MWR
++#include"MikeyMessageSakke.h"
++#include<libmikey/MikeyPayloadSakke.h>
++
++extern "C" {
++        #include <libsakke/keygen.h>
++        #include <libsakke/sakke.h>
++	#include <libsakke/eccsi.h>
++	#include <libsakke/util.h>
++	//#include "/home/mwrlabs/mksk/libsakke-0.0.0/src/libsakke.h"
++}
++
++
++// MWR
++
+ /// The signature calculation will be factor two faster if this 
+ /// guess is correct (128 bytes == 1024 bits)
+ #define GUESSED_SIGNATURE_LENGTH 128
+@@ -102,6 +116,12 @@ MikeyMessage* MikeyMessage::create( KeyAgreementRSAR* ka ){
+ 	return new MikeyMessageRSAR( ka );
+ }
+ 
++// MWR
++MikeyMessage* MikeyMessage::create( KeyAgreementSakke* ka ){
++        return new MikeyMessageSakke( ka );
++}
++// MWR
++
+ /*
+  * Alg.
+  *  1. Parse HDR payload
+@@ -153,6 +173,12 @@ MikeyMessage* MikeyMessage::parse( byte_t * message, int lengthLimit )
+ 		case MIKEY_TYPE_RSA_R_RESP:
+ 			msg = new MikeyMessageRSAR();
+ 			break;
++		// MWR
++                case MIKEY_TYPE_SAKKE_INIT:
++                case MIKEY_TYPE_SAKKE_RESP:
++                        msg = new MikeyMessageSakke();
++                        break;
++		// MWR
+ 		case MIKEY_TYPE_ERROR:
+ 			msg = new MikeyMessage();
+ 			break;
+@@ -222,6 +248,11 @@ static MRef<MikeyPayload*> parsePayload( int payloadType,
+ 		case MIKEYPAYLOAD_ID_PAYLOAD_TYPE:
+ 			payload = new MikeyPayloadID(msgpos, limit);
+ 			break;
++		// MWR
++                case MIKEYPAYLOAD_SAKKE_PAYLOAD_TYPE:
++                        payload = new MikeyPayloadSakke(msgpos, limit);
++                        break;
++		// MWR
+ 		case MIKEYPAYLOAD_CERT_PAYLOAD_TYPE:
+ 			payload = new MikeyPayloadCERT(msgpos, limit);
+ 			break;
+@@ -447,6 +478,37 @@ void MikeyPayloads::addSignaturePayload( MRef<Certificate *> cert,
+ 	compiled = false;
+ }
+ 
++// MWR
++void MikeyPayloads::addSignaturePayload( const char *uri, unsigned char *pvt, unsigned char* ssk, unsigned char *kpak, bool addIdsAndT ){
++        byte_t signature[129];
++        int signatureLength = 129;
++        MikeyPayloadSIGN * sign;
++        MRef<MikeyPayload*> last;
++        vector<byte_t> signData;
++        // set the previous nextPayloadType to signature
++        last = *lastPayload();
++        last->setNextPayloadType( MIKEYPAYLOAD_SIGN_PAYLOAD_TYPE );
++
++	addPayload( ( sign = new MikeyPayloadSIGN(/*GUESSED_SIGNATURE_LENGTH*/ signatureLength, MIKEYPAYLOAD_SIGN_TYPE_SAKKE ) ) );
++	
++	signData = buildSignData( signatureLength, addIdsAndT );
++	
++
++	// TODO replace hardcoded id
++	char id[] = "323031312D30320074656C3A2B34343737303039303031323300";
++        //char id[256+2];
++        //convert_id(id, (char *)uri);
++
++        char hs[64 + 1];
++        generate_hs(hs, (char *)kpak, id, (char *)pvt);
++	get_eccsi_signature(signature, hs, (char *)pvt, (char *)ssk, &signData.front(), (int)signData.size());
++
++	sign->setSigData( signature, signatureLength );
++
++	compiled = false;
++}
++// MWR
++
+ void MikeyPayloads::addKemacPayload( byte_t * tgk, int tgkLength,
+ 		                      byte_t * encrKey,
+ 				      byte_t * iv,
+@@ -919,6 +981,14 @@ MRef<CertificateChain*> MikeyPayloads::extractCertificateChain() const{
+ 	return peerChain;
+ }
+ 
++// MWR
++// create class to instiate eccsiinfo object
++//bool MikeyPayloads::verifySignature(eccsiinfo, bool addIdsAndT){
++// ECCSI Payload
++//}
++// MWR
++
++
+ bool MikeyPayloads::verifySignature( MRef<Certificate*> cert,
+ 				     bool addIdsAndT ){
+ 	MRef<MikeyPayload*> payload =
+diff --git a/mikey/MikeyMessageSakke.cxx b/mikey/MikeyMessageSakke.cxx
+new file mode 100644
+index 0000000..a088f6c
+--- /dev/null
++++ b/mikey/MikeyMessageSakke.cxx
+@@ -0,0 +1,491 @@
++/* MikeyMessageSakke
++ *
++ * Crown Copyright (c) 2012
++ *
++ * Authors: MWR InfoSecurity (Nils)
++ *
++ * This handles construction and parsing of Mikey-Sakke messages.
++ *
++ */
++
++
++#include <config.h>
++
++#include "MikeyMessageSakke.h"
++#include <libmikey/MikeyPayloadHDR.h>
++#include <libmikey/MikeyPayloadT.h>
++#include <libmikey/MikeyPayloadRAND.h>
++#include <libmikey/MikeyException.h>
++#include <libmikey/MikeyPayloadCERT.h>
++#include <libmikey/MikeyPayloadKeyData.h>
++#include <libmikey/MikeyPayloadERR.h>
++#include <libmikey/MikeyPayloadID.h>
++#include <libmikey/MikeyPayloadKEMAC.h>
++#include <libmikey/MikeyPayloadV.h>
++#include <libmikey/MikeyPayloadSakke.h>
++#include <libmikey/MikeyPayloadPKE.h>
++#include<libmcrypto/rand.h>
++
++
++extern "C" {
++#include <libsakke/util.h>
++#include <libsakke/sakke.h>
++#include <libsakke/eccsi.h>
++}
++
++
++using namespace std;
++
++MikeyMessageSakke::MikeyMessageSakke(){
++}
++
++MikeyMessageSakke::MikeyMessageSakke( KeyAgreementSakke* ka ){
++
++	unsigned int csbId = ka->csbId();
++
++	if( !csbId ){
++		Rand::randomize( &csbId, sizeof( csbId ));
++		ka->setCsbId( csbId );
++	}
++
++	MikeyPayloadT* tPayload;
++	MikeyPayloadRAND* randPayload;
++	MikeyPayloadSakke* sakkePayload;
++
++	// HDR
++	addPayload(new MikeyPayloadHDR(HDR_DATA_TYPE_SAKKE_INIT, 1, 
++					HDR_PRF_MIKEY_1, csbId, ka->nCs(),
++					ka->getCsIdMapType(), ka->csIdMap()));
++
++	// T
++	addPayload(tPayload = new MikeyPayloadT());
++
++	// T Copy
++	uint64_t t = tPayload->ts();
++	ka->setTSent(t);
++
++	// RND
++	addPayload(randPayload = new MikeyPayloadRAND());
++	
++	// RND Value
++	ka->setRand(randPayload->randData(), randPayload->randLength());
++
++	// IDRi
++	addId( ka->uri() );
++	cout << "adding uri " << ka->uri() << "\n";
++
++	// IDRr
++	if( !ka->peerUri().empty() ){
++		addId( ka->peerUri() );
++		cout << "adding peer uri " << ka->peerUri() << "\n";
++	}
++
++        // SP
++        //adding security policy
++        //addPolicyToPayload(ka); //Is in MikeyMessage.cxx
++
++	// SAKKE
++	addPayload(sakkePayload = new MikeyPayloadSakke(ka));
++
++	// SIGN
++	//addSignaturePayload(/*kpak, ssk , pvt, id*/id, );
++	addSignaturePayload(ka->uri().c_str(), ka->getPVT(), ka->getSSK(), ka->getKPAK(), 0);
++}
++
++void MikeyMessageSakke::setOffer(KeyAgreement* kaBase){
++	KeyAgreementSakke* ka = dynamic_cast<KeyAgreementSakke*>(kaBase);
++
++	if( !ka ){
++		throw MikeyExceptionMessageContent( 
++				"Not a Sakke keyagreement" );
++	}
++
++	MRef<MikeyPayload*> i = extractPayload( MIKEYPAYLOAD_HDR_PAYLOAD_TYPE );
++	bool error = false;
++	//uint32_t csbId;
++	MRef<MikeyCsIdMap*> csIdMap;
++	MRef<MikeyMessage*> errorMessage = new MikeyMessage();
++	//uint8_t nCs;
++
++	if( i.isNull() || 
++		i->payloadType() != MIKEYPAYLOAD_HDR_PAYLOAD_TYPE ){
++		throw MikeyExceptionMessageContent( 
++				"Sakke init message had no HDR payload" );
++	}
++
++#define hdr ((MikeyPayloadHDR *)(*i))
++	if( hdr->dataType() != HDR_DATA_TYPE_SAKKE_INIT ){
++		throw MikeyExceptionMessageContent( 
++				"Expected SAKKE init message" );
++	}
++
++	ka->setnCs( hdr->nCs() );
++	ka->setCsbId( hdr->csbId() );
++	//ka->setV(hdr->v());
++
++	if( hdr->csIdMapType() == HDR_CS_ID_MAP_TYPE_SRTP_ID || hdr->csIdMapType() == HDR_CS_ID_MAP_TYPE_IPSEC4_ID ){
++		ka->setCsIdMap( hdr->csIdMap() );
++		ka->setCsIdMapType( hdr->csIdMapType() );
++	}
++	else{
++		throw MikeyExceptionMessageContent( 
++				"Unknown type of CS ID map" );
++	}
++	
++
++#undef hdr
++	errorMessage->addPayload(
++			new MikeyPayloadHDR( HDR_DATA_TYPE_ERROR, 0,
++			HDR_PRF_MIKEY_1, ka->csbId(),
++			ka->nCs(), ka->getCsIdMapType(), 
++			ka->csIdMap() ) );
++
++	//FIXME look at the other fields!
++
++	remove( i );
++	i = extractPayload( MIKEYPAYLOAD_T_PAYLOAD_TYPE );
++
++	if( i.isNull() )
++		throw MikeyExceptionMessageContent( 
++				"Sakke init message had no T payload" );
++
++	// FIXME i can be NULL
++#define plT ((MikeyPayloadT *)(*i))
++	if( plT->checkOffset( MAX_TIME_OFFSET ) ){
++		error = true;
++		errorMessage->addPayload( 
++			new MikeyPayloadERR( MIKEY_ERR_TYPE_INVALID_TS ) );
++	}	
++	//ka->t_received = plT->ts();
++	
++	remove( i );
++#undef plT
++
++	addPolicyTo_ka(ka); //Is in MikeyMessage.cxx
++
++	i = extractPayload( MIKEYPAYLOAD_RAND_PAYLOAD_TYPE );
++
++	if( i.isNull() ){
++		error = true;
++		errorMessage->addPayload( 
++			new MikeyPayloadERR( MIKEY_ERR_TYPE_UNSPEC ) );
++	}	
++
++#define plRand ((MikeyPayloadRAND *)*i)
++	// FIXME i can be NULL
++	ka->setRand( plRand->randData(),
++			plRand->randLength() );
++
++	remove( i );
++#undef plRand
++	i = extractPayload( MIKEYPAYLOAD_ID_PAYLOAD_TYPE );
++
++	//FIXME treat the case of an ID payload
++	if( !i.isNull() ){
++		remove( i );
++	}
++
++
++#define plSakke ((MikeyPayloadSakke *)*i)
++	i = extractPayload( MIKEYPAYLOAD_SAKKE_PAYLOAD_TYPE );
++
++#undef plSakke
++}
++
++MRef<MikeyMessage*> MikeyMessageSakke::buildResponse(KeyAgreement* kaBase){
++	KeyAgreementSakke* ka = dynamic_cast<KeyAgreementSakke*>(kaBase);
++
++	if( !ka ){
++		throw MikeyExceptionMessageContent( 
++				"Not a Sakke keyagreement" );
++	}
++	
++	// Build the response message
++
++	// HDR
++	MRef<MikeyMessageSakke *> result = new MikeyMessageSakke();
++	result->addPayload( 
++			   new MikeyPayloadHDR( HDR_DATA_TYPE_SAKKE_RESP, 0, 
++						HDR_PRF_MIKEY_1, ka->csbId(),
++						ka->nCs(), ka->getCsIdMapType(), 
++						ka->csIdMap() ) );
++
++	// T
++	MikeyPayloadT* tPayload = new MikeyPayloadT();
++
++	result->addPayload( tPayload );
++
++	//Copy of the time stamp
++	uint64_t t = tPayload->ts();
++	ka->setTSent(t);
++
++	// RND
++	MikeyPayloadRAND* randPayload = NULL;
++	result->addPayload(randPayload = new MikeyPayloadRAND());
++
++	// IDRr
++	result->addId( ka->uri() );
++
++        // SAKKE
++	MikeyPayloadSakke* sakkePayload = NULL;
++        addPayload(sakkePayload = new MikeyPayloadSakke(ka));
++
++	// SIGN
++	//result->addSignaturePayload( );
++// 				     
++				    
++
++	return *result;
++}
++
++MRef<MikeyMessage *> MikeyMessageSakke::parseResponse( KeyAgreement * kaBase ){
++	KeyAgreementSakke* ka = dynamic_cast<KeyAgreementSakke*>(kaBase);
++
++	if( !ka ){
++		throw MikeyExceptionMessageContent( 
++				"Not a Sakke keyagreement" );
++	}
++
++	MRef<MikeyPayload *> i = extractPayload( MIKEYPAYLOAD_HDR_PAYLOAD_TYPE );
++	bool error = false;
++	MRef<MikeyMessage *> errorMessage = new MikeyMessage();
++	MRef<MikeyCsIdMap *> csIdMap;
++	uint8_t nCs;
++	
++	if( i.isNull() ||
++		i->payloadType() != MIKEYPAYLOAD_HDR_PAYLOAD_TYPE ){
++
++		throw MikeyExceptionMessageContent( 
++				"Sakke response message had no HDR payload" );
++	}
++
++#define hdr ((MikeyPayloadHDR *)(*i))
++	if( hdr->dataType() != HDR_DATA_TYPE_SAKKE_RESP )
++		throw MikeyExceptionMessageContent( 
++				"Expected SAKKE response message" );
++
++	if( hdr->csIdMapType() == HDR_CS_ID_MAP_TYPE_SRTP_ID || hdr->csIdMapType() == HDR_CS_ID_MAP_TYPE_IPSEC4_ID){
++		csIdMap = hdr->csIdMap();
++	}
++	else{
++		throw MikeyExceptionMessageContent( 
++				"Unknown type of CS ID map" );
++	}
++
++	nCs = hdr->nCs();
++#undef hdr
++	ka->setCsIdMap( csIdMap );
++
++	errorMessage->addPayload(
++			new MikeyPayloadHDR( HDR_DATA_TYPE_ERROR, 0,
++			HDR_PRF_MIKEY_1, ka->csbId(),
++			nCs, HDR_CS_ID_MAP_TYPE_SRTP_ID,
++			csIdMap ) );
++
++
++	remove( i );
++	i = extractPayload( MIKEYPAYLOAD_T_PAYLOAD_TYPE );
++
++	if( i.isNull() ){
++		error = true;
++		errorMessage->addPayload( 
++			new MikeyPayloadERR( MIKEY_ERR_TYPE_UNSPEC ) );
++	}	
++
++	// FIXME i can be NULL
++#define plT ((MikeyPayloadT*)*i)
++	if( plT->checkOffset( MAX_TIME_OFFSET ) ){
++		error = true;
++		errorMessage->addPayload( 
++			new MikeyPayloadERR( MIKEY_ERR_TYPE_INVALID_TS ) );
++	}	
++
++	uint64_t t_received = plT->ts();
++#undef plT
++
++#define plT ((MikeyPayloadSakke*)*i
++	i = extractPayload( MIKEYPAYLOAD_SAKKE_PAYLOAD_TYPE );
++#undef plSakke
++        if( i.isNull() ){
++                error = true;
++                errorMessage->addPayload(
++                        new MikeyPayloadERR( MIKEY_ERR_TYPE_UNSPEC ) );
++        }
++
++	addPolicyTo_ka(ka); //Is in MikeyMessage.cxx
++
++	return NULL;
++}
++
++bool MikeyMessageSakke::authenticate(KeyAgreement* kaBase){
++	KeyAgreementSakke* ka = dynamic_cast<KeyAgreementSakke*>(kaBase);
++	std::cout << "authenticate in sakke\n";
++	debugDump();
++
++	if( !ka ){
++		throw MikeyExceptionMessageContent( 
++				"Not a Sakke keyagreement" );
++	}
++	
++	MRef<MikeyPayload *> payload = *(lastPayload());
++	list<MikeyPayload *>::iterator payload_i;
++ 
++	if( ka->rand() == NULL ){
++		
++		MRef<MikeyPayload *> pl =
++			extractPayload(MIKEYPAYLOAD_RAND_PAYLOAD_TYPE );
++		
++		if( pl.isNull() ){
++			ka->setAuthError(
++				"The MIKEY init has no"
++				"RAND payload."
++			);
++			
++			return true;
++		}
++
++		MikeyPayloadRAND * randPayload;
++		
++		randPayload = (MikeyPayloadRAND*)*pl;
++		std::cout << "setting rand\n";
++		ka->setRand( randPayload->randData(), 
++			     randPayload->randLength() );
++	}
++
++	MRef<MikeyPayload *> pl = extractPayload(MIKEYPAYLOAD_SAKKE_PAYLOAD_TYPE);
++	if( pl.isNull() ) {
++		ka->setAuthError("Mikey payload has no SAKKE payload");
++		return true;
++	}
++
++	if( isInitiatorMessage() || isResponderMessage() ){
++		if( payload->payloadType() != MIKEYPAYLOAD_SIGN_PAYLOAD_TYPE){
++			throw MikeyException( 
++			   "Sakke init did not end with a SIGN payload" );
++		}
++
++		if( isResponderMessage() &&
++		    ka->csbId() != csbId() ){
++			ka->setAuthError( "CSBID mismatch\n" );
++			return true;
++		}
++
++		// Check Peer ID (IDi resp IDr)
++		string peerUri = extractIdStr( 0 );
++		std::cout << "peer uri: " << peerUri << "\n";
++		FILE *f = fopen("/data/data/com.csipsimple/files/test.txt", "w");
++                fprintf(f, "expeer: %s, peerui: %s\n", peerUri.c_str(), ka->peerUri().c_str());
++                fclose(f);
++		if( !peerUri.empty() ){
++			if( !ka->peerUri().empty() ){
++				if( peerUri != ka->peerUri() ){
++					cerr << "Peer ID mismatch " + peerUri + " != " + ka->peerUri() << endl;
++					ka->setAuthError( "Peer ID mismatch" );
++					return true;
++				}
++#ifdef DEBUG_OUTPUT
++				cerr << "Peer ID authenticated " << peerUri << endl;
++#endif
++			}
++			else{
++				ka->setPeerUri( peerUri );
++			}
++		}
++
++		// Check My ID (IDr)
++		char *uric;
++		if( isInitiatorMessage() ){
++			string uri = extractIdStr( 1 );
++			uric=(char *)uri.c_str();
++			f = fopen("/data/data/com.csipsimple/files/test.txt", "w");
++			fprintf(f, "myuri: %s, kauri: %s, peeruri: %s\n", uric, ka->uri().c_str(), peerUri.c_str());
++                        fclose(f);
++			std::cout << "my uri: " << uri << "\n";
++			if( !uri.empty() ){
++				if( uri != ka->uri() ){
++					cerr << "ID mismatch" << endl;
++					cerr << uri << "!=" << ka->uri() << endl;
++					ka->setAuthError( "ID mismatch" );
++					return true;
++				}
++#ifdef DEBUG_OUTPUT
++				cerr << "ID match" << endl;
++#endif
++			}
++
++			MikeyPayloadSakke * sakkePayload;
++      	  		sakkePayload = (MikeyPayloadSakke*)*pl;
++       		 	unsigned char *sakkeData = (unsigned char *)sakkePayload->sakkeData();
++			
++			printf("recovered sakke data: ");
++			int x=0;
++			for(x=0;x<173;x++) printf("%02X", sakkeData[x]);
++			printf("\n");
++
++        		char parsed_ssv[32 + 1];
++        		std::cout << "parsing payload\n";
++
++			char sakkeUri[256+2];
++        		//convert_id(sakkeUri, (char *) uri.c_str());
++			// todo: replace testid
++			//char testid[] = "323031312D30320074656C3A2B34343737303039303031323300";
++			std::cout << "PARSING: ";
++			std::cout << "RSK: " << ka->getRSK() << "\n";
++			std::cout << "Z: " << ka->getZ() << "\n";
++			std::cout << uric << "\n";
++        		parse_sakke_packet(parsed_ssv, sakkeData, (char *)ka->getRSK(), (char *)uric, (char *)ka->getZ());
++	
++			unsigned char bin_ssv[16];
++ 	 	        int i = 0;
++			for(i=0; i<16; i++) {
++         		       	unsigned char c = 0;
++               			int rc = sscanf(parsed_ssv+(i*2), "%02x", &c);
++                		bin_ssv[i] = c;
++        		}
++			f = fopen("/data/data/com.csipsimple/files/test.txt", "w");
++			fprintf(f, "tgk parsed: "); for(i=0; i<16; i++) fprintf(f, "%02x", bin_ssv[i]); fprintf(f,"\n");
++			fclose(f);
++
++        		ka->setTgk((byte_t *)bin_ssv, 16);
++
++        		std::cout << "\n\nSSV Recovered: " << parsed_ssv << "\n";
++		}
++
++		// TODO: verify SIGN
++		char testid[] = "323031312D30320074656C3A2B34343737303039303031323300";
++		MikeyPayloadSIGN * signPayload;
++		pl = extractPayload(MIKEYPAYLOAD_SIGN_PAYLOAD_TYPE);
++                signPayload = (MikeyPayloadSIGN*)*pl;
++		vector<byte_t> signData;
++		std::cout << "sign data: " << signPayload->sigLength() << "\n";
++        	signData = buildSignData( signPayload->sigLength(), 0 );
++		int signDataLen = signData.size();
++		std::cout << "sign data length: " << signDataLen << "\n";
++		unsigned char *message = &signData.front();
++		unsigned char *sigData = signPayload->sigData();
++		cout << "ECCSI verify: " << peerUri << "\n";
++		int signature_correct = verify_eccsi_signature((char*)ka->getKPAK(), (char *)peerUri.c_str(), sigData, message, signDataLen);
++ 		/*if( !signature_correct ) {
++			cout << "Verification of the Sakke init message SIGN payload failed!"  << endl;
++			return true;
++		}*/
++		ka->setCsbId( csbId() );
++
++		return false;
++	}
++	else{
++		throw MikeyException( "Invalide type for a Sakke message" );
++	}
++}
++
++bool MikeyMessageSakke::isInitiatorMessage() const{
++	return type() == MIKEY_TYPE_SAKKE_INIT;
++}
++
++bool MikeyMessageSakke::isResponderMessage() const{
++	return type() == MIKEY_TYPE_SAKKE_RESP;
++}
++
++int32_t MikeyMessageSakke::keyAgreementType() const{
++	return KEY_AGREEMENT_TYPE_SAKKE;
++}
+diff --git a/mikey/MikeyMessageSakke.h b/mikey/MikeyMessageSakke.h
+new file mode 100644
+index 0000000..03c8de3
+--- /dev/null
++++ b/mikey/MikeyMessageSakke.h
+@@ -0,0 +1,31 @@
++/* MikeyMessageSakke.h
++ *  
++ * Crown Copyright (c) 2012
++ *
++ * Authors: MWR InfoSecurity (Rafael Dominguez-Vega)
++ *
++*/
++
++#ifndef MIKEYMESSAGESAKKE_H
++#define MIKEYMESSAGESAKKE_H
++
++#include<libmikey/libmikey_config.h>
++#include<libmikey/MikeyMessage.h>
++#include<libmikey/KeyAgreementSakke.h>
++#include<libmcrypto/cert.h>
++
++class LIBMIKEY_API MikeyMessageSakke: public MikeyMessage{
++	public:
++		MikeyMessageSakke();
++		MikeyMessageSakke( KeyAgreementSakke* ka );
++
++		MRef<MikeyMessage *> parseResponse( KeyAgreement  * ka );
++		void setOffer( KeyAgreement * ka );
++		MRef<MikeyMessage *> buildResponse( KeyAgreement * ka );
++		bool authenticate( KeyAgreement  * ka );
++		bool isInitiatorMessage() const;
++		bool isResponderMessage() const;
++		int32_t keyAgreementType() const; 
++};
++
++#endif
+diff --git a/mikey/MikeyPayloadSakke.cxx b/mikey/MikeyPayloadSakke.cxx
+new file mode 100644
+index 0000000..3bc63f8
+--- /dev/null
++++ b/mikey/MikeyPayloadSakke.cxx
+@@ -0,0 +1,168 @@
++/* MikeyPayloadSakke
++ *
++ * Crown Copyright (c) 2012
++ *
++ * Authors: MWR InfoSecurity (Rafael Dominguez-Vega & Nils)
++ *
++ * Handles the specific Sakke payload within a MikeySakke message.
++ *
++ */
++
++
++#include<config.h>
++#include<libmikey/MikeyPayloadSakke.h>
++#include<libmikey/MikeyException.h>
++#include<libmutil/stringutils.h>
++#include<assert.h>
++#include<stdlib.h>
++#include<time.h>
++#include<sys/types.h>
++#include<string.h>
++
++// MWR
++extern "C" {
++        #include <libsakke/keygen.h>
++        #include <libsakke/sakke.h>
++	#include <libsakke/util.h>
++}
++// MWR
++
++#ifndef _MSC_VER
++#include<unistd.h>
++#endif
++
++using namespace std;
++
++MikeyPayloadSakke::MikeyPayloadSakke( int sakkelen, byte_t * sakkeDataPtr ){
++	this->sakkeLengthValue = sakkelen;
++	this->sakkeDataPtr = new byte_t[ sakkelen ];
++	memcpy( this->sakkeDataPtr, sakkeDataPtr, sakkelen );
++	std::cout << "Shouldn't call this";
++}
++
++MikeyPayloadSakke::MikeyPayloadSakke( byte_t *start, int lengthLimit ):
++MikeyPayload( start ){
++
++	this->payloadTypeValue = MIKEYPAYLOAD_SAKKE_PAYLOAD_TYPE;
++	if( lengthLimit <  1+1+1+2+273 ){
++                throw MikeyExceptionMessageLengthException(
++                        "Given data is too short to form a SAKKE Payload" );
++                return;
++        }
++	
++	setNextPayloadType( start[0] );
++	this->params = start[1];
++	this->idscheme = start[2];
++	this->sakkeLengthValue = (start[3] << 8) + start[4];
++	
++	if( sakkeLengthValue != 273){
++                throw MikeyExceptionMessageLengthException(
++                        "Given data is too short to form a SAKKE Payload" );
++                return;
++        }
++	sakkeDataPtr = new byte_t[ this->sakkeLengthValue ];
++	memcpy( sakkeDataPtr, &start[5],sakkeLengthValue );
++	endPtr = startPtr + 5 + sakkeLengthValue;
++	
++	assert( endPtr - startPtr == length() );
++
++}
++
++MikeyPayloadSakke::MikeyPayloadSakke(KeyAgreementSakke *ka):MikeyPayload(){
++	this->payloadTypeValue = MIKEYPAYLOAD_SAKKE_PAYLOAD_TYPE;
++        this->sakkeLengthValue = 273;
++	this->params = 0x01; // params
++	this->idscheme = 0x01; // id scheme
++
++        //char id[] = "323031312D30320074656C3A2B34343737303039303031323300";
++        //char Z[] = "045958EF1B1679BF099B3A030DF255AA6A23C1D8F143D4D23F753E69BD27A832F38CB4AD53DDEF4260B0FE8BB45C4C1FF510EFFE300367A37B61F701D914AEF09724825FA0707D61A6DFF4FBD7273566CDDE352A0B04B7C16A78309BE640697DE747613A5FC195E8B9F328852A579DB8F99B1D0034479EA9C5595F47C4B2F54FF21508D37514DCF7A8E143A6058C09A6BF2C9858CA37C258065AE6BF7532BC8B5B63383866E0753C5AC0E72709F8445F2E6178E065857E0EDA10F68206B63505ED87E534FB2831FF957FB7DC619DAE61301EEACC2FDA3680EA4999258A833CEA8FC67C6D19487FB449059F26CC8AAB655AB58B7CC796E24E9A394095754F5F8BAE";
++	char *uri = (char *)(ka->uri().c_str());
++	char *Z = (char*)(ka->getZ());
++
++	// id needs to be converted to sakke format
++	char id[256+2];
++       // convert_id(id, uri);
++
++        char *ssv = (char *)malloc(32 + 1);
++	memset(ssv, 0, 33);
++        generate_ssv(ssv);
++	FILE *f = fopen("/data/data/com.csipsimple/files/test.txt", "w");
++        fprintf(f, "ssv: %s\n", ssv);
++	std::cout << "SSV: " << ssv << "\n";
++	// ssv is returned as hex
++	// so we need to convert it to raw bytes
++	unsigned char bin_ssv[16];
++	//int i = 0;
++//	for(i=0; i<16; i++) {
++//		unsigned char c = 0;
++ //       	int rc = sscanf(ssv+(i*2), "%02x", &c);
++//		bin_ssv[i] = c;
++//        }
++
++	sakke_hex2bin(ssv, bin_ssv);
++	// set ssv as tgk
++	ka->setTgk((byte_t *)bin_ssv, 16);
++
++	int i=0;
++                 fprintf(f, "tgk: "); for(i=0; i<16; i++) fprintf(f, "%02x", bin_ssv[i]); fprintf(f,"\n");
++                        fclose(f);
++	//ka->setTgk((byte_t *)bin_ssv, 16);
++        //unsigned char payload[1 + 256 + 16];
++        // and drop the payload
++	this->sakkeDataPtr = new byte_t[273];
++	// todo replace testid
++	//char testid[] = "323031312D30320074656C3A2B34343737303039303031323300";
++	cout << "GENERATING" << "\n";
++	cout << "SSV: " << ssv << "\n";
++	cout << "ID: " << ka->peerUri() << "\n";
++	generate_sakke_packet(this->sakkeDataPtr, ssv, (char *)ka->peerUri().c_str(), Z);
++	
++	printf("orig sakke data: ");
++        int x=0;
++        for(x=0;x<173;x++) printf("%02X", sakkeDataPtr[x]);
++        printf("\n");
++
++	//sakkeDataPtr = payload;
++	//Rand::randomize( sakkeDataPtr, sakkeLengthValue );
++
++}
++
++MikeyPayloadSakke::~MikeyPayloadSakke(){
++	if( sakkeDataPtr ){
++		delete [] sakkeDataPtr;
++	}
++	sakkeDataPtr=NULL;
++}
++
++int MikeyPayloadSakke::length(){
++	
++	return 1+1+1+2+sakkeLengthValue;
++}
++
++void MikeyPayloadSakke::writeData(byte_t *start, int expectedLength){
++	assert( expectedLength == length() );
++	start[0] = nextPayloadType();
++	start[1] = this->params; // params
++	start[2] = this->idscheme; // scheme
++	start[3] = (this->sakkeLengthValue >> 8) & 0xff;
++	start[4] = (this->sakkeLengthValue) & 0xff;
++	memcpy( &start[5], sakkeDataPtr, sakkeLengthValue );
++
++}
++
++string MikeyPayloadSakke::debugDump(){
++
++	return "MikeyPayloadSakke: nextPayloadType=<" + 
++		itoa( nextPayloadType() ) +
++		"> sakkeLengthValue=<" + itoa( sakkeLengthValue ) + 
++		"> sakkeDataPtr=<" + binToHex( sakkeDataPtr, sakkeLengthValue ) + 
++		">";
++}
++
++int MikeyPayloadSakke::sakkeLength(){
++	return sakkeLengthValue;
++}
++
++byte_t * MikeyPayloadSakke::sakkeData(){
++	return sakkeDataPtr;
++}
+diff --git a/mikey/transport_mikey.cxx b/mikey/transport_mikey.cxx
+new file mode 100644
+index 0000000..628fff0
+--- /dev/null
++++ b/mikey/transport_mikey.cxx
+@@ -0,0 +1,142 @@
++/* transport_mikey
++ *
++ * Crown Copyright (c) 2012
++ *
++ * Authors: MWR InfoSecurity (Nils)
++ *
++ * Handles creation of the key agreement, and establishment
++ * of the initiator and receiver.
++ *
++ */
++
++#include <libmikey/transport_mikey.h>
++
++#include <libmikey/Mikey.h>
++#include <stdio.h>
++#include <libmcrypto/SipSim.h>
++
++int read_keys(char *fn, char **sipname, char **kms, char **rsk, char **kpak, char **pvt, char **ssk) {
++        FILE *f = fopen(fn,"r");
++        fseek(f, 0, SEEK_END);
++        unsigned int size = ftell(f);
++        fseek(f, 0, SEEK_SET);
++        printf("File size: %u\n", size);
++        int state = 0;
++        int i=0;
++        char *buf = (char*)malloc(size+1);
++        fread(buf, size, 1, f);
++        buf[size] = 0x0;
++        //char *sipname, *kms, *rsk, *kpak, *pvt, *ssk;
++	fclose(f);
++        while(i<size) {
++                char c = buf[i];
++                if(c == ':') {
++                        char *ptr = buf+i+1;
++                        switch(state) {
++                                case 0: *sipname = ptr;
++                                case 1: *kms = ptr; break;
++                                case 2: *rsk = ptr; break;
++                                case 3: *kpak = ptr; break;
++                                case 4: *pvt = ptr; break;
++                                case 5: *ssk = ptr; break;
++                                default:
++                                        printf("out of states :(\n");
++                        }
++                        state++;
++                } else if(c=='\n' || c=='\r') {
++                        buf[i] = 0x0;
++			if(buf[i+1] == '\n' || buf[i+1] == '\r') i++;
++                        if(state == 6) break;
++                }
++                i++;
++        }
++        printf("sipname: %s\n", *sipname);
++        printf("kms: %s\n", *kms);
++        printf("rsk: %s\n", *rsk);
++        printf("kpak: %s\n", *kpak);
++        printf("pvt: %s\n", *pvt);
++        printf("ssk: %s\n", *ssk);
++        return 0;
++}
++
++
++/*
++ *	mikey_initiator - return base64 mikey message and fills in key
++ */
++
++//id:323031322d3033007369703a757365723300
++//id:323031322d3034007369703a757365723400
++char* mikey_initiator(char *fn, unsigned char *key, unsigned int keylen) {
++	MikeySakkeConfig *config = new MikeySakkeConfig();
++	//char fn[] = "/home/nils/code/CSipSimple/tmp/key_material.xml";
++	char *turi;
++	char *tpeeruri;
++        read_keys(fn, &turi, &config->kms, &config->rsk, &config->kpak, &config->pvt, &config->ssk);
++	if(strcmp("323031322d3034007369703a757365723300", turi) == 0) {
++		tpeeruri = (char *)"323031322d3034007369703a757365723400";	
++	} else if(strcmp("323031322d3034007369703a757365723400", turi) == 0) {
++                tpeeruri = (char *)"323031322d3034007369703a757365723300";
++        } else if(strcmp("323031322d3034007369703a757365723100", turi) == 0) {
++                tpeeruri = (char *)"323031322d3034007369703a757365723200";
++        } else if(strcmp("323031322d3034007369703a757365723200", turi) == 0) {
++                tpeeruri = (char *)"323031322d3034007369703a757365723100";
++        } else {
++		tpeeruri = (char *)"FOOBAR";
++	}
++	printf("TPEER: %s\n", tpeeruri);
++        //std::string sakkeUri = std::string("sip:") + std::string((char *)config->turi);
++	config->setSakkeUri(turi);
++	Mikey *mikey = new Mikey(config);
++	mikey->addSender(0);
++	std::string initMsg = mikey->initiatorCreate(KEY_AGREEMENT_TYPE_SAKKE, std::string(tpeeruri));
++	std::cout << initMsg << "\n";
++
++        mikey->getKeyAgreement()->genTek(0, key, keylen);
++        int c=0;
++        printf("initiator key: ");
++        for(c=0; c<keylen; c++) printf("%02X", key[c]);
++        printf("\n");
++	return strdup(initMsg.c_str());
++}
++
++/*
++ *	mikey_responder - take in base64 message and fills in key
++ */
++void mikey_responder(char *message, char *fn, unsigned char *key, unsigned int keylen) {
++	MikeySakkeConfig *config = new MikeySakkeConfig();
++	//char fn[] = "/home/nils/code/CSipSimple/tmp/resp_material.xml";
++        char *turi;
++	char *tpeeruri;
++        read_keys(fn, &turi, &config->kms, &config->rsk, &config->kpak, &config->pvt, &config->ssk);
++	if(strcmp("323031322d3034007369703a757365723300", turi)==0) {
++                tpeeruri = (char *)"323031322d3034007369703a757365723400";
++        } else if(strcmp("323031322d3034007369703a757365723400", turi)==0) {
++                tpeeruri = (char *)"323031322d3034007369703a757365723300";
++        } else if(strcmp("323031322d3034007369703a757365723100", turi)==0) {
++                tpeeruri = (char *)"323031322d3034007369703a757365723200";
++        } else if(strcmp("323031322d3034007369703a757365723200", turi)==0) {
++                tpeeruri = (char *)"323031322d3034007369703a757365723100";
++        } else {
++                tpeeruri = (char *)"FOOBAR";
++        }
++	config->setSakkeUri(turi);
++	Mikey *mikey = new Mikey(config);
++	mikey->addSender(0);
++	printf("FO: %s\n", tpeeruri);
++	mikey->responderAuthenticate(std::string(message), std::string(tpeeruri));
++
++        mikey->getKeyAgreement()->genTek(0, key, keylen);
++        printf("responder key: ");
++	int c=0;
++        for(c=0; c<keylen; c++) printf("%02X", key[c]);
++        printf("\n");
++}
++
++int main() {
++	char uri_init[]="323031322d3033007369703a757365723300";
++	char uri_resp[]="323031322d3033007369703a757365723400";
++	char msg[]="mikey AQsFgKd+rYcCAAAAAAAAAAAAAAAAAAAAAAAAAAsAloIwFuOv+wQGEK7ZDkXKlAmbcJUQhw5R7k0GAQAkMzIzMDMxMzIyZDMwMzMwMDczNjk3MDNhNzU3MzY1NzIzMzAwDQEAJDMyMzAzMTMyMmQzMDMzMDA3MzY5NzAzYTc1NzM2NTcyMzQwMAQBAQERBEdW7b/71YI2U8ecQNCa/NQifa/AoqxNcRLBRCwpGQcYSVJvCwmPv/FFShaIE494pe8TKLrfOMo0de8vvjXgp5VZUgKK6cBOvx3djRbZO/ZSQdoQKyiQG9kwDtRyRKdD+ttQ+j2X4PC/6DmnC2r/vrxIWKfBoVcDGxSC52JFIHG+I67b3ns7e8gq4vK60EyXDysFJtTnqorwmh90KVLyBb7Z0bwMWBdHvUCtJq2sdtMXnBd58uC5Cqh5mpkGNOGXe8Li9u23X0H4ys9l1QgmkTnEQAWD2eDNYwyOjLCUrjB5G9eQgGwbpwuZ5igMrwEi1Dzck1opPRc5kUkSg/DFXX0KR4mCitAeIR1xsY2y9IIDIIHF0CotCJYTRNeFap5wJv7EBIcSmquD82oTIrxSzJlcajdaIVqC8JAuHEiP1xBRoMIvT2bPKRrYLBB5J/L3yIBVBIDM8xrTyMsmVLHKpiTEQlnazVAhpFsW770+qpMufgH7W3zS9WznpVxwlrnHEsQpSDIAgEOhbeEMHgs7DFmQUdA=";
++	unsigned char key[128];
++	char *message = mikey_initiator((char*)"/home/nils/code/CSipSimple/tmp/key_material.xml", key, 128);
++	mikey_responder(message, (char*)"/home/nils/code/CSipSimple/tmp/resp_material.xml", key, 30);
++}
