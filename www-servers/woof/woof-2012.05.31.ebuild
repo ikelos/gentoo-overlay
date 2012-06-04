@@ -8,8 +8,8 @@ inherit versionator eutils
 
 MY_VERSION="$(replace_all_version_separators '-')"
 
-DESCRIPTION=""
-HOMEPAGE=""
+DESCRIPTION="Web-of-one-file, small convenient webserver"
+HOMEPAGE="http://www.home.unix-ag.org/simon/woof.html"
 SRC_URI="http://www.home.unix-ag.org/simon/woof-${MY_VERSION}.py"
 
 LICENSE="GPL-2"
@@ -24,10 +24,6 @@ RDEPEND="${DEPEND}"
 src_unpack() {
 	mkdir ${S}
 	cp -L "${DISTDIR}/${A}" "${S}/woof"
-}
-
-src_prepare() {
-	epatch "${FILESDIR}/woof-remove-child-process.patch"
 }
 
 src_install() {
