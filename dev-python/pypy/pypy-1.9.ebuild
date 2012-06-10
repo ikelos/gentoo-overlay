@@ -1,6 +1,6 @@
 # Copyright 1999-2012 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/dev-python/pypy/pypy-1.8-r1.ebuild,v 1.3 2012/02/28 19:24:00 floppym Exp $
+# $Header: /var/cvsroot/gentoo-x86/dev-python/pypy/pypy-1.9.ebuild,v 1.1 2012/06/08 16:52:09 djc Exp $
 
 EAPI="4"
 
@@ -43,11 +43,10 @@ src_unpack() {
 
 src_prepare() {
 	epatch "${FILESDIR}/pypy-1.8-unknown-opcodes.patch"
-	epatch "${FILESDIR}/${PV}-elf-metadata-26a8d3fc57a7.patch"
-	epatch "${FILESDIR}/${PV}-sext-instructions-02dc2f6160ee.patch"
-	epatch "${FILESDIR}/1.7-scripts-location.patch"
-	epatch "${FILESDIR}/pypy-1.7-distutils.unixccompiler.UnixCCompiler.runtime_library_dir_option.patch"
-	epatch "${FILESDIR}/pypy-1.7-distutils-fix_handling_of_executables_and_flags.patch"
+	epatch "${FILESDIR}/${PV}-no-bytecode-4151f9c406b6.patch"
+	epatch "${FILESDIR}/${PV}-scripts-location.patch"
+	epatch "${FILESDIR}/${PV}-distutils.unixccompiler.UnixCCompiler.runtime_library_dir_option.patch"
+	epatch "${FILESDIR}/${PV}-distutils-fix_handling_of_executables_and_flags.patch"
 }
 
 src_compile() {
