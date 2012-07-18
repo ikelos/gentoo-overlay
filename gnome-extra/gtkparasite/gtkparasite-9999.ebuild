@@ -2,7 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
-inherit autotools gnome2 git
+inherit autotools gnome2 git-2
 
 EGIT_REPO_URI="git://github.com/chipx86/gtkparasite.git"
 
@@ -19,7 +19,7 @@ DEPEND=""
 RDEPEND=""
 
 src_unpack() {
-	git_src_unpack
+	git-2_src_unpack
 	cd ${S}
 	eautoreconf
 }
