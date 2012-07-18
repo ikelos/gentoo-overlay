@@ -14,7 +14,7 @@ S="${WORKDIR}/Sublime Text 2"
 DESCRIPTION="Sublime Text is a sophisticated text editor for code, html and prose"
 HOMEPAGE="http://www.sublimetext.com"
 COMMON_URI="http://c758482.r82.cf2.rackcdn.com"
-SRC_URI="amd64? ( ${COMMON_URI}/${MY_P}.tar.bz2 )
+SRC_URI="amd64? ( ${COMMON_URI}/${MY_P}%20x64.tar.bz2 )
 	x86? ( ${COMMON_URI}/${MY_P}.tar.bz2 )"
 LICENSE="Sublime"
 SLOT="0"
@@ -22,8 +22,13 @@ KEYWORDS="~amd64 ~x86"
 IUSE=""
 RESTRICT="mirror"
 
-RDEPEND="media-libs/libpng:1.2
-	>=x11-libs/gtk+-2.24.8-r1:2"
+RDEPEND="dev-libs/glib
+		 sys-libs/glibc
+		 dev-libs/libffi
+		 x11-libs/libXau
+		 x11-libs/libX11
+		 x11-libs/libXdmcp
+		 x11-libs/libxcb"
 
 src_install() {
 	insinto /opt/${PN}
