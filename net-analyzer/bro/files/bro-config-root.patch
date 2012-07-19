@@ -20,7 +20,7 @@ index 910cbbd..0b9b2b7 100755
          Config.writeState()
  
 -Config = config.Configuration("etc/broctl.cfg", BroBase, Version)
-+Config = config.Configuration("etc/broctl.cfg", "/", Version)
++Config = config.Configuration("../etc/broctl.cfg", "/usr", Version)
  
  for dir in Config.sitepluginpath.split(":") + [Config.plugindir]:
      if dir:

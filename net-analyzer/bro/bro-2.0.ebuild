@@ -59,3 +59,8 @@ src_configure() {
 
 	cmake-utils_src_configure
 }
+
+src_install() {
+	cmake-utils_src_install
+	dosym "/var/spool/bro/broctl-config.sh" "/usr/share/broctl/scripts/broctl-config.sh"
+}
