@@ -27,6 +27,7 @@ DEPEND="dev-libs/geoip
 RDEPEND="$DEPEND"
 
 src_prepare() {
+	epatch "${FILESDIR}/bro-config-root.patch"
 	epatch "${FILESDIR}/bro-userchanged.patch"
 	epatch "${FILESDIR}/bro-installpackageconfig.patch"
 }
