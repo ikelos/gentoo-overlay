@@ -1,0 +1,16 @@
+diff --git a/aux/broccoli/CMakeLists.txt b/aux/broccoli/CMakeLists.txt
+index 72151d4..4a98500 100644
+--- a/aux/broccoli/CMakeLists.txt
++++ b/aux/broccoli/CMakeLists.txt
+@@ -105,11 +105,6 @@ add_definitions(-DHAVE_CONFIG_H)
+ 
+ include(InstallPackageConfigFile)
+ 
+-InstallPackageConfigFile(
+-    ${CMAKE_CURRENT_SOURCE_DIR}/broccoli.conf
+-    ${BRO_SYSCONF_DIR}
+-    broccoli.conf)
+-
+ install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/broccoli-config DESTINATION bin)
+ 
+ ########################################################################
