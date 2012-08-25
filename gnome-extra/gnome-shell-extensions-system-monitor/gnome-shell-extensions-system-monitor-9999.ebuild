@@ -6,8 +6,9 @@ EAPI="3"
 PYTHON_DEPEND="2"
 
 EGIT_REPO_URI="git://github.com/paradoxxxzero/gnome-shell-system-monitor-applet"
+EGIT_BRANCH="gnome-3.2"
 
-inherit gnome2-utils gnome2 python git
+inherit gnome2-utils gnome2 python git-2
 
 DESCRIPTION="System monitor extension for GNOME Shell"
 HOMEPAGE="https://github.com/paradoxxxzero/gnome-shell-system-monitor-applet"
