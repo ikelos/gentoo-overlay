@@ -2,9 +2,11 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
-EAPI=3
+EAPI=5
 
-inherit git-2 python
+PYTHON_COMPAT=( python2_7 )
+
+inherit git-2 python-single-r1
 
 DESCRIPTION="Mail nagger for gnome-shell (port of popper for unity)"
 HOMEPAGE="http://launchpad.net/mailnag"
@@ -18,14 +20,15 @@ KEYWORDS="~amd64 ~x86"
 IUSE=""
 
 DEPEND="dev-python/pygobject:3
-		dev-python/gnome-keyring-python"
+		dev-python/gnome-keyring-python
+		${PYTHON_DEPS}"
 RDEPEND="${DEPEND}"
 
 src_prepare() {
 	cd "${S}"
 	"${S}/gen_locales"
 
-	sed -i -e 's|LIB_DIR=./Mailnag|LIB_DIR=/usr/share/mailnag/Mailnag|' "${PN}"*
+	sed -i -e 's|LIB_DIR=./Mailnag|LIB_DIR=/usr/share/mailnag/Mailnag|' -e 's|^python |python2.7 |' "${PN}"*
 }
 
 src_install() {
