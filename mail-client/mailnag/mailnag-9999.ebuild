@@ -6,7 +6,7 @@ EAPI=5
 
 PYTHON_COMPAT=( python2_7 )
 
-inherit git-2 python-single-r1
+inherit git-2 eutils python-single-r1
 
 DESCRIPTION="Mail nagger for gnome-shell (port of popper for unity)"
 HOMEPAGE="http://launchpad.net/mailnag"
@@ -28,7 +28,8 @@ src_prepare() {
 	cd "${S}"
 	"${S}/gen_locales"
 
-	sed -i -e 's|LIB_DIR=./Mailnag|LIB_DIR=/usr/share/mailnag/Mailnag|' -e 's|^python |python2.7 |' "${PN}"*
+	epatch "${FILESDIR}/${P}-libdir-location.patch"
+	epatch "${FILESDIR}/${P}-datadir.patch"
 }
 
 src_install() {
