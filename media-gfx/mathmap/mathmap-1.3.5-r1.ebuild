@@ -19,6 +19,7 @@ RDEPEND=">=media-gfx/gimp-2.2
 		 sci-libs/gsl
 		 x11-libs/gtksourceview
 		 gnome-base/libgnomecanvas
+		 =media-libs/libpng-1.6*
 		 sci-libs/fftw:3.0"
 DEPEND="${RDEPEND}
 		app-doc/doxygen"
