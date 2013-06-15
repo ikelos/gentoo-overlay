@@ -26,6 +26,7 @@ DEPEND="${RDEPEND}
 
 src_prepare() {
 	epatch "${FILESDIR}/${PN}-libpng16.patch"
+	epatch "${FILESDIR}/${PN}-remove-png_set_filler.patch"
 }
 
 src_compile() {
