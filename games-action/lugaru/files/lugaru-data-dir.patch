@@ -1,0 +1,21 @@
+diff -r e435472cb42f Source/MacCompatibility.cpp
+--- a/Source/MacCompatibility.cpp	Fri May 20 10:07:56 2011 +0200
++++ b/Source/MacCompatibility.cpp	Sat Jun 15 15:39:19 2013 +0100
+@@ -271,7 +271,16 @@
+     if ( (rc == 0) || ((rc == -1) && (iswriting)) ) // found or create?
+         strcpy(buf, prefpathfile);
+     else if ((rc < 0) && (!iswriting))  /* not writing? Try game dir... */
+-        rc = locateCorrectCase(buf, iswriting);
++    {
++        const char *GAMEDIR = "/usr/share/games/lugaru";
++        len = strlen(GAMEDIR) + strlen(buf) + 2;
++        char *gamedirfile = (char *) alloca(len);
++        snprintf(gamedirfile, len, "%s/%s", GAMEDIR, buf); 
++
++        rc = locateCorrectCase(gamedirfile, iswriting);
++        if (rc == 0)
++            strcpy(buf, gamedirfile);
++    }
+ 
+     return(rc);
+ } /* locateCorrectFile */
