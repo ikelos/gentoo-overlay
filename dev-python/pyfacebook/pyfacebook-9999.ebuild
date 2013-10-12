@@ -6,7 +6,7 @@ EAPI="3"
 
 EGIT_REPO_URI="git://github.com/sciyoshi/pyfacebook.git"
 
-inherit distutils eutils versionator git
+inherit distutils eutils versionator git-2
 
 DESCRIPTION="Python Client Library for the Facebook API"
 HOMEPAGE="http://code.google.com/p/pyfacebook"
