@@ -4,7 +4,7 @@
 
 EAPI="3"
 
-inherit python autotools eutils git
+inherit python autotools eutils git-2
 
 MY_PN="${PN/d/D}"
 
