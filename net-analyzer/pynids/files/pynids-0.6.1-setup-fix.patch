@@ -1,0 +1,61 @@
+diff --git a/setup.py b/setup.py
+index d69a7c6..017ac5b 100644
+--- a/setup.py
++++ b/setup.py
+@@ -16,38 +16,10 @@ PKGNAME  = 'libnids-1.24'
+ PKGTAR   = PKGNAME + '.tar.gz'
+ BUILDDIR = PKGNAME
+ 
+-INCLUDE_DIRS  = ['/usr/local/include', '/opt/local/include']
+-LIBRARY_DIRS  = ['/usr/local/lib', '/opt/local/lib']
++INCLUDE_DIRS  = ['/usr/include']
++LIBRARY_DIRS  = ['/usr/lib']
+ EXTRA_OBJECTS = []
+ 
+-class nidsMaker(build):
+-    NIDSTAR = PKGTAR
+-    NIDSDIR = BUILDDIR
+-    include_dirs = [ pathjoin(NIDSDIR, 'src') ]
+-    library_dirs = []
+-    extra_objects  = [ pathjoin(NIDSDIR, 'src', 'libnids.a') ]
+-
+-    def buildNids(self):
+-        # extremely crude package builder
+-        try:
+-            os.stat(self.NIDSDIR)
+-            return None           # assume already built
+-        except OSError:
+-            pass
+-
+-        spawn(['tar', '-zxf', self.NIDSTAR], search_path = 1)
+-        os.chdir(self.NIDSDIR)
+-        spawn([pathjoin('.','configure'), 'CFLAGS=-fPIC'])
+-        spawn(['make'], search_path = 1)
+-        os.chdir('..')
+-
+-    def run(self):
+-        self.buildNids()
+-        build.run(self)
+-
+-INCLUDE_DIRS = nidsMaker.include_dirs + INCLUDE_DIRS
+-EXTRA_OBJECTS = nidsMaker.extra_objects + EXTRA_OBJECTS
+-
+ setup (# Distribution meta-data
+         name = "pynids",
+         version = "0.6.1",
+@@ -61,13 +33,12 @@ library offering sniffing, IP defragmentation, TCP stream reassembly and TCP
+ port scan detection.
+ -------
+ ''',
+-        cmdclass = {'build': nidsMaker},
+         ext_modules = [ Extension(
+-                            "nidsmodule",
++                            "nids",
+                             #define_macros = [ ("DEBUG", None), ],
+                             sources=["nidsmodule.c"],
+                             include_dirs = INCLUDE_DIRS,
+-                            libraries = ["pcap", "net", "glib-2.0", "gthread-2.0"],
++                            libraries = ["pcap", "net", "glib-2.0", "gthread-2.0", "nids"],
+                             library_dirs = LIBRARY_DIRS,
+                             extra_objects = EXTRA_OBJECTS
+                         ) 
