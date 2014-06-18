@@ -4,19 +4,15 @@
 
 EAPI=5
 
-DESCRIPTION=""
-HOMEPAGE=""
+DESCRIPTION="IPFIX library"
+HOMEPAGE="http://tools.netsa.cert.org/"
 SRC_URI="https://tools.netsa.cert.org/releases/${P}.tar.gz"
 
-LICENSE=""
+LICENSE="LGPL-2"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
 IUSE=""
 
-DEPEND="sys-lib/zlib
-		net-libs/libpcap
-		net-libs/gnutls
-		dev-libs/lzo
-		dev-libs/libgpg-error
-		dev-libs/libgcrypt"
+DEPEND="dev-libs/glib
+		dev-libs/openssl"
 RDEPEND="${DEPEND}"
