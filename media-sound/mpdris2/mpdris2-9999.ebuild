@@ -20,7 +20,7 @@ IUSE=""
 
 DEPEND=">=dev-lang/python-2.4
 		>=dev-python/dbus-python-0.80
-		>=dev-python/pygobject-2.14
+		>=dev-python/pygobject-3.14.0:3
 		>=dev-python/python-mpd-0.3.0"
 
 src_prepare() {
