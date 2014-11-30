@@ -17,7 +17,7 @@ KEYWORDS="~x86 ~amd64"
 IUSE=""
 
 RDEPEND="media-video/mplayer
-		media-video/ffmpeg
+		virtual/ffmpeg
 		media-sound/lame
 		media-video/flvstreamer
 		dev-perl/libwww-perl
