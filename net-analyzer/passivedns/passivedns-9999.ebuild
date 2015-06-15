@@ -2,9 +2,9 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
-EAPI=4
+EAPI=5
 
-inherit git-2 toolchain-funcs
+inherit git-r3 autotools toolchain-funcs
 
 DESCRIPTION=""
 HOMEPAGE=""
@@ -20,9 +20,10 @@ DEPEND="net-libs/ldns
 		net-libs/libpcap"
 RDEPEND="${DEPEND}"
 
-#src_prepare() {
-#	sed -i -e 's|OCFLAGS=.*|OCFLAGS=-I/usr/include|' "${S}/src/Makefile" || die "Failed to sed the Makefile"
-#}
+src_prepare() {
+    eautoreconf
+	# sed -i -e 's|OCFLAGS=.*|OCFLAGS=-I/usr/include|' "${S}/src/Makefile" || die "Failed to sed the Makefile"
+}
 
 src_compile() {
 	cd "${S}/src"
