@@ -4,7 +4,7 @@
 
 EAPI=4
 
-inherit git-2 eutils autotools
+inherit git-r3 eutils autotools
 
 EGIT_REPO_URI="https://android.googlesource.com/platform/external/svox/"
 
