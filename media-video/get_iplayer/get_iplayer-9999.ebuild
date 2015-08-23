@@ -1,10 +1,10 @@
-# Copyright 1999-2009 Gentoo Foundation
+# Copyright 1999-2015 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
-EAPI="2"
+EAPI=3
 
-inherit git-2
+inherit git-r3
 
 DESCRIPTION="BBC Iplayer downloading application"
 HOMEPAGE="http://linuxcentre.net/get_iplayer/"
@@ -30,4 +30,3 @@ src_install() {
 	insinto /usr/share/${PN}/plugins
 	doins plugins/*
 }
-
