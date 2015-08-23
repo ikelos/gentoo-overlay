@@ -6,8 +6,8 @@ EAPI=5
 
 inherit user
 
-DESCRIPTION=""
-HOMEPAGE=""
+DESCRIPTION="Tool for simulating an entire internet with working services on a single box."
+HOMEPAGE="http://www.inetsim.org/"
 SRC_URI="http://www.inetsim.org/downloads/${P}.tar.gz"
 
 LICENSE=""
