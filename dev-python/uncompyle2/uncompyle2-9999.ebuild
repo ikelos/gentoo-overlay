@@ -9,10 +9,10 @@ PYTHON_COMPAT=( python2_7 )
 inherit git-r3 distutils
 
 DESCRIPTION="A Python 2.7 byte-code decompiler"
-HOMEPAGE="https://github.com/gstarnberger/uncompyle"
+HOMEPAGE="https://github.com/wibiti/uncompyle2"
 SRC_URI=""
 
-EGIT_REPO_URI="https://github.com/gstarnberger/uncompyle.git"
+EGIT_REPO_URI="http://github.com/wibiti/uncompyle2.git"
 
 LICENSE=""
 SLOT="0"
