@@ -3,7 +3,7 @@
 # $Header: $
 
 EAPI="3"
-PYTHON_DEPEND="2:2.5"
+PYTHON_COMPAT=( python2_7 )
 
 inherit versionator distutils eutils
 
@@ -22,5 +22,5 @@ IUSE=""
 DEPEND="dev-lang/python"
 RDEPEND="dev-lang/python"
 
-S=${WORKDIR}/${MY_P}
+S=${WORKDIR}/${PN}-${MY_P}
 
