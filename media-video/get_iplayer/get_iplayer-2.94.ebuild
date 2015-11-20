@@ -13,7 +13,8 @@ SLOT="0"
 KEYWORDS="~x86 ~amd64"
 IUSE=""
 
-RDEPEND="media-video/mplayer
+RDEPEND="|| ( media-video/mplayer
+              media-video/mpv )
 		virtual/ffmpeg
 		media-sound/lame
 		media-video/flvstreamer
