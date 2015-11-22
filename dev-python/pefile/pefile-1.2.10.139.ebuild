@@ -11,8 +11,8 @@ MY_PV=$(replace_version_separator 3 '-')
 MY_P=${PN}-${MY_PV}
 
 DESCRIPTION="PE File analysis module"
-HOMEPAGE="http://code.google.com/p/pefile/"
-SRC_URI="http://${PN}.googlecode.com/files/${MY_P}.tar.gz"
+HOMEPAGE="https://github.com/erocarrera/pefile"
+SRC_URI="https://github.com/erocarrera/pefile/archive/pefile-1.2.10-139.tar.gz"
 
 LICENSE="MIT"
 SLOT="0"
@@ -23,4 +23,9 @@ DEPEND="dev-lang/python"
 RDEPEND="dev-lang/python"
 
 S=${WORKDIR}/${PN}-${MY_P}
+
+src_prepare() {
+	default_src_prepare
+	sed -i -e "s/__revision__\[21:-2\]/$(get_version_component_range 4)/" "pefile.py"
+}
 
