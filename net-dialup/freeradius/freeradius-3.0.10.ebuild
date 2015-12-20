@@ -33,6 +33,7 @@ RDEPEND="!net-dialup/cistronradius
 	sys-devel/libtool
 	dev-lang/perl
 	sys-libs/gdbm
+	sys-libs/talloc
 	python? ( ${PYTHON_DEPS} )
 	readline? ( sys-libs/readline )
 	pcap? ( net-libs/libpcap )
