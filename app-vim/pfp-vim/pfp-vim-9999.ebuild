@@ -15,7 +15,8 @@ IUSE=""
 
 EGIT_REPO_URI="https://github.com/d0c-s4vage/pfp-vim"
 
-DEPEND="dev-python/pfp"
+DEPEND="dev-python/pfp
+		app-misc/010-editor-templates"
 
 VIM_PLUGIN_HELPFILES=""
 VIM_PLUGIN_HELPTEXT=""
