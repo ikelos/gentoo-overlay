@@ -10,6 +10,7 @@ DESCRIPTION="A modified unsquashfs utility that attempts to support as many hack
 HOMEPAGE="https://github.com/devttys0/sasquatch"
 SRC_URI=""
 EGIT_REPO_URI="https://github.com/devttys0/sasquatch.git"
+EGIT_COMMIT="e4ca65b176c5fe6f3ed4efb001bab0b0ca334836"
 
 LICENSE=""
 SLOT="0"
