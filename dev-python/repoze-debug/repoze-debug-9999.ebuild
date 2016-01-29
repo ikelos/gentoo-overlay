@@ -7,7 +7,7 @@ PYTHON_COMPAT=( python{2_7,3_3,3_4} )
 
 inherit distutils-r1 git-r3
 
-DESCRIPTION="repoze.who is an identification and authentication framework for WSGI."
+DESCRIPTION="repoze.debug is an debugging framework for WSGI."
 HOMEPAGE="http://www.repoze.org"
 S="${WORKDIR}/repoze.debug-${PV}"
 if [ "${PV}" == 9999 ]; then
@@ -20,7 +20,7 @@ fi
 
 LICENSE="repoze"
 SLOT="0"
-KEYWORDS="-amd64 -x86"
+KEYWORDS="amd64 x86"
 IUSE=""
 
 DEPEND="

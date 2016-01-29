@@ -5,12 +5,18 @@
 EAPI=5
 PYTHON_COMPAT=( python{2_7,3_3,3_4} )
 
-inherit distutils-r1
+inherit distutils-r1 git-r3
 
-DESCRIPTION="repoze.who is an identification and authentication framework for WSGI."
+DESCRIPTION="repoze.debug is an debugging framework for WSGI."
 HOMEPAGE="http://www.repoze.org"
-SRC_URI="mirror://pypi/${PN:0:1}/repoze.debug/repoze.debug-${PV}.tar.gz"
 S="${WORKDIR}/repoze.debug-${PV}"
+if [ "${PV}" == 9999 ]; then
+	SRC_URI=""
+	EGIT_REPO_URI="https://github.com/repoze/repoze.debug/"
+	EGIT_CHECKOUT_DIR="${S}"
+else
+	SRC_URI="mirror://pypi/${PN:0:1}/repoze.debug/repoze.debug-${PV}.tar.gz"
+fi
 
 LICENSE="repoze"
 SLOT="0"
