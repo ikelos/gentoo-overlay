@@ -1,6 +1,6 @@
-# Copyright 1999-2009 Gentoo Foundation
+# Copyright 1999-2016 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/app-crypt/ophcrack-tables/ophcrack-tables-1.0-r1.ebuild,v 1.2 2009/10/31 00:38:46 ikelos Exp $
+# $Id$
 
 EAPI="5"
 
@@ -65,11 +65,12 @@ SRC_URI="xpfast? ( mirror://sourceforge/project/ophcrack/tables/XP%20free/tables
 		 mirror://sourceforge/project/ophcrack/tables/Vista%20special/table3.start -> vistaspecial_table3.start
 		 )"
 
-IUSE="xpsmall +xpfast +vistafree +vistaprobafree xpspecial xpgerman vistanum vistaspecial"
-
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~x86 ~amd64 ~ppc"
+IUSE="xpsmall +xpfast +vistafree +vistaprobafree xpspecial xpgerman vistanum vistaspecial"
+
+REQUIRED_USE="|| ( xpfast xpsmall vistafree vistaprobafree xpspecial xpgerman vistanum vistaspecial )"
 
 DEPEND="app-arch/unzip"
 RDEPEND=""
@@ -113,22 +114,22 @@ src_unpack() {
 	for i in ${A};
 	do
 	    if [ "${i:(-4)}" == ".zip" ]; then
-	    	table=${i#tables_}
-			table=${table%.zip}
-			mkdir "${S}/${table}"
-			cd "${S}/${table}"
-			unpack "${i}"
-		else
-			filename=${i##/}
-		    useflag=${filename%%_*}
-			[ -d "${S}/${useflag}" ] || mkdir "${S}/${useflag}"
-			use ${useflag} && cp -L "${DISTDIR}/${i}" "${S}/${useflag}/${filename#_}"
-		fi
+		table=${i#tables_}
+		table=${table%.zip}
+		mkdir "${S}/${table}"
+		cd $_ || die
+		unpack "${i}"
+	    else
+		filename=${i##/}
+		useflag=${filename%%_*}
+		[ -d "${S}/${useflag}" ] || mkdir "${S}/${useflag}"
+		use ${useflag} && cp -L "${DISTDIR}/${i}" "${S}/${useflag}/${filename#_}"
+	    fi
 	done
 }
 
 src_install() {
 	dodir /usr/share/ophcrack/
 	use vistaprobafree && mv vista_proba_free/vista_proba_free/* vista_proba_free/ && rmdir vista_proba_free/vista_proba_free
-	cp -r "${S}"/* "${D}/usr/share/ophcrack"
+	cp -r "${S}"/* "${ED}"/usr/share/ophcrack/ || die
 }
