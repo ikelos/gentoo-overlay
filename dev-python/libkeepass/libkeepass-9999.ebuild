@@ -7,13 +7,13 @@ EAPI=6
 PYTHON_COMPAT=( python2_7 python3_4 )
 inherit git-r3 distutils-r1
 
-DESCRIPTION=""
-HOMEPAGE=""
+DESCRIPTION="Python module to read KeePass 1.x/KeePassX (v3) and KeePass 2.x (v4) files"
+HOMEPAGE="https://github.com/crass/libkeepass"
 SRC_URI=""
 
 EGIT_REPO_URI="https://github.com/crass/libkeepass"
 
-LICENSE=""
+LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~amd64"
 IUSE=""

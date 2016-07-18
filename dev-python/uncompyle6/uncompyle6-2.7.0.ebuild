@@ -15,7 +15,7 @@ SRC_URI=""
 EGIT_REPO_URI="http://github.com/rocky/python-uncompyle6.git"
 EGIT_TAG="v${PN}"
 
-LICENSE=""
+LICENSE="MIT"
 SLOT="0"
 KEYWORDS="~amd64"
 IUSE=""
