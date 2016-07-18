@@ -83,20 +83,20 @@ pkg_setup() {
 	installsize=0
 	for useflag in ${IUSE};
 	do
-    	if use ${useflag#+}; then
+		if use ${useflag#+}; then
 			case ${useflag} in
-    	    	vistaspecial)
-	    	        installsize=$((${installsize} + 9))
-    	    	    ;;
-	        	xpspecial|xpgerman)
-		            installsize=$((${installsize} + 8))
-    		        ;;
-        		vistanum)
-		            installsize=$((${installsize} + 4))
-    		        ;;
-        		*)
-            		installsize=$((${installsize} + 1))
-		    esac
+				vistaspecial)
+					installsize=$((${installsize} + 9))
+					;;
+				xpspecial|xpgerman)
+					installsize=$((${installsize} + 8))
+					;;
+				vistanum)
+					installsize=$((${installsize} + 4))
+					;;
+				*)
+					installsize=$((${installsize} + 1))
+			esac
 		fi
 	done
 
