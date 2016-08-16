@@ -4,7 +4,7 @@
 
 EAPI=5
 
-inherit eutils readme.gentoo
+inherit eutils readme.gentoo-r1
 
 DESCRIPTION="Intelligent Python IDE with unique code assistance and analysis"
 HOMEPAGE="http://www.jetbrains.com/pycharm/"
@@ -34,5 +34,5 @@ src_install() {
 	newicon "bin/${MY_PN}.png" ${PN}.png
 	make_desktop_entry ${PN} "${PN}" "${PN}"
 
-	readme.gentoo_src_install
+	readme.gentoo_create_doc
 }
