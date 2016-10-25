@@ -64,6 +64,7 @@ src_install() {
 	emake DESTDIR="${D}" install
 	# This carries over from -0.13 but appears to have no effect.
 	python_optimize "${D}"usr/share/${PN}
+    python_fix_shebang ${D}
 }
 
 pkg_postinst() {
