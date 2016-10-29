@@ -2,11 +2,13 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header$
 
-EAPI="3"
+EAPI="6"
 
 EGIT_REPO_URI="git://github.com/sciyoshi/pyfacebook.git"
 
-inherit distutils eutils versionator git-2
+PYTHON_COMPAT=("python2_7")
+
+inherit distutils-r1 eutils versionator git-r3
 
 DESCRIPTION="Python Client Library for the Facebook API"
 HOMEPAGE="http://code.google.com/p/pyfacebook"
@@ -20,8 +22,6 @@ RDEPEND="dev-lang/python
          dev-python/simplejson"
 DEPEND="${RDEPEND}"
 
-S="${WORKDIR}"
-
 src_test() {
 	elog "Please note: You're using a live GIT ebuild."
 	elog "We therefore won't fix any failures in the tests."
@@ -31,7 +31,7 @@ src_test() {
 }
 
 src_install() {
-	distutils_src_install
+	distutils-r1_src_install
 
 	dobin bin/djangofb.py
 
