@@ -2,11 +2,12 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
-EAPI=4
+EAPI=6
+PYTHON_COMPAT=(python2_7)
 
-inherit distutils subversion eutils
+inherit distutils-r1 git-r3 eutils
 
-ESVN_REPO_URI="https://pdbparse.googlecode.com/svn/trunk/"
+EGIT_REPO_URI="https://github.com/moyix/pdbparse"
 
 DESCRIPTION=""
 HOMEPAGE=""
