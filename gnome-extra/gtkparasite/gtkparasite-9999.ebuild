@@ -9,7 +9,7 @@ inherit autotools gnome2 git-r3
 EGIT_REPO_URI="git://github.com/chipx86/gtkparasite.git"
 
 DESCRIPTION="Tool for GTK debugging and live interaction"
-HOMEPAGE="http://gtkparasite.googlecode.com/"
+HOMEPAGE="http://chipx86.github.io/gtkparasite/"
 SRC_URI=""
 
 LICENSE="GPL-2"
