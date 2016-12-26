@@ -2,13 +2,13 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
-EAPI="5"
+EAPI=6
 PYTHON_COMPAT=( python2_7 python3_4 )
 
 inherit distutils-r1 git-r3
 
 DESCRIPTION="Python bindings for the libnfc library"
-HOMEPAGE="http://pynfc.googlecode.com/"
+HOMEPAGE="https://github.com/ikelos/pynfc-cffi"
 SRC_URI=""
 EGIT_REPO_URI="https://github.com/ikelos/pynfc-cffi.git"
 
