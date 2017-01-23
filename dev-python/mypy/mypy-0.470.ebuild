@@ -22,13 +22,14 @@ KEYWORDS="~amd64"
 IUSE="doc test"
 
 DEPEND="
+    dev-python/typing[${PYTHON_USEDEP}]
 	test? ( dev-python/flake8[${PYTHON_USEDEP}] )
 	doc? (
 		dev-python/sphinx[${PYTHON_USEDEP}]
 		dev-python/sphinx_rtd_theme[${PYTHON_USEDEP}]
 	)
 "
-RDEPEND="$(python_gen_cond_dep '!dev-python/typing[${PYTHON_USEDEP}]' 'python3_3' 'python3_4')"
+RDEPEND="${DEPEND}"
 
 python_compile_all() {
 	use doc && emake -C docs html
