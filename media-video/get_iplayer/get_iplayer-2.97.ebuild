@@ -1,15 +1,20 @@
-# Copyright 1999-2015 Gentoo Foundation
+# Copyright 1999-2017 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
-EAPI=3
+EAPI=6
 
+if [ "${PV}" == "9999" ]; then
 inherit git-r3
+
+SRC_URI=""
+EGIT_REPO_URI="https://github.com/${PN/_/-}/${PN}.git"
+else
+SRC_URI="https://github.com/${PN/_/-}/${PN}/archive/v${PV}.tar.gz -> ${P}.tar.gz"
+fi
 
 DESCRIPTION="BBC Iplayer downloading application"
 HOMEPAGE="http://linuxcentre.net/get_iplayer/"
-SRC_URI="" # ftp://ftp.infradead.org/pub/get_iplayer/${P}.tar.gz"
-EGIT_REPO_URI="git://git.infradead.org/get_iplayer.git"
 
 LICENSE="GPL-3"
 SLOT="0"
@@ -21,13 +26,15 @@ RDEPEND="|| ( media-video/mplayer
 		virtual/ffmpeg
 		media-sound/lame
 		media-video/flvstreamer
+		media-video/rtmpdump
 		dev-perl/libwww-perl
+		dev-perl/XML-Simple
+		dev-perl/XML-LibXML
 		"
 DEPEND=""
 
 src_install() {
 	dobin ${PN}
 	doman ${PN}.1
-	insinto /usr/share/${PN}/plugins
-	doins plugins/*
+	dodoc "README.md" "CHANGELOG.md" "CONTRIBUTORS"
 }
