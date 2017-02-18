@@ -26,7 +26,8 @@ RDEPEND="dev-python/pillow
 	>=dev-python/pygtk-2.6.1:2[${PYTHON_USEDEP}]
 	dev-python/pygobject:2[${PYTHON_USEDEP}]
 	>=dev-python/sqlalchemy-0.5.2[${PYTHON_USEDEP}]
-	>=dev-python/reportlab-1.19[${PYTHON_USEDEP}]"
+	>=dev-python/reportlab-1.19[${PYTHON_USEDEP}]
+	>=dev-python/imdbpy-5.0[${PYTHON_USEDEP}]"
 DEPEND="${RDEPEND}
 	doc? ( app-text/docbook2X )"
 
@@ -44,7 +45,7 @@ src_prepare() {
 		-e 's/ISO-8859-1/UTF-8/' \
 		"${S}"/lib/gconsole.py || die "sed failed"
 
-	# epatch "${FILESDIR}/0.10-fix_lib_path.patch"
+	cp "${FILESDIR}/PluginMovieIMDbpy.py" "${S}/lib/plugins/movie/"
 }
 
 src_compile() {
