@@ -2,9 +2,11 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
-EAPI="3"
+EAPI="6"
 
-inherit python autotools eutils git-2
+PYTHON_COMPAT=(python2_7)
+
+inherit python-r1 autotools eutils git-r3
 
 MY_PN="${PN/d/D}"
 
@@ -24,6 +26,7 @@ DEPEND=">=dev-lang/python-2.4
 		>=dev-python/python-mpd-0.3.0"
 
 src_prepare() {
+	default_src_prepare
 	eautoreconf
 }
 
