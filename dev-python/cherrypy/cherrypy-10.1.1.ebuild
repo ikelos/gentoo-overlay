@@ -20,7 +20,7 @@ IUSE="test"
 
 DEPEND="dev-python/setuptools[${PYTHON_USEDEP}]
 	test? ( >=dev-python/nose-1.3.3[${PYTHON_USEDEP}] )"
-RDEPEND=""
+RDEPEND=">=dev-python/cheroot-5[${PYTHON_USEDEP}]"
 S="${WORKDIR}/${MY_P}"
 
 # testsuite predominantly connects to the network
