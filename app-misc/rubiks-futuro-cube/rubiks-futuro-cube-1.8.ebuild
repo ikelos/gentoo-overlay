@@ -29,8 +29,14 @@ src_prepare() {
 
 src_install() {
 	dodir "/opt/${PN}/"
+
 	insinto "/opt/${PN}"
 	doins -r "${S}"/*
 	exeinto "/opt/${PN}"
 	doexe "${S}/${PN}"
+	exeinto "/opt/${PN}/lib/futurocubesuite/bin/"
+	doexe "${S}/lib/futurocubesuite/bin/"*
+
+	insinto /etc/udev/rules.d
+	doins ${FILESDIR}/95-futurocube.rules
 }
