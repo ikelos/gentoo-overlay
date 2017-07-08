@@ -30,3 +30,8 @@ RDEPEND="
 	dev-python/webob[${PYTHON_USEDEP}]
 	dev-python/zope-interface[${PYTHON_USEDEP}]
 "
+
+python_install_all() {
+  distutils-r1_python_install_all
+  find "${ED}" -name '*.pth' -delete || die
+}
