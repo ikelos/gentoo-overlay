@@ -16,7 +16,15 @@ EGIT_REPO_URI="https://github.com/arskom/spyne.git"
 LICENSE="LGPL-2.1"
 SLOT="0"
 KEYWORDS="-amd64 -x86"
-IUSE=""
+IUSE="httprpc msgpack json yaml html xml"
 
 DEPEND=""
-RDEPEND="${DEPEND}"
+RDEPEND="${DEPEND}
+		dev-python/pytz
+		html? ( >=dev-python/lxml-3.2.5 )
+		xml? ( >=dev-python/lxml-3.4.1 )
+		httprpc? ( dev-python/werkzeug )
+		msgpack? ( dev-python/msgpack )
+		json? ( dev-python/simplejson )
+		yaml? ( dev-python/pyyaml )"
+
