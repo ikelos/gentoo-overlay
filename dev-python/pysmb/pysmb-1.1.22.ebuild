@@ -10,7 +10,7 @@ DESCRIPTION="Pysmb is an experimental SMB/CIFS library written in Python to supp
 HOMEPAGE="https://miketeo.net/projects/pysmb"
 SRC_URI="https://github.com/miketeo/${PN}/archive/rel-${PV//./-}.tar.gz"
 
-LICENSE="as-is"
+LICENSE="ZLIB"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
 IUSE=""
