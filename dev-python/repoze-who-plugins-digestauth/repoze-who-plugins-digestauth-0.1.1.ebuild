@@ -29,6 +29,7 @@ RDEPEND="
 
 src_prepare() {
 	epatch "${FILESDIR}/${PN}-python3.patch"
+	default
 }
 
 python_test() {
