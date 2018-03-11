@@ -3,13 +3,16 @@
 # $Id$
 
 EAPI=6
-PYTHON_COMPAT=( python3_5 python3_6 )
+PYTHON_COMPAT=( python3_{4,5,6} )
 
 inherit distutils-r1 git-r3
 
 DESCRIPTION="Optional static typing for Python"
 HOMEPAGE="http://www.mypy-lang.org/"
-SRC_URI="" # https://github.com/python/${PN}/archive/v${PV}.tar.gz -> ${P}.tar.gz"
+# We do not use SRC_URI from 
+# https://github.com/python/${PN}/archive/v${PV}.tar.gz -> ${P}.tar.gz"
+# because we would also need to grab typeshed which hasn't had an official release yet
+SRC_URI=""
 EGIT_REPO_URI="https://github.com/python/${PN}"
 
 if [ "${PV}" != "9999" ]; then
@@ -18,7 +21,7 @@ fi
 
 LICENSE="MIT"
 SLOT="0"
-KEYWORDS="~amd64"
+KEYWORDS="~amd64 ~x86"
 IUSE="doc test"
 
 DEPEND="
