@@ -25,8 +25,9 @@ KEYWORDS="~amd64 ~x86"
 IUSE="doc test"
 
 DEPEND="
-	~dev-python/psutil-5.4.0
-	~dev-python/typed-ast-1.1.0
+    dev-python/setuptools[${PYTHON_USEDEP}]
+	~dev-python/psutil-5.4.0[${PYTHON_USEDEP}]
+	~dev-python/typed-ast-1.1.0[${PYTHON_USEDEP}]
 	test? ( dev-python/flake8[${PYTHON_USEDEP}] )
 	doc? (
 		dev-python/sphinx[${PYTHON_USEDEP}]
