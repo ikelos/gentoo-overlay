@@ -4,19 +4,20 @@
 EAPI=6
 PYTHON_COMPAT=( python3_{4,5,6} )
 
+if [ "${PV}" == "9999" ]; then
 inherit distutils-r1 git-r3
+EGIT_REPO_URI="https://github.com/python/${PN}"
+EGIT_COMMIT="v${PV}"
+SRC_URI=""
+else
+inherit distutils-r1
+TYPESHED_COMMIT="9b6df1d"
+SRC_URI="https://github.com/python/${PN}/archive/v${PV}.tar.gz -> ${P}.tar.gz
+         https://api.github.com/repos/python/typeshed/tarball/${TYPESHED_COMMIT} -> mypy-typeshed-${PV}.tar.gz"
+fi
 
 DESCRIPTION="Optional static typing for Python"
 HOMEPAGE="http://www.mypy-lang.org/"
-# We do not use SRC_URI from 
-# https://github.com/python/${PN}/archive/v${PV}.tar.gz -> ${P}.tar.gz"
-# because we would also need to grab typeshed which hasn't had an official release yet
-SRC_URI=""
-EGIT_REPO_URI="https://github.com/python/${PN}"
-
-if [ "${PV}" != "9999" ]; then
-EGIT_COMMIT="v${PV}"
-fi
 
 LICENSE="MIT"
 SLOT="0"
@@ -40,6 +41,12 @@ CDEPEND="
 	"
 
 RDEPEND="${CDEPEND}"
+
+src_unpack() {
+	unpack ${A}
+	rmdir "${S}/typeshed"
+	mv "${WORKDIR}/python-typeshed-${TYPESHED_COMMIT}" "${S}/typeshed"
+}
 
 python_compile_all() {
 	use doc && emake -C docs html
