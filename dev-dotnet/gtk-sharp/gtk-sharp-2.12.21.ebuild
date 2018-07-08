@@ -38,7 +38,7 @@ DEPEND="${RDEPEND}
 src_prepare() {
 	base_src_prepare
 	eautoreconf
-	libtoolize
+	# libtoolize
 }
 
 src_configure() {
