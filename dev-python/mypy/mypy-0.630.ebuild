@@ -37,6 +37,7 @@ CDEPEND="
 	<dev-python/psutil-5.5.0[${PYTHON_USEDEP}]
 	>=dev-python/typed-ast-1.1.0[${PYTHON_USEDEP}]
 	<dev-python/typed-ast-1.2.0[${PYTHON_USEDEP}]
+	~dev-python/mypy_extensions-0.5.0[${PYTHON_USEDEP}]
 	"
 
 RDEPEND="${CDEPEND}"
