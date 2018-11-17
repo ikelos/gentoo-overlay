@@ -1,6 +1,5 @@
-# Copyright 1999-2016 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Id$
 
 EAPI=6
 PYTHON_COMPAT=( python3_5 python3_6 python3_7 )
@@ -8,7 +7,7 @@ PYTHON_COMPAT=( python3_5 python3_6 python3_7 )
 inherit distutils-r1 git-r3
 
 MY_PN="mypy"
-MY_PV="0.630"
+MY_PV="0.641"
 
 DESCRIPTION="Optional static typing for Python"
 HOMEPAGE="http://www.mypy-lang.org/"
@@ -24,14 +23,16 @@ SLOT="0"
 KEYWORDS="~amd64"
 IUSE="doc test"
 
-DEPEND="
-	test? ( dev-python/flake8[${PYTHON_USEDEP}] )
+RDEPEND="
 	doc? (
 		dev-python/sphinx[${PYTHON_USEDEP}]
 		dev-python/sphinx_rtd_theme[${PYTHON_USEDEP}]
 	)
 "
-RDEPEND="${DEPEND}"
+DEPEND="
+	test? ( dev-python/flake8[${PYTHON_USEDEP}] )
+	${RDEPEND}
+"
 
 S="${WORKDIR}/${P}/extensions"
 
