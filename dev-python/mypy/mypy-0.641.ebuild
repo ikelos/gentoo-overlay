@@ -2,7 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
-PYTHON_COMPAT=( python3_{4,5,6,7} )
+PYTHON_COMPAT=( python3_{5,6,7} )
 
 if [ "${PV}" == "9999" ]; then
 	inherit distutils-r1 git-r3
@@ -10,7 +10,7 @@ if [ "${PV}" == "9999" ]; then
 	SRC_URI=""
 else
 	inherit distutils-r1
-	TYPESHED_COMMIT="8ed0159"
+	TYPESHED_COMMIT="94485f9"
 	SRC_URI="https://github.com/python/${PN}/archive/v${PV}.tar.gz -> ${P}.tar.gz
 			https://api.github.com/repos/python/typeshed/tarball/${TYPESHED_COMMIT} -> mypy-typeshed-${PV}-${TYPESHED_COMMIT}.tar.gz"
 fi
@@ -20,7 +20,7 @@ HOMEPAGE="http://www.mypy-lang.org/"
 
 LICENSE="MIT"
 SLOT="0"
-KEYWORDS="~amd64 ~x86"
+KEYWORDS="~amd64"
 IUSE="doc test"
 
 DEPEND="
@@ -50,6 +50,11 @@ src_unpack() {
 		rmdir "${S}/mypy/typeshed"
 		mv "${WORKDIR}/python-typeshed-${TYPESHED_COMMIT}" "${S}/mypy/typeshed"
 	fi
+}
+
+src_prepare() {
+	sed -i -e 's/mypy_extensions >= 0.4.0, < 0.5.0/mypy_extensions >= 0.4.0, < 0.6.0/' "${S}/setup.py"
+	default
 }
 
 python_compile_all() {
