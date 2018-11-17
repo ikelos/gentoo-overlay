@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+  <use>
+    <flag name="postproc">Turn-on post processing features</flag>
+    <flag name="rabbitmq">Support RabbitMQ</flag>
+    <flag name="rest">Enables RESTful API</flag>
+    <flag name="turn">Enables TURN support</flag>
+    <flag name="websockets">Allow websocket connections</flag>
+    <flag name="unix-sockets">Allow unix socket connections</flag>
+  </use>
+</pkgmetadata>
