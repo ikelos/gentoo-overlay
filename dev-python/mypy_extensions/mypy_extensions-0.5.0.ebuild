@@ -7,7 +7,7 @@ PYTHON_COMPAT=( python3_5 python3_6 python3_7 )
 inherit distutils-r1 git-r3
 
 MY_PN="mypy"
-MY_PV="0.641"
+MY_PV="0.650"
 
 DESCRIPTION="Optional static typing for Python"
 HOMEPAGE="http://www.mypy-lang.org/"
