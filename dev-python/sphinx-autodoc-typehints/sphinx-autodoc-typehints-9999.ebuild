@@ -31,7 +31,7 @@ RDEPEND="${DEPEND}"
 
 src_prepare() {
 	sed -i -e "s/use_scm_version=True/version='${PV}'/" setup.py
-	eapply "${DISTDIR}/${P}-46.patch"
+	# eapply "${DISTDIR}/${P}-46.patch"
 
 	default
 }
