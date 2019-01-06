@@ -1,15 +1,15 @@
 # Copyright 1999-2017 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=5
+EAPI=6
 
-inherit dotnet autotools base mono-env
+inherit dotnet autotools mono-env
 
 SLOT="2"
 DESCRIPTION="gtk bindings for mono"
 LICENSE="GPL-2"
 HOMEPAGE="http://www.mono-project.com/GtkSharp"
-KEYWORDS="amd64 ~arm64 ppc x86"
+KEYWORDS="~amd64 ~x86 ~ppc"
 SRC_URI="http://download.mono-project.com/sources/gtk-sharp212/${P}.tar.gz"
 IUSE="debug"
 
@@ -36,9 +36,8 @@ DEPEND="${RDEPEND}
 	sys-devel/automake:1.11"
 
 src_prepare() {
-	base_src_prepare
 	eautoreconf
-	# libtoolize
+	eapply_user
 }
 
 src_configure() {

@@ -3,6 +3,6 @@
 <pkgmetadata>
 	<maintainer type="project">
 		<email>dotnet@gentoo.org</email>
-		<name>Gentoo Dotnet Project</name>
+		<description>Gentoo Dotnet Project</description>
 	</maintainer>
 </pkgmetadata>
