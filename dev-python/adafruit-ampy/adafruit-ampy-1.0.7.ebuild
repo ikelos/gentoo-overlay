@@ -15,6 +15,7 @@ SLOT="0"
 KEYWORDS="~amd64 ~x86"
 IUSE=""
 
-DEPEND=""
+DEPEND="dev-python/python-dotenv
+		dev-python/pyserial"
 RDEPEND="${DEPEND}"
 BDEPEND=""
