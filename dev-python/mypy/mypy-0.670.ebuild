@@ -10,7 +10,7 @@ if [ "${PV}" == "9999" ]; then
 	SRC_URI=""
 else
 	inherit distutils-r1
-	TYPESHED_COMMIT="1841486"
+	TYPESHED_COMMIT="3eb66ba"
 	SRC_URI="https://github.com/python/${PN}/archive/v${PV}.tar.gz -> ${P}.tar.gz
 			https://api.github.com/repos/python/typeshed/tarball/${TYPESHED_COMMIT} -> mypy-typeshed-${PV}-${TYPESHED_COMMIT}.tar.gz"
 fi
@@ -35,9 +35,10 @@ CDEPEND="
 	!dev-util/stubgen
 	>=dev-python/psutil-5.4.0[${PYTHON_USEDEP}]
 	<dev-python/psutil-5.5.0[${PYTHON_USEDEP}]
-	>=dev-python/typed-ast-1.1.0[${PYTHON_USEDEP}]
-	<dev-python/typed-ast-1.2.0[${PYTHON_USEDEP}]
-	~dev-python/mypy_extensions-0.5.0[${PYTHON_USEDEP}]
+	>=dev-python/typed-ast-1.3.1[${PYTHON_USEDEP}]
+	<dev-python/typed-ast-1.4.0[${PYTHON_USEDEP}]
+	>=dev-python/mypy_extensions-0.4.0[${PYTHON_USEDEP}]
+	<dev-python/mypy_extensions-0.5.0[${PYTHON_USEDEP}]
 	"
 
 RDEPEND="${CDEPEND}"
