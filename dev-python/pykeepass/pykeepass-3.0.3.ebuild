@@ -21,4 +21,4 @@ RDEPEND="${DEPEND}
 		dev-python/argon2_cffi[${PYTHON_USEDEP}]"
 BDEPEND=""
 
-PATCHES=("${FILESDIR}/${PN}-3.0.2-dont-install-tests.patch")
+PATCHES=("${FILESDIR}/${PN}-3.0.3-dont-install-tests.patch")
