@@ -16,7 +16,8 @@ KEYWORDS="~amd64 ~x86"
 IUSE=""
 
 DEPEND="net-libs/libvncserver
-		>=media-video/pipewire-0.2.5"
+		>=media-video/pipewire-0.2.5
+		sys-apps/xdg-desktop-portal-gtk"
 RDEPEND="${DEPEND}"
 
 src_install () {

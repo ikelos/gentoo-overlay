@@ -37,7 +37,7 @@ RDEPEND="
 	gnome-base/gnome-desktop:3=
 
 	media-video/pipewire
-	sys-apps/xdg-desktop-portal-gtk
+	sys-apps/xdg-desktop-portal
 
 	x11-libs/libICE
 	x11-libs/libSM
