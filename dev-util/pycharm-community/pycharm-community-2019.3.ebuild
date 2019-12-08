@@ -14,7 +14,7 @@ SLOT="0"
 KEYWORDS="~amd64 ~x86"
 
 RDEPEND=">=virtual/jre-1.8
-	 dev-python/pip"
+		dev-python/pip"
 
 RESTRICT="mirror strip"
 
@@ -35,6 +35,7 @@ src_install() {
 	doins -r *
 
 	fperms a+x /opt/${PN}/bin/{pycharm.sh,fsnotifier{,64},inspect.sh}
+	fperms a+x /opt/${PN}/jbr/bin/*
 
 	dosym ../../opt/${PN}/bin/pycharm.sh /usr/bin/${PN}
 	newicon bin/${MY_PN}.png ${PN}.png
