@@ -1,0 +1,85 @@
+diff --git a/gtk/asset/assets-gtk2-scripts/render-assets-gtk2.sh b/gtk/asset/assets-gtk2-scripts/render-assets-gtk2.sh
+index 0eb26e34..cacdfb1e 100755
+--- a/gtk/asset/assets-gtk2-scripts/render-assets-gtk2.sh
++++ b/gtk/asset/assets-gtk2-scripts/render-assets-gtk2.sh
+@@ -30,7 +30,8 @@ render-non-scale() {
+     $INKSCAPE --export-id=$ID \
+               --export-dpi="$non_scale_dpi" \
+               --export-id-only \
+-              --export-png=$ASSETS_DIR/$i.png $SRC_FILE >/dev/null \
++	      --export-type=png \
++              --export-file=$ASSETS_DIR/$i.png $SRC_FILE >/dev/null \
+                                                         2>>../inkscape.log
+ }
+ 
+diff --git a/gtk/asset/assets-gtk3-scripts/render-assets-gtk3.sh b/gtk/asset/assets-gtk3-scripts/render-assets-gtk3.sh
+index 0fd7c9b0..3acb01f1 100755
+--- a/gtk/asset/assets-gtk3-scripts/render-assets-gtk3.sh
++++ b/gtk/asset/assets-gtk3-scripts/render-assets-gtk3.sh
+@@ -32,7 +32,8 @@ render-non-scale() {
+     $INKSCAPE --export-id=$i \
+               --export-dpi="$non_scale_dpi" \
+               --export-id-only \
+-              --export-png=$ASSETS_DIR/$i.png $SRC_FILE >/dev/null \
++	      --export-type=png \
++              --export-file=$ASSETS_DIR/$i.png $SRC_FILE >/dev/null \
+                                                         2>>../inkscape.log
+ }
+ 
+@@ -40,7 +41,8 @@ render-scale() {
+     $INKSCAPE --export-id=$i \
+               --export-dpi="$scale_dpi" \
+               --export-id-only \
+-              --export-png=$ASSETS_DIR/$i@2.png $SRC_FILE >/dev/null \
++	      --export-type=png \
++              --export-file=$ASSETS_DIR/$i@2.png $SRC_FILE >/dev/null \
+                                                           2>>../inkscape.log
+ }
+ 
+diff --git a/shell/asset/render-assets-cinnamon-thumb.sh b/shell/asset/render-assets-cinnamon-thumb.sh
+index 7ec619b1..8660e595 100755
+--- a/shell/asset/render-assets-cinnamon-thumb.sh
++++ b/shell/asset/render-assets-cinnamon-thumb.sh
+@@ -49,10 +49,12 @@ fi
+ # Renderer
+ render-non-scale() {
+     $INKSCAPE --export-dpi="$non_scale_dpi" \
+-              --export-png=$ASSETS_DIR/$THUMB.png $SRC_DIR/$THUMB.svg >/dev/null \
++              --export-type=png \
++              --export-file=$ASSETS_DIR/$THUMB.png $SRC_DIR/$THUMB.svg >/dev/null \
+                                                                       2>>inkscape.log
+     $INKSCAPE --export-dpi="$non_scale_dpi" \
+-              --export-png=$ASSETS_DARK_DIR/$THUMB.png $SRC_DARK_DIR/$THUMB.svg >/dev/null \
++              --export-type=png \
++              --export-file=$ASSETS_DARK_DIR/$THUMB.png $SRC_DARK_DIR/$THUMB.svg >/dev/null \
+                                                                                 2>>inkscape.log
+ }
+ 
+diff --git a/wm/asset/assets-metacity-scripts/render-assets-metacity.sh b/wm/asset/assets-metacity-scripts/render-assets-metacity.sh
+index 3c9aae56..1d5a3b7d 100755
+--- a/wm/asset/assets-metacity-scripts/render-assets-metacity.sh
++++ b/wm/asset/assets-metacity-scripts/render-assets-metacity.sh
+@@ -27,7 +27,8 @@ fi
+ # Renderer
+ render-non-scale() {
+     $INKSCAPE --export-dpi="$non_scale_dpi" \
+-              --export-png=$ASSETS_DIR/$i.png $SRC_DIR/$i.svg >/dev/null \
++              --export-type=png \
++              --export-file=$ASSETS_DIR/$i.png $SRC_DIR/$i.svg >/dev/null \
+                                                               2>>../inkscape.log
+ }
+ 
+diff --git a/wm/asset/assets-xfwm-scripts/render-assets-xfwm.sh b/wm/asset/assets-xfwm-scripts/render-assets-xfwm.sh
+index dcd52913..09ecea86 100755
+--- a/wm/asset/assets-xfwm-scripts/render-assets-xfwm.sh
++++ b/wm/asset/assets-xfwm-scripts/render-assets-xfwm.sh
+@@ -27,7 +27,8 @@ fi
+ # Renderer
+ render-non-scale() {
+     $INKSCAPE --export-dpi="$non_scale_dpi" \
+-              --export-png=$ASSETS_DIR/$i.png $SRC_DIR/$i.svg >/dev/null \
++              --export-type=png \
++              --export-file=$ASSETS_DIR/$i.png $SRC_DIR/$i.svg >/dev/null \
+                                                               2>>../inkscape.log
+ }
+ 

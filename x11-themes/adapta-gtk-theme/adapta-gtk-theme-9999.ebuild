@@ -43,6 +43,7 @@ RDEPEND="${DEPEND}"
 src_prepare(){
 	eautoreconf
 	gnome2_src_prepare
+	epatch "${FILESDIR}/adapta-gtk-render-assets.patch"
 }
 
 src_configure(){
