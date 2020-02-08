@@ -16,6 +16,7 @@ KEYWORDS="~amd64 ~x86"
 IUSE=""
 
 DEPEND="dev-python/python-dotenv
-		dev-python/pyserial"
+		dev-python/pyserial
+		dev-python/click"
 RDEPEND="${DEPEND}"
 BDEPEND=""
