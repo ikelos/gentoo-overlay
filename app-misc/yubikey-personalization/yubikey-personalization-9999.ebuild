@@ -2,9 +2,9 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
-EAPI=4
+EAPI=5
 
-inherit eutils git-2 autotools
+inherit eutils git-r3 autotools
 
 DESCRIPTION=""
 HOMEPAGE=""
@@ -16,7 +16,7 @@ SLOT="0"
 KEYWORDS="~amd64"
 IUSE=""
 
-DEPEND=""
+DEPEND="sys-auth/libyubikey"
 RDEPEND="${DEPEND}"
 
 src_prepare() {
