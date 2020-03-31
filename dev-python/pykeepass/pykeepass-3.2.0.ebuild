@@ -3,7 +3,7 @@
 
 EAPI=7
 
-PYTHON_COMPAT=( python2_7 python3_{4,5,6,7} )
+PYTHON_COMPAT=( python3_{6,7} )
 inherit distutils-r1
 
 DESCRIPTION="Python Keepass library"
@@ -17,6 +17,10 @@ IUSE=""
 
 DEPEND=""
 RDEPEND="${DEPEND}
+		>=dev-python/future-0.17[${PYTHON_USEDEP}]
+		>=dev-python/lxml-4.3.5[${PYTHON_USEDEP}]
+		>=dev-python/python-dateutil-2.8[${PYTHON_USEDEP}]
+		=dev-python/pycryptodome-3.9.4[${PYTHON_USEDEP}]
 		>=dev-python/construct-2.9[${PYTHON_USEDEP}]
 		dev-python/argon2_cffi[${PYTHON_USEDEP}]"
 BDEPEND=""
