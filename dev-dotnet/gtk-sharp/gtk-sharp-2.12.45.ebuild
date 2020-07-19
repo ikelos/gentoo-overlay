@@ -36,13 +36,15 @@ DEPEND="${RDEPEND}
 	sys-devel/automake:1.11"
 
 src_prepare() {
+	eapply "${FILESDIR}/${PN}-2.12.45-gtk-range-test.patch"
+	sed -i -e "s|-gacdir \$(DESTDIR)\$(prefix)/lib|-root \"${ED}/usr/$(get_libdir)\" -gacdir \"${ED}\/usr\/lib/\"|" ${S}/configure.in
+	rm ${S}/configure
 	eautoreconf
-	eapply_user
+	default
 }
 
 src_configure() {
 	econf	--disable-static \
-		--disable-dependency-tracking \
 		--disable-maintainer-mode \
 		$(use_enable debug)
 }
@@ -53,6 +55,11 @@ src_compile() {
 
 src_install() {
 	default
-	# dotnet_multilib_comply
+	dotnet_multilib_comply
+	for i in `find ${D}/usr/lib64/mono/`; do
+		newgac="${i/\/usr\/lib64\/mono\///usr/lib/mono/}"
+		mkdir $(dirname ${newgac})
+		mv "${i}" "${i/\/usr\/lib64\/mono\///usr/lib/mono/}"
+	done
 	sed -i "s/\\r//g" "${D}"/usr/bin/* || die "sed failed"
 }

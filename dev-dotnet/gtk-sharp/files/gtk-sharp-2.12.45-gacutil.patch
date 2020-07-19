@@ -1,0 +1,13 @@
+diff --git a/configure.in b/configure.in
+index 54cee6a..ebd0b58 100644
+--- a/configure.in
++++ b/configure.in
+@@ -132,7 +132,7 @@ if test "x$AL" = "xno" ; then
+ fi
+ 
+ if test "x$has_mono" = "xtrue"; then
+-GACUTIL_FLAGS='-package $(PACKAGE_VERSION) -gacdir $(DESTDIR)$(prefix)/lib'
++GACUTIL_FLAGS='-package $(PACKAGE_VERSION) -gacdir $(DESTDIR)$(libdir)'
+ GENERATED_SOURCES=generated/*.cs
+ AC_PATH_PROG(RUNTIME, mono, no)
+ 
