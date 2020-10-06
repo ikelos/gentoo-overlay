@@ -40,7 +40,7 @@ src_install() {
 
 	fperms a+x /opt/${PN}/bin/{pycharm.sh,fsnotifier{,64},inspect.sh}
 	fperms a+x /opt/${PN}/jbr/bin/{jaotc,java,javac,jdb,jjs,jrunscript,keytool,pack200,rmid,rmiregistry,serialver,unpack20}
-	fperms a+x /opt/${PN}/jbr/lib/{jcef_helper}
+	fperms a+x /opt/${PN}/jbr/lib/jcef_helper
 
 	dosym ../../opt/${PN}/bin/pycharm.sh /usr/bin/${PN}
 	newicon bin/${MY_PN}.png ${PN}.png
