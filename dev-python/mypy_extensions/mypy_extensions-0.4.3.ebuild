@@ -1,8 +1,8 @@
-# Copyright 1999-2018 Gentoo Foundation
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
-PYTHON_COMPAT=( python3_5 python3_6 python3_7 )
+PYTHON_COMPAT=( python3_6 python3_7 python3_8 )
 
 inherit distutils-r1
 
@@ -13,15 +13,16 @@ SRC_URI="https://github.com/python/${PN}/archive/${PV}.tar.gz -> ${P}.tar.gz"
 if [ "${PV}" == "9999" ]; then
 inherit git-r3
 EGIT_REPO_URI="https://github.com/python/${PN}"
-EGIT_COMMIT="master" 
+EGIT_COMMIT="master"
 else
 EGIT_REPO_URI="${PV}"
 fi
 
 LICENSE="MIT"
 SLOT="0"
-KEYWORDS="~amd64"
+KEYWORDS="amd64 x86"
 IUSE="doc test"
+RESTRICT="!test? ( test )"
 
 RDEPEND="
 	doc? (
@@ -39,9 +40,7 @@ python_compile_all() {
 }
 
 python_test() {
-	local PYTHONPATH="$(pwd)"
-
-	"${PYTHON}" runtests.py || die "tests failed under ${EPYTHON}"
+	"${PYTHON}" -m unittest discover tests -v || die "tests fail with ${EPYTHON}"
 }
 
 python_install_all() {
