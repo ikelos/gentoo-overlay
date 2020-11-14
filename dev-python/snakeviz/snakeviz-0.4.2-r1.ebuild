@@ -5,12 +5,11 @@ EAPI=6
 
 PYTHON_COMPAT=( python3_{6,7,8,9} )
 
-inherit distutils-r1 git-r3
+inherit distutils-r1
 
 DESCRIPTION="A visualization interface for python profile information"
 HOMEPAGE="http://jiffyclub.github.io/snakeviz/"
-SRC_URI="" # https://github.com/jiffyclub/${PN}/archive/v${PV}.tar.gz -> ${P}.tar.gz"
-EGIT_REPO_URI="https://github.com/jiffyclub/snakeviz"
+SRC_URI="https://github.com/jiffyclub/${PN}/archive/v${PV}.tar.gz -> ${P}.tar.gz"
 
 LICENSE=""
 SLOT="0"
