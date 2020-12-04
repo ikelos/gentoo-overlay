@@ -17,7 +17,8 @@ SLOT="0"
 KEYWORDS="~amd64 ~x86"
 IUSE=""
 
-DEPEND="dev-python/retype[${PYTHON_USEDEP}]"
+DEPEND=">=dev-python/libcst-0.3.7[${PYTHON_USEDEP}]
+		dev-python/mypy_extensions[${PYTHON_USEDEP}]"
 RDEPEND="${DEPEND}"
 BDEPEND=""
 
