@@ -3,7 +3,7 @@
 
 EAPI=6
 
-PYTHON_COMPAT=( python3_{5,6,7} )
+PYTHON_COMPAT=( python3_{6,7,8,9} )
 inherit distutils-r1
 
 COMMON_SRC_URI="https://patch-diff.githubusercontent.com/raw/agronholm/sphinx-autodoc-typehints/pull/46.patch -> ${P}-46.patch"
