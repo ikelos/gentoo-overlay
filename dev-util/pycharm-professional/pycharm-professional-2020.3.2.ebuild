@@ -22,6 +22,8 @@ RESTRICT="mirror strip"
 QA_PREBUILT="opt/${PN}/bin/fsnotifier
 	opt/${PN}/bin/fsnotifier64
 	opt/${PN}/bin/fsnotifier-arm
+	opt/${PN}/jbr/lib/libjcef.so
+	opt/${PN}/jbr/lib/jcef_helper
 	opt/${PN}/bin/libyjpagent-linux.so
 	opt/${PN}/bin/libyjpagent-linux64.so"
 
