@@ -29,7 +29,6 @@ QA_PREBUILT="opt/${PN}/bin/fsnotifier
 
 
 MY_PN=${PN/-community/}
-S="${WORKDIR}/${MY_PN}-${PV}"
 
 src_prepare() {
 	default
