@@ -37,7 +37,7 @@ DEPEND="${RDEPEND}
 
 src_prepare() {
 	eapply "${FILESDIR}/${PN}-2.12.45-gtk-range-test.patch"
-	sed -i -e "s|-gacdir \$(DESTDIR)\$(prefix)/lib|-root \"${ED}/usr/$(get_libdir)\" -gacdir \"${ED}\/usr\/lib/\"|" ${S}/configure.in
+	# sed -i -e "s|-gacdir \$(DESTDIR)\$(prefix)/lib|-root \"${ED}/usr/$(get_libdir)\" -gacdir \"${ED}\/usr\/lib/\"|" ${S}/configure.in
 	rm ${S}/configure
 	eautoreconf
 	default
@@ -56,9 +56,10 @@ src_compile() {
 src_install() {
 	default
 	dotnet_multilib_comply
+	sed -i -e "s|{libdir}/mono/|{exec_prefix}/lib/mono/|g" "${D}/usr/lib64/pkgconfig/"*.pc
 	for i in `find ${D}/usr/lib64/mono/`; do
 		newgac="${i/\/usr\/lib64\/mono\///usr/lib/mono/}"
-		mkdir $(dirname ${newgac})
+		mkdir -p $(dirname ${newgac})
 		mv "${i}" "${i/\/usr\/lib64\/mono\///usr/lib/mono/}"
 	done
 	sed -i "s/\\r//g" "${D}"/usr/bin/* || die "sed failed"
