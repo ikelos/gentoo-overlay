@@ -18,6 +18,7 @@ RDEPEND="dev-libs/jansson
 		net-libs/libnice
 		>=dev-libs/openssl-1.0.1e
 		>=net-libs/libsrtp-2
+		dev-libs/libconfig
 		dev-util/gengetopt
 		postproc? ( virtual/ffmpeg
 					media-libs/libogg )
