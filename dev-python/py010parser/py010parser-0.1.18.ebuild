@@ -4,7 +4,7 @@
 
 EAPI=5
 
-PYTHON_COMPAT=( python2_7 python3_4 )
+PYTHON_COMPAT=( python3_{7,8,9} )
 
 inherit distutils-r1
 
@@ -17,5 +17,7 @@ SLOT="0"
 KEYWORDS="~amd64"
 IUSE=""
 
-DEPEND=""
+DEPEND=">=dev-python/six-1.10.0
+		<dev-python/six-2.0.0
+		>dev-python/regex-2019.0.0"
 RDEPEND="${DEPEND}"
