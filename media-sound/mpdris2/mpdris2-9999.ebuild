@@ -4,7 +4,7 @@
 
 EAPI="6"
 
-PYTHON_COMPAT=(python2_7)
+PYTHON_COMPAT=(python3_{7,8,9})
 
 inherit python-r1 autotools eutils git-r3
 
@@ -13,7 +13,7 @@ MY_PN="${PN/d/D}"
 DESCRIPTION="An implementation of the MPRIS 2 interface as a client for MPD"
 HOMEPAGE="http://github.com/eonpatapon/mpDris2"
 SRC_URI="" # http://ayeon.org/projects/${MY_PN}/${MY_PN}-${PV}.tar.bz2"
-EGIT_REPO_URI="git://github.com/eonpatapon/mpDris2.git"
+EGIT_REPO_URI="https://github.com/eonpatapon/mpDris2.git"
 
 LICENSE="GPL-3"
 SLOT="0"
