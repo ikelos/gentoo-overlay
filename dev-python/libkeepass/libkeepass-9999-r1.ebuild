@@ -2,9 +2,9 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Id$
 
-EAPI=6
+EAPI=7
 
-PYTHON_COMPAT=( python2_7 python3_4 python3_5 python3_6 python3_7)
+PYTHON_COMPAT=( python3_{6,7,8,9} )
 inherit git-r3 distutils-r1
 
 DESCRIPTION="Python module to read KeePass 1.x/KeePassX (v3) and KeePass 2.x (v4) files"
