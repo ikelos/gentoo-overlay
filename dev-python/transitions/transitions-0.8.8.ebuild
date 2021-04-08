@@ -3,7 +3,7 @@
 
 EAPI=6
 
-PYTHON_COMPAT=( python2_7 python3_4 python3_6 )
+PYTHON_COMPAT=( python3_{7,8,9} )
 inherit distutils-r1
 
 DESCRIPTION="Light-weight python state machine."
