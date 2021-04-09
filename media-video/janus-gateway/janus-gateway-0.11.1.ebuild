@@ -20,7 +20,7 @@ RDEPEND="dev-libs/jansson
 		>=net-libs/libsrtp-2
 		dev-libs/libconfig
 		dev-util/gengetopt
-		postproc? ( virtual/ffmpeg
+		postproc? ( media-video/ffmpeg
 					media-libs/libogg )
 		rabbitmq? ( net-libs/rabbitmq-c )
 		rest? ( net-libs/libmicrohttpd )
