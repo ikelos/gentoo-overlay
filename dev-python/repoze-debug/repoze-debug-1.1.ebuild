@@ -3,7 +3,7 @@
 # $Header: /var/cvsroot/gentoo-x86/dev-python/repoze-who/repoze-who-2.2.ebuild,v 1.4 2015/07/08 20:55:35 zlogene Exp $
 
 EAPI=6
-PYTHON_COMPAT=( python{2_7,3_3,3_4,3_5,3_6} )
+PYTHON_COMPAT=( python3_{7,8,9} )
 
 inherit distutils-r1 git-r3
 

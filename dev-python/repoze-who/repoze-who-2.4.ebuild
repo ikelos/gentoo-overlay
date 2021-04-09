@@ -1,17 +1,15 @@
 # Copyright 1999-2017 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
-PYTHON_COMPAT=( python{2_7,3_4,3_5,3_6} )
+EAPI=7
+PYTHON_COMPAT=( python3_{7,8,9} )
 
-inherit eutils distutils-r1
-
-MY_PN="${PN//-/.}"
+inherit distutils-r1
 
 DESCRIPTION="repoze.who is an identification and authentication framework for WSGI"
 HOMEPAGE="http://www.repoze.org"
-SRC_URI="mirror://pypi/${PN:0:1}/${MY_PN}/${MY_PN}-${PV}.tar.gz"
-S="${WORKDIR}/${MY_PN}-${PV}"
+SRC_URI="mirror://pypi/${PN:0:1}/repoze.who/repoze.who-${PV}.tar.gz"
+S="${WORKDIR}/repoze.who-${PV}"
 
 LICENSE="repoze"
 SLOT="0"
@@ -27,13 +25,19 @@ RDEPEND="
 	dev-python/zope-interface[${PYTHON_USEDEP}]
 "
 
-src_prepare() {
-	epatch "${FILESDIR}/${PN}-python3.patch"
-	default
-}
-
 python_test() {
 	esetup.py test
+}
+
+python_install() {
+	distutils-r1_python_install
+
+	# install __init__.py files for sub-namespaces
+	python_moduleinto repoze.who
+	python_domodule repoze/who/__init__.py
+
+	python_moduleinto repoze.who.plugins
+	python_domodule repoze/who/plugins/__init__.py
 }
 
 python_install_all() {
