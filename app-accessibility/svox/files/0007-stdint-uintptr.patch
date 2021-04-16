@@ -1,0 +1,48 @@
+diff --git a/pico/lib/picoapi.h b/pico/lib/picoapi.h
+index aa60358..6770845 100644
+--- a/pico/lib/picoapi.h
++++ b/pico/lib/picoapi.h
+@@ -151,6 +151,7 @@ typedef struct pico_engine   *pico_Engine;
+ #define PICO_UINT32_MAX  0xffffffff
+ 
+ #include <limits.h>
++#include <stdint.h>
+ 
+ #if (SHRT_MAX == PICO_INT16_MAX)
+ typedef short pico_Int16;
+diff --git a/pico/lib/picoctrl.h b/pico/lib/picoctrl.h
+index f7b9b6e..4c2161f 100644
+--- a/pico/lib/picoctrl.h
++++ b/pico/lib/picoctrl.h
+@@ -31,6 +31,7 @@
+ #include "picoos.h"
+ #include "picorsrc.h"
+ #include "picodata.h"
++#include <stdint.h>
+ 
+ #ifdef __cplusplus
+ extern "C" {
+diff --git a/pico/lib/picopr.c b/pico/lib/picopr.c
+index 7cf1824..ece3297 100644
+--- a/pico/lib/picopr.c
++++ b/pico/lib/picopr.c
+@@ -34,6 +34,7 @@
+ #include "picokpr.h"
+ #include "picopr.h"
+ #include "picoktab.h"
++#include <stdint.h>
+ 
+ #ifdef __cplusplus
+ extern "C" {
+diff --git a/pico/lib/picorsrc.h b/pico/lib/picorsrc.h
+index 4dfb19e..77fd357 100644
+--- a/pico/lib/picorsrc.h
++++ b/pico/lib/picorsrc.h
+@@ -36,6 +36,7 @@
+ #include "picodefs.h"
+ #include "picoos.h"
+ #include "picoknow.h"
++#include <stdint.h>
+ 
+ #ifdef __cplusplus
+ extern "C" {

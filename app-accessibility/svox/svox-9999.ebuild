@@ -2,14 +2,14 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
-EAPI=4
+EAPI=7
 
 inherit git-r3 eutils autotools
 
 EGIT_REPO_URI="https://android.googlesource.com/platform/external/svox/"
 
 DESCRIPTION="SVOX PicoTTS text-to-speech engine"
-HOMEPAGE="https://android.googlesource.com/platform/external/svox/+/master"
+HOMEPAGE="https://github.com/naggety/picotts"
 SRC_URI=""
 
 LICENSE="Apache-2.0"
@@ -20,10 +20,18 @@ IUSE=""
 DEPEND=""
 RDEPEND="${DEPEND}"
 
-EPATCH_FORCE="yes"
+PATCHES=( 
+		"${FILESDIR}/0001-autoconf-building-of-library-using-libtool.patch"
+		"${FILESDIR}/0002-gitignore-for-autotools-files.patch"
+		"${FILESDIR}/0003-pico2wave-Convert-text-to-.wav-using-svox-text-to-sp.patch"
+		"${FILESDIR}/0004-add-header-files.patch"
+		"${FILESDIR}/0005-Install-lang-files.patch"
+		"${FILESDIR}/0006-Set-picolangdir.patch"
+		"${FILESDIR}/0007-stdint-uintptr.patch"
+		)
 
 src_prepare() {
-	epatch -p1 ${FILESDIR}
+	default_src_prepare
 	cd "${S}/pico"
 	eautoreconf
 }
