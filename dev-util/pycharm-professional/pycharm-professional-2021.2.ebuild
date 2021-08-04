@@ -40,7 +40,7 @@ src_install() {
 	insinto /opt/${PN}
 	doins -r *
 
-	fperms a+x /opt/${PN}/bin/{pycharm.sh,fsnotifier{,64},inspect.sh}
+	fperms a+x /opt/${PN}/bin/{pycharm.sh,fsnotifier,inspect.sh}
 	fperms a+x /opt/${PN}/jbr/bin/{jaotc,java,javac,jdb,jjs,jrunscript,keytool,pack200,rmid,rmiregistry,serialver,unpack200}
 	fperms a+x /opt/${PN}/jbr/lib/jcef_helper
 
