@@ -2,7 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
-EAPI=5
+EAPI=7
 
 inherit user
 
@@ -16,11 +16,12 @@ KEYWORDS="~amd64"
 IUSE=""
 
 DEPEND="dev-perl/IPC-Shareable
-		dev-perl/net-server"
+		dev-perl/Net-Server
+		dev-perl/Net-DNS"
 RDEPEND="${DEPEND}"
 
 pkg_setup() {
-	enewgroup inetsim
+	enewgroup -M inetsim
 }
 
 src_install() {
