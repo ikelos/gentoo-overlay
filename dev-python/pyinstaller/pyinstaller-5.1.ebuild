@@ -3,7 +3,7 @@
 
 EAPI=7
 
-PYTHON_COMPAT=( python3_{6,7,8,9} )
+PYTHON_COMPAT=( python3_{8,9,10,11} )
 PYTHON_REQ_USE='threads(+)'
 
 inherit distutils-r1
@@ -18,7 +18,7 @@ if [[ ${PV} == 9999 ]]; then
 else
 	MY_PN="PyInstaller"
 	MY_P="${MY_PN}-${PV}"
-	SRC_URI="https://github.com/pyinstaller/pyinstaller/releases/download/v${PV}/${MY_P}.tar.gz"
+	SRC_URI="https://github.com/pyinstaller/pyinstaller/archive/refs/tags/v${PV}.tar.gz -> ${P}.tar.gz"
 	KEYWORDS="amd64 ~arm64 x86"
 fi
 
