@@ -1,0 +1,68 @@
+diff --git a/src/ui/preferences/preferences.blp b/src/ui/preferences/preferences.blp
+index b5d2763..3f6fb78 100644
+--- a/src/ui/preferences/preferences.blp
++++ b/src/ui/preferences/preferences.blp
+@@ -20,7 +20,6 @@ template PaperPreferencesWindow : Adw.PreferencesWindow {
+         FontButton font_button {
+           title: _("Pick a font for displaying the notes' content");
+           use-size: false;
+-          level: family;
+           valign: center;
+         }
+       }
+@@ -34,7 +33,6 @@ template PaperPreferencesWindow : Adw.PreferencesWindow {
+         FontButton font_button_monospace {
+           title: _("Pick a font for displaying code");
+           use-size: false;
+-          level: family;
+           valign: center;
+           preview-text: "function var struct enum type impl >= <= => =< == === <== ==> >- <- -> -< :: != ~= := =: >> << >>=";
+         }
+@@ -129,4 +127,4 @@ template PaperPreferencesWindow : Adw.PreferencesWindow {
+       }
+     }
+   }
+-}
+\ No newline at end of file
++}
+diff --git a/src/ui/window/notebooks_bar/icon.blp b/src/ui/window/notebooks_bar/icon.blp
+index fcf6771..ff4374c 100644
+--- a/src/ui/window/notebooks_bar/icon.blp
++++ b/src/ui/window/notebooks_bar/icon.blp
+@@ -5,7 +5,7 @@ template PaperNotebookIcon : Box {
+   hexpand: true;
+ 
+   accessibility {
+-    labelled-by: icon;
++    labelled_by: icon;
+   }
+ 
+   Overlay {
+diff --git a/src/ui/window/sidebar/note_card.blp b/src/ui/window/sidebar/note_card.blp
+index aea291b..b15257d 100644
+--- a/src/ui/window/sidebar/note_card.blp
++++ b/src/ui/window/sidebar/note_card.blp
+@@ -3,8 +3,8 @@ using Gtk 4.0;
+ template PaperNoteCard : Box {
+ 
+   accessibility {
+-    labelled-by: label;
+-    described-by: descrption_box;
++    labelled_by: label;
++    described_by: descrption_box;
+   }
+ 
+   hexpand: true;
+diff --git a/src/ui/window/window.blp b/src/ui/window/window.blp
+index 03f9710..2083ca8 100644
+--- a/src/ui/window/window.blp
++++ b/src/ui/window/window.blp
+@@ -78,7 +78,7 @@ template PaperWindow : Adw.ApplicationWindow {
+ 
+                 ListView notebook_notes_list {
+                   accessibility {
+-                    labelled-by: notebook_title;
++                    labelled_by: notebook_title;
+                   }
+                 }
+               }

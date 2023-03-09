@@ -21,6 +21,9 @@ DEPEND="$(vala_depend)
 RDEPEND="${DEPEND}"
 BDEPEND=""
 
+PATCHES=("${FILESDIR}/${P}-preferences.patch"
+	     "${FILESDIR}/${P}-adwaita-dep.patch")
+
 src_prepare() {
 	vala_setup
 	default
