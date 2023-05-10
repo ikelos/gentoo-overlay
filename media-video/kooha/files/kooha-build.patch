@@ -1,0 +1,17 @@
+diff --git a/src/meson.build b/src/meson.build
+index c007838..0103a66 100644
+--- a/src/meson.build
++++ b/src/meson.build
+@@ -19,10 +19,10 @@ run_command(
+ )
+ 
+ manifest_path = meson.project_source_root() / 'Cargo.toml'
+-cargo_home = meson.project_build_root() / 'cargo-home'
++cargo_home = meson.project_build_root() / '..' / 'cargo_home'
+ cargo_target_dir = meson.project_build_root() / 'src'
+ 
+-cargo_options = [ '--manifest-path', manifest_path ]
++cargo_options = [ '--offline', '--manifest-path', manifest_path ]
+ cargo_options += [ '--target-dir', cargo_target_dir ]
+ 
+ if get_option('profile') == 'default'
