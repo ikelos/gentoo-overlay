@@ -18,8 +18,8 @@ gst_pbutils-0.20.5
 gst-0.20.0
 gst-plugin-gif-0.10.0
 gst-plugin-gtk4-0.10.5
-futures-channel-0.3.19
-futures-util-0.3
+futures-channel-0.3.28
+futures-util-0.3.28
 gsettings-macro-0.1.15
 pulse-2.26.0
 pulse_glib-2.25.1
