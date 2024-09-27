@@ -16,7 +16,7 @@ KEYWORDS="~amd64 ~x86"
 IUSE="debug test"
 
 RDEPEND="
-	>=dev-util/meson-0.46
+	>=dev-build/meson-0.46
 	>=dev-lang/mono-1.1.14
 	>=dev-dotnet/gtk-sharp-2.12.21:2
 "
