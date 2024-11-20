@@ -1,0 +1,12 @@
+diff --git a/build.rs b/build.rs
+index 3f83726..2f9d4c0 100644
+--- a/build.rs
++++ b/build.rs
+@@ -184,6 +184,7 @@ fn build_v8(is_asan: bool) {
+   let target_arch = env::var("CARGO_CFG_TARGET_ARCH").unwrap();
+   // On windows, rustc cannot link with a V8 debug build.
+   let mut gn_args = if is_debug() && target_os != "windows" {
++    println!("cargo:rustc-link-lib=dylib=execinfo");
+     // Note: When building for Android aarch64-qemu, use release instead of debug.
+     vec!["is_debug=true".to_string()]
+   } else {

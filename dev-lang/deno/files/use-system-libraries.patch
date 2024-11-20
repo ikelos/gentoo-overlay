@@ -1,0 +1,96 @@
+diff --git a/Cargo.lock b/Cargo.lock
+index 2ae13eab0..280bdf699 100644
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -1428,7 +1428,6 @@ dependencies = [
+  "bit-vec",
+  "bytes",
+  "cooked-waker",
+- "deno_core_icudata",
+  "deno_ops",
+  "deno_unsync",
+  "futures",
+@@ -1448,12 +1447,6 @@ dependencies = [
+  "v8",
+ ]
+ 
+-[[package]]
+-name = "deno_core_icudata"
+-version = "0.0.73"
+-source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "a13951ea98c0a4c372f162d669193b4c9d991512de9f2381dd161027f34b26b1"
+-
+ [[package]]
+ name = "deno_cron"
+ version = "0.56.0"
+@@ -4184,11 +4177,11 @@ dependencies = [
+ 
+ [[package]]
+ name = "libsqlite3-sys"
+-version = "0.30.0"
++version = "0.30.1"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "6b694a822684ddb75df4d657029161431bcb4a85c1856952f845b76912bc6fec"
++checksum = "2e99fb7a497b1e3339bc746195567ed8d3e24945ecd636e3619d20b9de9e9149"
+ dependencies = [
+- "cc",
++ "bindgen 0.69.4",
+  "pkg-config",
+  "vcpkg",
+ ]
+@@ -5776,9 +5769,9 @@ dependencies = [
+ 
+ [[package]]
+ name = "rusqlite"
+-version = "0.32.0"
++version = "0.32.1"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "1cdbe9230a57259b37f7257d0aff38b8c9dbda3513edba2105e59b130189d82f"
++checksum = "7753b721174eb8ff87a9a0e799e2d7bc3749323e773db92e0984debb00019d6e"
+ dependencies = [
+  "bitflags 2.6.0",
+  "fallible-iterator",
+diff --git a/Cargo.toml b/Cargo.toml
+index 13140b65d..8b4201ad8 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -46,7 +46,7 @@ repository = "https://github.com/denoland/deno"
+ 
+ [workspace.dependencies]
+ deno_ast = { version = "=0.43.3", features = ["transpiling"] }
+-deno_core = { version = "0.318.0" }
++deno_core = { version = "0.318.0", default-features = false }
+ 
+ deno_bench_util = { version = "0.170.0", path = "./bench_util" }
+ deno_lockfile = "=0.23.1"
+@@ -163,7 +163,7 @@ rand = "=0.8.5"
+ regex = "^1.7.0"
+ reqwest = { version = "=0.12.5", default-features = false, features = ["rustls-tls", "stream", "gzip", "brotli", "socks", "json", "http2"] } # pinned because of https://github.com/seanmonstar/reqwest/pull/1955
+ ring = "^0.17.0"
+-rusqlite = { version = "0.32.0", features = ["unlock_notify", "bundled"] }
++rusqlite = { version = "0.32.0", features = ["unlock_notify", "buildtime_bindgen"] }
+ rustls = { version = "0.23.11", default-features = false, features = ["logging", "std", "tls12", "ring"] }
+ rustls-pemfile = "2"
+ rustls-tokio-stream = "=0.3.0"
+@@ -205,7 +205,7 @@ webpki-roots = "0.26"
+ which = "4.2.5"
+ yoke = { version = "0.7.4", features = ["derive"] }
+ zeromq = { version = "=0.4.0", default-features = false, features = ["tcp-transport", "tokio-runtime"] }
+-zstd = "=0.12.4"
++zstd = { version = "=0.12.4", features = ["pkg-config"] }
+ 
+ # crypto
+ hkdf = "0.12.3"
+diff --git a/ext/ffi/Cargo.toml b/ext/ffi/Cargo.toml
+index 27ecd1d54..7657566d1 100644
+--- a/ext/ffi/Cargo.toml
++++ b/ext/ffi/Cargo.toml
+@@ -19,7 +19,7 @@ deno_permissions.workspace = true
+ dlopen2.workspace = true
+ dynasmrt = "1.2.3"
+ libffi = "=3.2.0"
+-libffi-sys = "=2.3.0"
++libffi-sys = { version = "=2.3.0" , features = ["system"] }
+ log.workspace = true
+ num-bigint.workspace = true
+ serde.workspace = true
