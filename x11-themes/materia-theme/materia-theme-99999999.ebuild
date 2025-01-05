@@ -3,12 +3,15 @@
 
 EAPI=7
 
+inherit meson
+
 DESCRIPTION="A Material Design-like flat theme for GTK3, GTK2 and GNOME Shell"
 HOMEPAGE="https://github.com/nana-4/materia-theme"
 
 if [[ ${PV} == 99999999 ]];then
 	inherit git-r3
 	EGIT_REPO_URI="${HOMEPAGE}"
+	KEYWORDS="~amd64 ~x86"
 else
 	SRC_URI="${HOMEPAGE}/archive/v${PV}.tar.gz -> ${P}.tar.gz"
 	KEYWORDS="~amd64 ~x86"
@@ -24,11 +27,7 @@ DEPEND="
 	x11-libs/gdk-pixbuf"
 RDEPEND="${DEPEND}"
 BDEPEND="
-	dev-lang/sassc
+	dev-util/dart-sass
 	media-gfx/inkscape
 	media-gfx/optipng"
 
-src_install(){
-	mkdir -p "${ED}/usr/share/themes"
-	./install.sh --dest "${ED}/usr/share/themes" || die
-}
