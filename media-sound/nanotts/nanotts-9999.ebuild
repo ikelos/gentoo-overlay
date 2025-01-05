@@ -18,6 +18,11 @@ DEPEND=""
 RDEPEND="${DEPEND}"
 BDEPEND=""
 
+src_prepare() {
+	sed -i -e 's/-Wall/-Wall -Wno-error=incompatible-pointer-types/' Makefile
+	eapply_user
+}
+
 src_install() {
 	dobin nanotts
 	insinto "/usr/share/pico/lang"
