@@ -14,7 +14,8 @@ SLOT="0"
 KEYWORDS="~amd64 ~x86"
 
 DEPEND=">=media-libs/gstreamer-1.18
-		>=gui-libs/libadwaita-1.0.0"
+		>=gui-libs/libadwaita-1.0.0
+		dev-libs/libpeas:2"
 RDEPEND="${DEPEND}"
 BDEPEND=""
 
