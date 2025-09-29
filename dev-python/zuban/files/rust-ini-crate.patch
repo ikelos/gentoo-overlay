@@ -1,0 +1,16 @@
+diff --git a/Cargo.lock b/Cargo.lock
+index 2fd9d7dcd..9307a222e 100644
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -1170,8 +1170,9 @@ checksum = "caf4aa5b0f434c91fe5c7f1ecb6a5ece2130b02ad2a590589dda5146df959001"
+ 
+ [[package]]
+ name = "rust-ini"
+-version = "0.21.1"
+-source = "git+https://github.com/davidhalter-archive/rust-ini.git?branch=indented-multiline-values#ae7f2cd0782bb6df1c943e022538c274ac0cdaad"
++version = "0.21.3"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "796e8d2b6696392a43bea58116b667fb4c29727dc5abd27d6acf338bb4f688c7"
+ dependencies = [
+  "cfg-if",
+  "ordered-multimap",
