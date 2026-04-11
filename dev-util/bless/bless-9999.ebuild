@@ -18,13 +18,15 @@ IUSE="debug test"
 RDEPEND="
 	>=dev-build/meson-0.46
 	>=dev-lang/mono-1.1.14
-	>=dev-dotnet/gtk-sharp-2.12.21:2
+	>=dev-dotnet/gtk-sharp-2.12.21
 "
 DEPEND="${RDEPEND}
 	app-text/rarian
 	>=sys-devel/gettext-0.15
 	virtual/pkgconfig
 "
+
+PATCHES=("${FILESDIR}/0001-Port-bless-from-gtk-sharp-2-to-GtkSharp-3.22.patch")
 
 # See bug 278162
 # Waiting on nunit ebuild entering the tree
