@@ -26,7 +26,8 @@ DEPEND="${RDEPEND}
 	virtual/pkgconfig
 "
 
-PATCHES=("${FILESDIR}/0001-Port-bless-from-gtk-sharp-2-to-GtkSharp-3.22.patch")
+PATCHES=("${FILESDIR}/0001-port-to-gtksharp-3.0.patch"
+         "${FILESDIR}/0002-gtk322-runtime-fixes.patch")
 
 # See bug 278162
 # Waiting on nunit ebuild entering the tree

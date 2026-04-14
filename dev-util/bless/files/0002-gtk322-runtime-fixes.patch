@@ -1,0 +1,309 @@
+diff --git a/data/ui/BitwiseOperationsPlugin.ui b/data/ui/BitwiseOperationsPlugin.ui
+index ef2cc41..8399bb0 100644
+--- a/data/ui/BitwiseOperationsPlugin.ui
++++ b/data/ui/BitwiseOperationsPlugin.ui
+@@ -120,8 +120,13 @@
+     <child>
+       <object class="GtkButton" id="DoOperationButton">
+         <property name="visible">True</property>
+-        <property name="icon-name">system-run</property>
+-        <signal handler="OnDoOperationClicked" name="clicked"/>
++                <signal handler="OnDoOperationClicked" name="clicked"/>
++          <child>
++            <object class="GtkImage">
++              <property name="visible">True</property>
++              <property name="icon-name">system-run</property>
++            </object>
++          </child>
+       </object>
+       <packing>
+         <property name="expand">False</property>
+@@ -139,7 +144,7 @@
+         <child>
+           <object class="GtkImage" id="image8">
+             <property name="visible">True</property>
+-            <property name="stock">gtk-close</property>
++            <property name="icon-name">window-close</property>
+             <property name="icon_size">1</property>
+           </object>
+         </child>
+diff --git a/data/ui/ConversionTablePlugin.ui b/data/ui/ConversionTablePlugin.ui
+index e5ee388..6a4b659 100644
+--- a/data/ui/ConversionTablePlugin.ui
++++ b/data/ui/ConversionTablePlugin.ui
+@@ -27,7 +27,7 @@
+         <child>
+           <object class="GtkImage" id="image1332">
+             <property name="visible">True</property>
+-            <property name="stock">gtk-close</property>
++            <property name="icon-name">window-close</property>
+             <property name="icon_size">1</property>
+           </object>
+         </child>
+diff --git a/data/ui/ExportDialog.ui b/data/ui/ExportDialog.ui
+index 5184a87..c4b3650 100644
+--- a/data/ui/ExportDialog.ui
++++ b/data/ui/ExportDialog.ui
+@@ -30,7 +30,7 @@
+                 <child>
+                   <object class="GtkImage" id="image4">
+                     <property name="visible">True</property>
+-                    <property name="stock">gtk-save</property>
++                    <property name="icon-name">document-save</property>
+                   </object>
+                 </child>
+               </object>
+@@ -47,7 +47,7 @@
+                 <child>
+                   <object class="GtkImage" id="image5">
+                     <property name="visible">True</property>
+-                    <property name="stock">gtk-delete</property>
++                    <property name="icon-name">edit-delete</property>
+                   </object>
+                 </child>
+               </object>
+@@ -113,7 +113,7 @@
+                 <child>
+                   <object class="GtkImage" id="image2">
+                     <property name="visible">True</property>
+-                    <property name="stock">gtk-open</property>
++                    <property name="icon-name">document-open</property>
+                   </object>
+                 </child>
+               </object>
+@@ -281,9 +281,14 @@
+         <child>
+           <object class="GtkButton" id="CancelButton">
+             <property name="visible">True</property>
+-            <property name="icon-name">process-stop</property>
+-            <signal handler="OnExportCancelClicked" name="clicked"/>
+-          </object>
++                        <signal handler="OnExportCancelClicked" name="clicked"/>
++                  <child>
++                <object class="GtkImage">
++                  <property name="visible">True</property>
++                  <property name="icon-name">process-stop</property>
++                </object>
++              </child>
++      </object>
+           <packing>
+             <property name="expand">False</property>
+             <property name="fill">False</property>
+diff --git a/data/ui/FindReplacePlugin.ui b/data/ui/FindReplacePlugin.ui
+index 056f0b5..c273d97 100644
+--- a/data/ui/FindReplacePlugin.ui
++++ b/data/ui/FindReplacePlugin.ui
+@@ -91,7 +91,7 @@
+                 <child>
+                   <object class="GtkImage" id="image1329">
+                     <property name="visible">True</property>
+-                    <property name="stock">gtk-go-down</property>
++                    <property name="icon-name">go-down</property>
+                   </object>
+                   <packing>
+                     <property name="expand">False</property>
+@@ -144,7 +144,7 @@
+                 <child>
+                   <object class="GtkImage" id="image1331">
+                     <property name="visible">True</property>
+-                    <property name="stock">gtk-find-and-replace</property>
++                    <property name="icon-name">edit-find-replace</property>
+                   </object>
+                   <packing>
+                     <property name="expand">False</property>
+@@ -243,7 +243,7 @@
+                 <child>
+                   <object class="GtkImage" id="image1330">
+                     <property name="visible">True</property>
+-                    <property name="stock">gtk-go-up</property>
++                    <property name="icon-name">go-up</property>
+                   </object>
+                   <packing>
+                     <property name="expand">False</property>
+@@ -334,7 +334,7 @@
+         <child>
+           <object class="GtkImage" id="image3">
+             <property name="visible">True</property>
+-            <property name="stock">gtk-close</property>
++            <property name="icon-name">window-close</property>
+             <property name="icon_size">1</property>
+           </object>
+         </child>
+diff --git a/data/ui/GotoOffsetPlugin.ui b/data/ui/GotoOffsetPlugin.ui
+index 49bdda8..9bc4cb5 100644
+--- a/data/ui/GotoOffsetPlugin.ui
++++ b/data/ui/GotoOffsetPlugin.ui
+@@ -48,7 +48,7 @@
+                 <child>
+                   <object class="GtkImage" id="image1333">
+                     <property name="visible">True</property>
+-                    <property name="stock">gtk-jump-to</property>
++                    <property name="icon-name">go-jump</property>
+                   </object>
+                   <packing>
+                     <property name="expand">False</property>
+@@ -89,7 +89,7 @@
+         <child>
+           <object class="GtkImage" id="image1334">
+             <property name="visible">True</property>
+-            <property name="stock">gtk-close</property>
++            <property name="icon-name">window-close</property>
+             <property name="icon_size">1</property>
+           </object>
+         </child>
+diff --git a/data/ui/PreferencesDialog.ui b/data/ui/PreferencesDialog.ui
+index e06b76f..c9d4fc6 100644
+--- a/data/ui/PreferencesDialog.ui
++++ b/data/ui/PreferencesDialog.ui
+@@ -145,7 +145,7 @@
+                                 <child>
+                                   <object class="GtkImage" id="image1238">
+                                     <property name="visible">True</property>
+-                                    <property name="stock">gtk-open</property>
++                                    <property name="icon-name">document-open</property>
+                                   </object>
+                                   <packing>
+                                     <property name="expand">False</property>
+@@ -268,7 +268,7 @@
+                         <child>
+                           <object class="GtkImage" id="image7">
+                             <property name="visible">True</property>
+-                            <property name="stock">gtk-open</property>
++                            <property name="icon-name">document-open</property>
+                           </object>
+                         </child>
+                       </object>
+diff --git a/data/ui/ProgressDisplayPlugin.ui b/data/ui/ProgressDisplayPlugin.ui
+index 62cd15e..013cbbc 100644
+--- a/data/ui/ProgressDisplayPlugin.ui
++++ b/data/ui/ProgressDisplayPlugin.ui
+@@ -14,8 +14,13 @@
+     <child>
+       <object class="GtkButton" id="CancelButton">
+         <property name="visible">True</property>
+-        <property name="icon-name">process-stop</property>
+-        <signal handler="OnCancelButtonClicked" name="clicked"/>
++                <signal handler="OnCancelButtonClicked" name="clicked"/>
++          <child>
++            <object class="GtkImage">
++              <property name="visible">True</property>
++              <property name="icon-name">process-stop</property>
++            </object>
++          </child>
+       </object>
+       <packing>
+         <property name="expand">False</property>
+diff --git a/data/ui/SelectRangePlugin.ui b/data/ui/SelectRangePlugin.ui
+index 5990e77..40c6de7 100644
+--- a/data/ui/SelectRangePlugin.ui
++++ b/data/ui/SelectRangePlugin.ui
+@@ -69,7 +69,7 @@
+                 <child>
+                   <object class="GtkImage" id="image1642">
+                     <property name="visible">True</property>
+-                    <property name="stock">gtk-apply</property>
++                    <property name="icon-name">emblem-default</property>
+                   </object>
+                   <packing>
+                     <property name="expand">False</property>
+@@ -109,7 +109,7 @@
+         <child>
+           <object class="GtkImage" id="image1643">
+             <property name="visible">True</property>
+-            <property name="stock">gtk-close</property>
++            <property name="icon-name">window-close</property>
+             <property name="icon_size">1</property>
+           </object>
+         </child>
+diff --git a/meson.build b/meson.build
+index 22974b2..ab677cb 100644
+--- a/meson.build
++++ b/meson.build
+@@ -8,8 +8,17 @@ project(
+ 
+ add_project_arguments('-d:ENABLE_UNIX_SPECIFIC', language: 'cs')
+ 
+-gtk_sharp_2_dep = dependency('gtk-sharp-3.0')
+-glib_sharp_2_dep = dependency('glib-sharp-3.0')
++gtk_sharp_2_dep = dependency('gtk-sharp-3.0', version: '>= 2.99.1')
++glib_sharp_2_dep = dependency('glib-sharp-3.0', version: '>= 2.99.1')
++
++# Verify the underlying GTK+ C library is >= 3.22 when headers are available.
++# On systems where gtk+-3.0 is not on the default PKG_CONFIG_PATH this is a
++# non-fatal advisory check; the runtime version is what ultimately matters.
++gtk3_c_dep = dependency('gtk+-3.0', version: '>= 3.22', required: false)
++if not gtk3_c_dep.found()
++    message('gtk+-3.0 C library not found via pkg-config; ' +
++            'ensure GTK+ >= 3.22 is installed at runtime')
++endif
+ 
+ subdir('src')
+ subdir('data')
+diff --git a/src/gui/MainWindow.cs b/src/gui/MainWindow.cs
+index f01b5a0..5d7768f 100644
+--- a/src/gui/MainWindow.cs
++++ b/src/gui/MainWindow.cs
+@@ -36,9 +36,9 @@ using Mono.Unix;
+ 
+ public class BlessMain
+ {
+-	[Gtk.Builder.Object] Gtk.HBox DataViewBox;
++	[Gtk.Builder.Object] Gtk.Box DataViewBox;
+ 	[Gtk.Builder.Object] Gtk.Window MainWindow;
+-	[Gtk.Builder.Object] Gtk.VBox MainVBox;
++	[Gtk.Builder.Object] Gtk.Box MainVBox;
+ 
+ 	const string uiXml =
+ 		"<menubar>" +
+diff --git a/src/gui/plugins/BitwiseOperationsPlugin.cs b/src/gui/plugins/BitwiseOperationsPlugin.cs
+index 2d38ef7..2fd9d17 100644
+--- a/src/gui/plugins/BitwiseOperationsPlugin.cs
++++ b/src/gui/plugins/BitwiseOperationsPlugin.cs
+@@ -193,7 +193,7 @@ public class BitwiseOperationsPlugin : GuiPlugin
+ ///</summary>
+ public class BitwiseOperationsWidget : Gtk.Box
+ {
+-	[Gtk.Builder.Object] Gtk.HBox BitwiseOperationsHBox;
++	[Gtk.Builder.Object] Gtk.Box BitwiseOperationsHBox;
+ 	[Gtk.Builder.Object] Gtk.Label SourceLabel;
+ 	[Gtk.Builder.Object] Gtk.EventBox SourceLabelEB;
+ 	[Gtk.Builder.Object] Gtk.Button DoOperationButton;
+diff --git a/src/gui/plugins/GotoOffsetPlugin.cs b/src/gui/plugins/GotoOffsetPlugin.cs
+index cd78ac0..1bed212 100644
+--- a/src/gui/plugins/GotoOffsetPlugin.cs
++++ b/src/gui/plugins/GotoOffsetPlugin.cs
+@@ -100,7 +100,7 @@ public class GotoOffsetPlugin : GuiPlugin
+ ///</summary>
+ public class GotoOffsetWidget : Gtk.Box
+ {
+-	[Gtk.Builder.Object] Gtk.HBox GotoOffsetHBox;
++	[Gtk.Builder.Object] Gtk.Box GotoOffsetHBox;
+ 	[Gtk.Builder.Object] Gtk.Button GotoOffsetButton;
+ 	[Gtk.Builder.Object] Gtk.Entry OffsetEntry;
+ 	[Gtk.Builder.Object] Gtk.Button CloseButton;
+diff --git a/src/gui/plugins/ProgressDisplayPlugin.cs b/src/gui/plugins/ProgressDisplayPlugin.cs
+index 5ca0b23..fdc68e4 100644
+--- a/src/gui/plugins/ProgressDisplayPlugin.cs
++++ b/src/gui/plugins/ProgressDisplayPlugin.cs
+@@ -100,7 +100,7 @@ public class ProgressDisplayWidget : Gtk.Box, IProgressDisplay
+ 
+ public class ProgressDisplayBar : Gtk.Box {
+ 
+-	[Gtk.Builder.Object] Gtk.HBox ProgressBarHBox;
++	[Gtk.Builder.Object] Gtk.Box ProgressBarHBox;
+ 	[Gtk.Builder.Object] Gtk.Button CancelButton;
+ 	[Gtk.Builder.Object] Gtk.ProgressBar ProgressBar;
+ 
+diff --git a/src/gui/plugins/SelectRangePlugin.cs b/src/gui/plugins/SelectRangePlugin.cs
+index f738cea..64debad 100644
+--- a/src/gui/plugins/SelectRangePlugin.cs
++++ b/src/gui/plugins/SelectRangePlugin.cs
+@@ -120,7 +120,7 @@ public class SelectRangePlugin : GuiPlugin
+ ///</summary>
+ public class SelectRangeWidget : Gtk.Box
+ {
+-	[Gtk.Builder.Object] Gtk.HBox SelectRangeHBox;
++	[Gtk.Builder.Object] Gtk.Box SelectRangeHBox;
+ 	[Gtk.Builder.Object] Gtk.Button SelectButton;
+ 	[Gtk.Builder.Object] Gtk.Entry FromEntry;
+ 	[Gtk.Builder.Object] Gtk.Entry ToEntry;

@@ -1,4 +1,4 @@
-From 3930fe8733a0a6497ce6dd796c64859075fb9bab Mon Sep 17 00:00:00 2001
+From 2d8e7b8884602858b388a71cc6ad7f25e2acc422 Mon Sep 17 00:00:00 2001
 From: GTK3 Migration <patch@example.com>
 Date: Thu, 9 Apr 2026 18:27:00 +0000
 Subject: [PATCH] Port from gtk-sharp-2.0 to GtkSharp 3.22 (GTK3)
@@ -477,22 +477,23 @@ Use unified mono compiler 'mcs' by default
  README                                        |   8 +-
  data/ui/BitwiseOperationsPlugin.ui            |  32 +-
  data/ui/ConversionTablePlugin.ui              | 550 +++++++-----------
- data/ui/ExportDialog.ui                       |  94 ++-
- data/ui/FindReplacePlugin.ui                  | 292 ++++------
- data/ui/GotoOffsetPlugin.ui                   |  69 ++-
+ data/ui/ExportDialog.ui                       |  97 ++-
+ data/ui/FindReplacePlugin.ui                  | 295 ++++------
+ data/ui/GotoOffsetPlugin.ui                   |  70 ++-
  data/ui/LayoutSelectionDialog.ui              |  10 +-
- data/ui/MainWindow.ui                         |  20 +-
- data/ui/PreferencesDialog.ui                  | 148 ++---
+ data/ui/MainWindow.ui                         |  22 +-
+ data/ui/PreferencesDialog.ui                  | 150 ++---
  data/ui/ProgressDialog.ui                     |  12 +-
  data/ui/ProgressDisplayPlugin.ui              |  10 +-
- data/ui/SelectRangePlugin.ui                  |  75 ++-
+ data/ui/SelectRangePlugin.ui                  |  76 ++-
  meson.build                                   |   4 +-
  src/gui/DataBook.cs                           |   5 +-
- src/gui/DataViewControl.cs                    |   9 +-
- src/gui/DataViewDisplay.cs                    |  44 +-
+ src/gui/DataViewControl.cs                    |  56 +-
+ src/gui/DataViewDisplay.cs                    |  46 +-
  src/gui/FileChangedBar.cs                     |   5 +-
  src/gui/FileService.cs                        |   4 +-
  src/gui/MainWindow.cs                         |   6 +-
+ src/gui/WidgetGroup.cs                        |   6 +-
  src/gui/areas/Area.cs                         | 266 ++++-----
  src/gui/areas/AreaGroup.cs                    |  22 +-
  src/gui/areas/AsciiArea.cs                    |  21 +-
@@ -518,22 +519,22 @@ Use unified mono compiler 'mcs' by default
  src/gui/drawers/HexDrawer.cs                  |  71 +--
  src/gui/drawers/OctalDrawer.cs                |  47 +-
  src/gui/drawers/PixmapManager.cs              |  81 ++-
- src/gui/plugins/BitwiseOperationsPlugin.cs    |   9 +-
+ src/gui/plugins/BitwiseOperationsPlugin.cs    |  12 +-
  src/gui/plugins/ConversionTablePlugin.cs      |   5 +-
- src/gui/plugins/CopyOffsetPlugin.cs           |  13 +-
+ src/gui/plugins/CopyOffsetPlugin.cs           |  15 +-
  src/gui/plugins/EditOperationsPlugin.cs       |  14 +-
- src/gui/plugins/FileOperationsPlugin.cs       |  18 +-
- src/gui/plugins/FindReplacePlugin.cs          |   9 +-
- src/gui/plugins/GotoOffsetPlugin.cs           |   7 +-
- src/gui/plugins/HelpOperationsPlugin.cs       |   2 +-
- src/gui/plugins/InfobarPlugin.cs              |   3 +-
+ src/gui/plugins/FileOperationsPlugin.cs       |  26 +-
+ src/gui/plugins/FindReplacePlugin.cs          |  12 +-
+ src/gui/plugins/GotoOffsetPlugin.cs           |   9 +-
+ src/gui/plugins/HelpOperationsPlugin.cs       |   4 +-
+ src/gui/plugins/InfobarPlugin.cs              |   5 +-
  .../plugins/PatternMatchHighlightPlugin.cs    |   3 +-
- src/gui/plugins/ProgressDisplayPlugin.cs      |  10 +-
- src/gui/plugins/SelectRangePlugin.cs          |   7 +-
+ src/gui/plugins/ProgressDisplayPlugin.cs      |  12 +-
+ src/gui/plugins/SelectRangePlugin.cs          |   9 +-
  src/gui/plugins/StatisticsPlugin.cs           |  48 +-
  src/meson.build                               |  18 +-
- src/plugins/GuiPlugin.cs                      |   2 +-
- 60 files changed, 1180 insertions(+), 1433 deletions(-)
+ src/plugins/GuiPlugin.cs                      |  74 +--
+ 61 files changed, 1284 insertions(+), 1494 deletions(-)
 
 diff --git a/.gitignore b/.gitignore
 index 8b5c82a..ffa149a 100644
@@ -571,7 +572,7 @@ index 52b0876..5e50143 100644
  
  ----------------
 diff --git a/data/ui/BitwiseOperationsPlugin.ui b/data/ui/BitwiseOperationsPlugin.ui
-index 5ce9c6e..5763c14 100644
+index 5ce9c6e..e94fe16 100644
 --- a/data/ui/BitwiseOperationsPlugin.ui
 +++ b/data/ui/BitwiseOperationsPlugin.ui
 @@ -1,8 +1,8 @@
@@ -662,7 +663,7 @@ index 5ce9c6e..5763c14 100644
          <property name="visible">True</property>
          <property name="can_focus">True</property>
 -        <property name="relief">GTK_RELIEF_NONE</property>
-+        <property name="relief">relief_none</property>
++        <property name="relief">none</property>
          <property name="focus_on_click">False</property>
 -        <signal handler="OnCloseButtonClicked" name="clicked"/>
 +        <signal handler="OnCloseButtonClicked" name="clicked" />
@@ -676,7 +677,7 @@ index 5ce9c6e..5763c14 100644
          </child>
        </object>
 diff --git a/data/ui/ConversionTablePlugin.ui b/data/ui/ConversionTablePlugin.ui
-index 4b2359f..ffc7acd 100644
+index 4b2359f..f6d6ebe 100644
 --- a/data/ui/ConversionTablePlugin.ui
 +++ b/data/ui/ConversionTablePlugin.ui
 @@ -1,124 +1,86 @@
@@ -710,7 +711,7 @@ index 4b2359f..ffc7acd 100644
          <property name="visible">True</property>
          <property name="can_focus">True</property>
 -        <property name="relief">GTK_RELIEF_NONE</property>
-+        <property name="relief">relief_none</property>
++        <property name="relief">none</property>
          <property name="focus_on_click">False</property>
 -        <signal handler="OnCloseButtonClicked" name="clicked"/>
 +        <signal handler="OnCloseButtonClicked" name="clicked" />
@@ -728,8 +729,8 @@ index 4b2359f..ffc7acd 100644
 -        <property name="right_attach">7</property>
 -        <property name="x_options">GTK_FILL</property>
 -        <property name="y_options"/>
-+        <property name="column">6</property>
-+        <property name="row">0</property>
++        <property name="left-attach">6</property>
++        <property name="top-attach">0</property>
        </packing>
      </child>
      <child>
@@ -755,8 +756,8 @@ index 4b2359f..ffc7acd 100644
 -        <property name="top_attach">4</property>
 -        <property name="bottom_attach">5</property>
 -        <property name="y_options"/>
-+        <property name="column">5</property>
-+        <property name="row">4</property>
++        <property name="left-attach">5</property>
++        <property name="top-attach">4</property>
        </packing>
      </child>
      <child>
@@ -782,8 +783,8 @@ index 4b2359f..ffc7acd 100644
 -        <property name="top_attach">2</property>
 -        <property name="bottom_attach">3</property>
 -        <property name="y_options"/>
-+        <property name="column">5</property>
-+        <property name="row">2</property>
++        <property name="left-attach">5</property>
++        <property name="top-attach">2</property>
        </packing>
      </child>
      <child>
@@ -809,8 +810,8 @@ index 4b2359f..ffc7acd 100644
 -        <property name="top_attach">1</property>
 -        <property name="bottom_attach">2</property>
 -        <property name="y_options"/>
-+        <property name="column">5</property>
-+        <property name="row">1</property>
++        <property name="left-attach">5</property>
++        <property name="top-attach">1</property>
        </packing>
      </child>
      <child>
@@ -834,8 +835,8 @@ index 4b2359f..ffc7acd 100644
 -        <property name="left_attach">5</property>
 -        <property name="right_attach">6</property>
 -        <property name="y_options"/>
-+        <property name="column">5</property>
-+        <property name="row">0</property>
++        <property name="left-attach">5</property>
++        <property name="top-attach">0</property>
        </packing>
      </child>
      <child>
@@ -848,8 +849,8 @@ index 4b2359f..ffc7acd 100644
 -        <property name="top_attach">3</property>
 -        <property name="bottom_attach">4</property>
 -        <property name="y_options"/>
-+        <property name="column">5</property>
-+        <property name="row">3</property>
++        <property name="left-attach">5</property>
++        <property name="top-attach">3</property>
        </packing>
      </child>
      <child>
@@ -868,8 +869,8 @@ index 4b2359f..ffc7acd 100644
 -        <property name="x_options">GTK_FILL</property>
 -        <property name="y_options"/>
 -        <property name="x_padding">6</property>
-+        <property name="column">4</property>
-+        <property name="row">4</property>
++        <property name="left-attach">4</property>
++        <property name="top-attach">4</property>
        </packing>
      </child>
      <child>
@@ -899,8 +900,8 @@ index 4b2359f..ffc7acd 100644
 -        <property name="bottom_attach">7</property>
 -        <property name="x_options">GTK_FILL</property>
 -        <property name="y_options"/>
-+        <property name="column">2</property>
-+        <property name="row">6</property>
++        <property name="left-attach">2</property>
++        <property name="top-attach">6</property>
 +        <property name="width">2</property>
        </packing>
      </child>
@@ -931,8 +932,8 @@ index 4b2359f..ffc7acd 100644
 -        <property name="top_attach">6</property>
 -        <property name="bottom_attach">7</property>
 -        <property name="y_options"/>
-+        <property name="column">0</property>
-+        <property name="row">6</property>
++        <property name="left-attach">0</property>
++        <property name="top-attach">6</property>
 +        <property name="width">2</property>
        </packing>
      </child>
@@ -959,8 +960,8 @@ index 4b2359f..ffc7acd 100644
 -        <property name="top_attach">3</property>
 -        <property name="bottom_attach">4</property>
 -        <property name="y_options"/>
-+        <property name="column">3</property>
-+        <property name="row">3</property>
++        <property name="left-attach">3</property>
++        <property name="top-attach">3</property>
        </packing>
      </child>
      <child>
@@ -986,8 +987,8 @@ index 4b2359f..ffc7acd 100644
 -        <property name="top_attach">2</property>
 -        <property name="bottom_attach">3</property>
 -        <property name="y_options"/>
-+        <property name="column">3</property>
-+        <property name="row">2</property>
++        <property name="left-attach">3</property>
++        <property name="top-attach">2</property>
        </packing>
      </child>
      <child>
@@ -1013,8 +1014,8 @@ index 4b2359f..ffc7acd 100644
 -        <property name="top_attach">1</property>
 -        <property name="bottom_attach">2</property>
 -        <property name="y_options"/>
-+        <property name="column">3</property>
-+        <property name="row">1</property>
++        <property name="left-attach">3</property>
++        <property name="top-attach">1</property>
        </packing>
      </child>
      <child>
@@ -1038,8 +1039,8 @@ index 4b2359f..ffc7acd 100644
 -        <property name="left_attach">3</property>
 -        <property name="right_attach">4</property>
 -        <property name="y_options"/>
-+        <property name="column">3</property>
-+        <property name="row">0</property>
++        <property name="left-attach">3</property>
++        <property name="top-attach">0</property>
        </packing>
      </child>
      <child>
@@ -1065,8 +1066,8 @@ index 4b2359f..ffc7acd 100644
 -        <property name="top_attach">5</property>
 -        <property name="bottom_attach">6</property>
 -        <property name="y_options"/>
-+        <property name="column">1</property>
-+        <property name="row">5</property>
++        <property name="left-attach">1</property>
++        <property name="top-attach">5</property>
        </packing>
      </child>
      <child>
@@ -1092,8 +1093,8 @@ index 4b2359f..ffc7acd 100644
 -        <property name="top_attach">4</property>
 -        <property name="bottom_attach">5</property>
 -        <property name="y_options"/>
-+        <property name="column">1</property>
-+        <property name="row">4</property>
++        <property name="left-attach">1</property>
++        <property name="top-attach">4</property>
        </packing>
      </child>
      <child>
@@ -1119,8 +1120,8 @@ index 4b2359f..ffc7acd 100644
 -        <property name="top_attach">2</property>
 -        <property name="bottom_attach">3</property>
 -        <property name="y_options"/>
-+        <property name="column">1</property>
-+        <property name="row">2</property>
++        <property name="left-attach">1</property>
++        <property name="top-attach">2</property>
        </packing>
      </child>
      <child>
@@ -1146,8 +1147,8 @@ index 4b2359f..ffc7acd 100644
 -        <property name="top_attach">1</property>
 -        <property name="bottom_attach">2</property>
 -        <property name="y_options"/>
-+        <property name="column">1</property>
-+        <property name="row">1</property>
++        <property name="left-attach">1</property>
++        <property name="top-attach">1</property>
        </packing>
      </child>
      <child>
@@ -1171,8 +1172,8 @@ index 4b2359f..ffc7acd 100644
 -        <property name="left_attach">1</property>
 -        <property name="right_attach">2</property>
 -        <property name="y_options"/>
-+        <property name="column">1</property>
-+        <property name="row">0</property>
++        <property name="left-attach">1</property>
++        <property name="top-attach">0</property>
        </packing>
      </child>
      <child>
@@ -1198,8 +1199,8 @@ index 4b2359f..ffc7acd 100644
 -        <property name="top_attach">3</property>
 -        <property name="bottom_attach">4</property>
 -        <property name="y_options"/>
-+        <property name="column">1</property>
-+        <property name="row">3</property>
++        <property name="left-attach">1</property>
++        <property name="top-attach">3</property>
        </packing>
      </child>
      <child>
@@ -1218,8 +1219,8 @@ index 4b2359f..ffc7acd 100644
 -        <property name="x_options">GTK_FILL</property>
 -        <property name="y_options"/>
 -        <property name="x_padding">6</property>
-+        <property name="column">4</property>
-+        <property name="row">3</property>
++        <property name="left-attach">4</property>
++        <property name="top-attach">3</property>
        </packing>
      </child>
      <child>
@@ -1238,8 +1239,8 @@ index 4b2359f..ffc7acd 100644
 -        <property name="x_options">GTK_FILL</property>
 -        <property name="y_options"/>
 -        <property name="x_padding">6</property>
-+        <property name="column">4</property>
-+        <property name="row">2</property>
++        <property name="left-attach">4</property>
++        <property name="top-attach">2</property>
        </packing>
      </child>
      <child>
@@ -1258,8 +1259,8 @@ index 4b2359f..ffc7acd 100644
 -        <property name="x_options">GTK_FILL</property>
 -        <property name="y_options"/>
 -        <property name="x_padding">6</property>
-+        <property name="column">4</property>
-+        <property name="row">1</property>
++        <property name="left-attach">4</property>
++        <property name="top-attach">1</property>
        </packing>
      </child>
      <child>
@@ -1276,8 +1277,8 @@ index 4b2359f..ffc7acd 100644
 -        <property name="x_options">GTK_FILL</property>
 -        <property name="y_options"/>
 -        <property name="x_padding">6</property>
-+        <property name="column">4</property>
-+        <property name="row">0</property>
++        <property name="left-attach">4</property>
++        <property name="top-attach">0</property>
        </packing>
      </child>
      <child>
@@ -1299,8 +1300,8 @@ index 4b2359f..ffc7acd 100644
 -        <property name="y_options"/>
 -        <property name="x_padding">6</property>
 -        <property name="y_padding">6</property>
-+        <property name="column">2</property>
-+        <property name="row">3</property>
++        <property name="left-attach">2</property>
++        <property name="top-attach">3</property>
        </packing>
      </child>
      <child>
@@ -1322,8 +1323,8 @@ index 4b2359f..ffc7acd 100644
 -        <property name="y_options"/>
 -        <property name="x_padding">6</property>
 -        <property name="y_padding">6</property>
-+        <property name="column">2</property>
-+        <property name="row">2</property>
++        <property name="left-attach">2</property>
++        <property name="top-attach">2</property>
        </packing>
      </child>
      <child>
@@ -1345,8 +1346,8 @@ index 4b2359f..ffc7acd 100644
 -        <property name="y_options"/>
 -        <property name="x_padding">6</property>
 -        <property name="y_padding">6</property>
-+        <property name="column">2</property>
-+        <property name="row">1</property>
++        <property name="left-attach">2</property>
++        <property name="top-attach">1</property>
        </packing>
      </child>
      <child>
@@ -1366,8 +1367,8 @@ index 4b2359f..ffc7acd 100644
 -        <property name="y_options"/>
 -        <property name="x_padding">6</property>
 -        <property name="y_padding">6</property>
-+        <property name="column">2</property>
-+        <property name="row">0</property>
++        <property name="left-attach">2</property>
++        <property name="top-attach">0</property>
        </packing>
      </child>
      <child>
@@ -1387,8 +1388,8 @@ index 4b2359f..ffc7acd 100644
 -        <property name="y_options"/>
 -        <property name="x_padding">6</property>
 -        <property name="y_padding">6</property>
-+        <property name="column">0</property>
-+        <property name="row">5</property>
++        <property name="left-attach">0</property>
++        <property name="top-attach">5</property>
        </packing>
      </child>
      <child>
@@ -1408,8 +1409,8 @@ index 4b2359f..ffc7acd 100644
 -        <property name="y_options"/>
 -        <property name="x_padding">6</property>
 -        <property name="y_padding">6</property>
-+        <property name="column">0</property>
-+        <property name="row">4</property>
++        <property name="left-attach">0</property>
++        <property name="top-attach">4</property>
        </packing>
      </child>
      <child>
@@ -1429,8 +1430,8 @@ index 4b2359f..ffc7acd 100644
 -        <property name="y_options"/>
 -        <property name="x_padding">6</property>
 -        <property name="y_padding">6</property>
-+        <property name="column">0</property>
-+        <property name="row">3</property>
++        <property name="left-attach">0</property>
++        <property name="top-attach">3</property>
        </packing>
      </child>
      <child>
@@ -1450,8 +1451,8 @@ index 4b2359f..ffc7acd 100644
 -        <property name="y_options"/>
 -        <property name="x_padding">6</property>
 -        <property name="y_padding">6</property>
-+        <property name="column">0</property>
-+        <property name="row">2</property>
++        <property name="left-attach">0</property>
++        <property name="top-attach">2</property>
        </packing>
      </child>
      <child>
@@ -1471,8 +1472,8 @@ index 4b2359f..ffc7acd 100644
 -        <property name="y_options"/>
 -        <property name="x_padding">6</property>
 -        <property name="y_padding">6</property>
-+        <property name="column">0</property>
-+        <property name="row">1</property>
++        <property name="left-attach">0</property>
++        <property name="top-attach">1</property>
        </packing>
      </child>
      <child>
@@ -1490,16 +1491,16 @@ index 4b2359f..ffc7acd 100644
 -        <property name="y_options"/>
 -        <property name="x_padding">6</property>
 -        <property name="y_padding">6</property>
-+        <property name="column">0</property>
-+        <property name="row">0</property>
++        <property name="left-attach">0</property>
++        <property name="top-attach">0</property>
        </packing>
      </child>
    </object>
 diff --git a/data/ui/ExportDialog.ui b/data/ui/ExportDialog.ui
-index 14a259d..4e15bd4 100644
+index 14a259d..b06a106 100644
 --- a/data/ui/ExportDialog.ui
 +++ b/data/ui/ExportDialog.ui
-@@ -1,38 +1,34 @@
+@@ -1,38 +1,35 @@
 -<?xml version="1.0"?>
 +<?xml version="1.0" encoding="UTF-8"?>
  <interface>
@@ -1545,10 +1546,11 @@ index 14a259d..4e15bd4 100644
                      <property name="visible">True</property>
 -                    <property name="stock">gtk-save</property>
 +                    <property name="icon-name">document-save</property>
++            <property name="icon_size">3</property>
                    </object>
                  </child>
                </object>
-@@ -45,11 +41,11 @@
+@@ -45,11 +42,12 @@
              <child>
                <object class="GtkButton" id="DeletePatternButton">
                  <property name="visible">True</property>
@@ -1559,10 +1561,11 @@ index 14a259d..4e15bd4 100644
                      <property name="visible">True</property>
 -                    <property name="stock">gtk-delete</property>
 +                    <property name="icon-name">edit-delete</property>
++            <property name="icon_size">3</property>
                    </object>
                  </child>
                </object>
-@@ -61,29 +57,18 @@
+@@ -61,29 +59,18 @@
              </child>
            </object>
            <packing>
@@ -1571,8 +1574,8 @@ index 14a259d..4e15bd4 100644
 -            <property name="top_attach">2</property>
 -            <property name="bottom_attach">3</property>
 -            <property name="y_options"/>
-+            <property name="column">1</property>
-+            <property name="row">2</property>
++            <property name="left-attach">1</property>
++            <property name="top-attach">2</property>
            </packing>
          </child>
          <child>
@@ -1593,20 +1596,20 @@ index 14a259d..4e15bd4 100644
 -            <property name="right_attach">2</property>
 -            <property name="top_attach">1</property>
 -            <property name="bottom_attach">2</property>
-+            <property name="column">1</property>
-+            <property name="row">1</property>
++            <property name="left-attach">1</property>
++            <property name="top-attach">1</property>
            </packing>
          </child>
          <child>
-@@ -94,13 +79,13 @@
+@@ -94,13 +81,13 @@
              <property name="use_underline">True</property>
            </object>
            <packing>
 -            <property name="top_attach">2</property>
 -            <property name="bottom_attach">3</property>
 -            <property name="x_options">GTK_FILL</property>
-+            <property name="column">0</property>
-+            <property name="row">2</property>
++            <property name="left-attach">0</property>
++            <property name="top-attach">2</property>
            </packing>
          </child>
          <child>
@@ -1616,7 +1619,7 @@ index 14a259d..4e15bd4 100644
              <property name="visible">True</property>
              <property name="spacing">6</property>
              <child>
-@@ -111,11 +96,11 @@
+@@ -111,11 +98,12 @@
              <child>
                <object class="GtkButton" id="SelectFileButton">
                  <property name="visible">True</property>
@@ -1627,43 +1630,44 @@ index 14a259d..4e15bd4 100644
                      <property name="visible">True</property>
 -                    <property name="stock">gtk-open</property>
 +                    <property name="icon-name">document-open</property>
++            <property name="icon_size">3</property>
                    </object>
                  </child>
                </object>
-@@ -126,8 +111,8 @@
+@@ -126,8 +114,8 @@
              </child>
            </object>
            <packing>
 -            <property name="left_attach">1</property>
 -            <property name="right_attach">2</property>
-+            <property name="column">1</property>
-+            <property name="row">0</property>
++            <property name="left-attach">1</property>
++            <property name="top-attach">0</property>
            </packing>
          </child>
          <child>
-@@ -138,9 +123,8 @@
+@@ -138,9 +126,8 @@
              <property name="use_underline">True</property>
            </object>
            <packing>
 -            <property name="top_attach">1</property>
 -            <property name="bottom_attach">2</property>
 -            <property name="x_options">GTK_FILL</property>
-+            <property name="column">0</property>
-+            <property name="row">1</property>
++            <property name="left-attach">0</property>
++            <property name="top-attach">1</property>
            </packing>
          </child>
          <child>
-@@ -151,7 +135,8 @@
+@@ -151,7 +138,8 @@
              <property name="use_underline">True</property>
            </object>
            <packing>
 -            <property name="x_options">GTK_FILL</property>
-+            <property name="column">0</property>
-+            <property name="row">0</property>
++            <property name="left-attach">0</property>
++            <property name="top-attach">0</property>
            </packing>
          </child>
        </object>
-@@ -172,7 +157,8 @@
+@@ -172,7 +160,8 @@
        </packing>
      </child>
      <child>
@@ -1673,7 +1677,7 @@ index 14a259d..4e15bd4 100644
          <property name="visible">True</property>
          <child>
            <object class="GtkLabel" id="label9">
-@@ -181,7 +167,8 @@
+@@ -181,7 +170,8 @@
            </object>
          </child>
          <child>
@@ -1683,7 +1687,7 @@ index 14a259d..4e15bd4 100644
              <property name="visible">True</property>
              <child>
                <object class="GtkRadioButton" id="WholeFileRadio">
-@@ -210,7 +197,8 @@
+@@ -210,7 +200,8 @@
                </packing>
              </child>
              <child>
@@ -1693,7 +1697,7 @@ index 14a259d..4e15bd4 100644
                  <property name="visible">True</property>
                  <property name="spacing">6</property>
                  <child>
-@@ -220,7 +208,7 @@
+@@ -220,7 +211,7 @@
                      <property name="use_underline">True</property>
                      <property name="draw_indicator">True</property>
                      <property name="group">WholeFileRadio</property>
@@ -1702,7 +1706,7 @@ index 14a259d..4e15bd4 100644
                    </object>
                  </child>
                  <child>
-@@ -270,7 +258,8 @@
+@@ -270,7 +261,8 @@
        </packing>
      </child>
      <child>
@@ -1712,7 +1716,7 @@ index 14a259d..4e15bd4 100644
          <property name="visible">True</property>
          <property name="spacing">6</property>
          <child>
-@@ -281,9 +270,8 @@
+@@ -281,9 +273,8 @@
          <child>
            <object class="GtkButton" id="CancelButton">
              <property name="visible">True</property>
@@ -1725,7 +1729,7 @@ index 14a259d..4e15bd4 100644
            <packing>
              <property name="expand">False</property>
 diff --git a/data/ui/FindReplacePlugin.ui b/data/ui/FindReplacePlugin.ui
-index 65078f5..7e5ec7e 100644
+index 65078f5..84d2f13 100644
 --- a/data/ui/FindReplacePlugin.ui
 +++ b/data/ui/FindReplacePlugin.ui
 @@ -1,8 +1,8 @@
@@ -1777,8 +1781,8 @@ index 65078f5..7e5ec7e 100644
 -        <property name="bottom_attach">2</property>
 -        <property name="x_options">GTK_FILL</property>
 -        <property name="y_options">GTK_FILL</property>
-+        <property name="column">3</property>
-+        <property name="row">1</property>
++        <property name="left-attach">3</property>
++        <property name="top-attach">1</property>
        </packing>
      </child>
      <child>
@@ -1801,17 +1805,17 @@ index 65078f5..7e5ec7e 100644
 -        <property name="right_attach">4</property>
 -        <property name="x_options">GTK_FILL</property>
 -        <property name="y_options">GTK_FILL</property>
-+        <property name="column">3</property>
-+        <property name="row">0</property>
++        <property name="left-attach">3</property>
++        <property name="top-attach">0</property>
        </packing>
      </child>
      <child>
-@@ -79,51 +71,46 @@
+@@ -79,51 +71,47 @@
          <property name="visible">True</property>
          <property name="sensitive">False</property>
          <property name="can_focus">True</property>
 -        <property name="relief">GTK_RELIEF_NONE</property>
-+        <property name="relief">relief_none</property>
++        <property name="relief">none</property>
          <property name="focus_on_click">False</property>
 -        <signal handler="OnFindNextButtonClicked" name="clicked"/>
 +        <property name="margin-start">6</property>
@@ -1855,6 +1859,7 @@ index 65078f5..7e5ec7e 100644
 -                  </packing>
 -                </child>
 +                <property name="icon-name">go-down</property>
++            <property name="icon_size">3</property>
                </object>
 +              <packing>
 +                <property name="expand">False</property>
@@ -1882,17 +1887,17 @@ index 65078f5..7e5ec7e 100644
 -        <property name="x_options"/>
 -        <property name="y_options"/>
 -        <property name="x_padding">6</property>
-+        <property name="column">4</property>
-+        <property name="row">0</property>
++        <property name="left-attach">4</property>
++        <property name="top-attach">0</property>
        </packing>
      </child>
      <child>
-@@ -131,81 +118,70 @@
+@@ -131,81 +119,71 @@
          <property name="visible">True</property>
          <property name="sensitive">False</property>
          <property name="can_focus">True</property>
 -        <property name="relief">GTK_RELIEF_NONE</property>
-+        <property name="relief">relief_none</property>
++        <property name="relief">none</property>
          <property name="focus_on_click">False</property>
 -        <signal handler="OnReplaceButtonClicked" name="clicked"/>
 +        <property name="margin-start">6</property>
@@ -1912,6 +1917,7 @@ index 65078f5..7e5ec7e 100644
 +              <object class="GtkImage" id="image1331">
 +                <property name="visible">True</property>
 +                <property name="icon-name">edit-find-replace</property>
++            <property name="icon_size">3</property>
 +              </object>
 +              <packing>
 +                <property name="expand">False</property>
@@ -1965,8 +1971,8 @@ index 65078f5..7e5ec7e 100644
 -        <property name="x_options">GTK_FILL</property>
 -        <property name="y_options"/>
 -        <property name="x_padding">6</property>
-+        <property name="column">4</property>
-+        <property name="row">1</property>
++        <property name="left-attach">4</property>
++        <property name="top-attach">1</property>
        </packing>
      </child>
      <child>
@@ -1984,8 +1990,8 @@ index 65078f5..7e5ec7e 100644
 -        <property name="x_options">GTK_FILL</property>
 -        <property name="y_options"/>
 -        <property name="x_padding">6</property>
-+        <property name="column">2</property>
-+        <property name="row">1</property>
++        <property name="left-attach">2</property>
++        <property name="top-attach">1</property>
        </packing>
      </child>
      <child>
@@ -2001,17 +2007,17 @@ index 65078f5..7e5ec7e 100644
 -        <property name="x_options">GTK_FILL</property>
 -        <property name="y_options"/>
 -        <property name="x_padding">6</property>
-+        <property name="column">2</property>
-+        <property name="row">0</property>
++        <property name="left-attach">2</property>
++        <property name="top-attach">0</property>
        </packing>
      </child>
      <child>
-@@ -214,18 +190,14 @@
+@@ -214,18 +192,14 @@
          <property name="sensitive">False</property>
          <property name="can_focus">True</property>
          <property name="label" translatable="yes">Replace All</property>
 -        <property name="relief">GTK_RELIEF_NONE</property>
-+        <property name="relief">relief_none</property>
++        <property name="relief">none</property>
          <property name="use_underline">True</property>
          <property name="focus_on_click">False</property>
 -        <signal handler="OnReplaceAllButtonClicked" name="clicked"/>
@@ -2024,17 +2030,17 @@ index 65078f5..7e5ec7e 100644
 -        <property name="bottom_attach">2</property>
 -        <property name="x_options">GTK_FILL</property>
 -        <property name="y_options"/>
-+        <property name="column">5</property>
-+        <property name="row">1</property>
++        <property name="left-attach">5</property>
++        <property name="top-attach">1</property>
        </packing>
      </child>
      <child>
-@@ -233,51 +205,45 @@
+@@ -233,51 +207,46 @@
          <property name="visible">True</property>
          <property name="sensitive">False</property>
          <property name="can_focus">True</property>
 -        <property name="relief">GTK_RELIEF_NONE</property>
-+        <property name="relief">relief_none</property>
++        <property name="relief">none</property>
          <property name="focus_on_click">False</property>
 -        <signal handler="OnFindPreviousButtonClicked" name="clicked"/>
 +        <signal handler="OnFindPreviousButtonClicked" name="clicked" />
@@ -2052,6 +2058,7 @@ index 65078f5..7e5ec7e 100644
 +              <object class="GtkImage" id="image1330">
 +                <property name="visible">True</property>
 +                <property name="icon-name">go-up</property>
++            <property name="icon_size">3</property>
 +              </object>
 +              <packing>
 +                <property name="expand">False</property>
@@ -2104,12 +2111,12 @@ index 65078f5..7e5ec7e 100644
 -        <property name="right_attach">6</property>
 -        <property name="x_options">GTK_FILL</property>
 -        <property name="y_options"/>
-+        <property name="column">5</property>
-+        <property name="row">0</property>
++        <property name="left-attach">5</property>
++        <property name="top-attach">0</property>
        </packing>
      </child>
      <child>
-@@ -285,14 +251,11 @@
+@@ -285,14 +254,11 @@
          <property name="visible">True</property>
          <property name="can_focus">True</property>
          <property name="activates_default">True</property>
@@ -2122,12 +2129,12 @@ index 65078f5..7e5ec7e 100644
 -        <property name="top_attach">1</property>
 -        <property name="bottom_attach">2</property>
 -        <property name="y_options"/>
-+        <property name="column">1</property>
-+        <property name="row">1</property>
++        <property name="left-attach">1</property>
++        <property name="top-attach">1</property>
        </packing>
      </child>
      <child>
-@@ -300,12 +263,11 @@
+@@ -300,12 +266,11 @@
          <property name="visible">True</property>
          <property name="can_focus">True</property>
          <property name="activates_default">True</property>
@@ -2138,12 +2145,12 @@ index 65078f5..7e5ec7e 100644
 -        <property name="left_attach">1</property>
 -        <property name="right_attach">2</property>
 -        <property name="y_options"/>
-+        <property name="column">1</property>
-+        <property name="row">0</property>
++        <property name="left-attach">1</property>
++        <property name="top-attach">0</property>
        </packing>
      </child>
      <child>
-@@ -316,10 +278,8 @@
+@@ -316,10 +281,8 @@
          <property name="use_markup">True</property>
        </object>
        <packing>
@@ -2151,19 +2158,19 @@ index 65078f5..7e5ec7e 100644
 -        <property name="bottom_attach">2</property>
 -        <property name="x_options">GTK_FILL</property>
 -        <property name="y_options"/>
-+        <property name="column">0</property>
-+        <property name="row">1</property>
++        <property name="left-attach">0</property>
++        <property name="top-attach">1</property>
        </packing>
      </child>
      <child>
-@@ -330,28 +290,26 @@
+@@ -330,28 +293,26 @@
          <property name="use_markup">True</property>
        </object>
        <packing>
 -        <property name="x_options">GTK_FILL</property>
 -        <property name="y_options"/>
-+        <property name="column">0</property>
-+        <property name="row">0</property>
++        <property name="left-attach">0</property>
++        <property name="top-attach">0</property>
        </packing>
      </child>
      <child>
@@ -2171,7 +2178,7 @@ index 65078f5..7e5ec7e 100644
          <property name="visible">True</property>
 -        <property name="relief">GTK_RELIEF_NONE</property>
 -        <signal handler="OnCloseButtonClicked" name="clicked"/>
-+        <property name="relief">relief_none</property>
++        <property name="relief">none</property>
 +        <signal handler="OnCloseButtonClicked" name="clicked" />
          <child>
            <object class="GtkImage" id="image3">
@@ -2187,13 +2194,13 @@ index 65078f5..7e5ec7e 100644
 -        <property name="right_attach">7</property>
 -        <property name="x_options">GTK_FILL</property>
 -        <property name="y_options">GTK_FILL</property>
-+        <property name="column">6</property>
-+        <property name="row">0</property>
++        <property name="left-attach">6</property>
++        <property name="top-attach">0</property>
        </packing>
      </child>
    </object>
 diff --git a/data/ui/GotoOffsetPlugin.ui b/data/ui/GotoOffsetPlugin.ui
-index afae5cc..452b124 100644
+index afae5cc..45a9479 100644
 --- a/data/ui/GotoOffsetPlugin.ui
 +++ b/data/ui/GotoOffsetPlugin.ui
 @@ -1,6 +1,7 @@
@@ -2217,12 +2224,12 @@ index afae5cc..452b124 100644
        </object>
        <packing>
          <property name="position">1</property>
-@@ -31,41 +32,37 @@
+@@ -31,41 +32,38 @@
        <object class="GtkButton" id="GotoOffsetButton">
          <property name="visible">True</property>
          <property name="can_focus">True</property>
 -        <property name="relief">GTK_RELIEF_NONE</property>
-+        <property name="relief">relief_none</property>
++        <property name="relief">none</property>
          <property name="focus_on_click">False</property>
 -        <signal handler="OnGotoOffsetClicked" name="clicked"/>
 +        <signal handler="OnGotoOffsetClicked" name="clicked" />
@@ -2264,6 +2271,7 @@ index afae5cc..452b124 100644
 -                  </packing>
 -                </child>
 +                <property name="icon-name">go-jump</property>
++            <property name="icon_size">3</property>
                </object>
 +              <packing>
 +                <property name="expand">False</property>
@@ -2284,12 +2292,12 @@ index afae5cc..452b124 100644
              </child>
            </object>
          </child>
-@@ -81,14 +78,14 @@
+@@ -81,14 +79,14 @@
        <object class="GtkButton" id="CloseButton">
          <property name="visible">True</property>
          <property name="can_focus">True</property>
 -        <property name="relief">GTK_RELIEF_NONE</property>
-+        <property name="relief">relief_none</property>
++        <property name="relief">none</property>
          <property name="focus_on_click">False</property>
 -        <signal handler="OnCloseButtonClicked" name="clicked"/>
 +        <signal handler="OnCloseButtonClicked" name="clicked" />
@@ -2342,10 +2350,10 @@ index e7d552c..ba39b1f 100644
          <child type="label">
            <object class="GtkLabel" id="label3">
 diff --git a/data/ui/MainWindow.ui b/data/ui/MainWindow.ui
-index c376e1f..1448447 100644
+index c376e1f..fc13cb2 100644
 --- a/data/ui/MainWindow.ui
 +++ b/data/ui/MainWindow.ui
-@@ -5,27 +5,29 @@
+@@ -5,35 +5,39 @@
      <property name="title">Bless - Gtk# Hex Editor</property>
      <property name="default_width">400</property>
      <property name="default_height">400</property>
@@ -2383,7 +2391,9 @@ index c376e1f..1448447 100644
              </child>
            </object>
            <packing>
-@@ -33,7 +35,7 @@
++            <property name="expand">True</property>
++            <property name="fill">True</property>
+             <property name="position">2</property>
            </packing>
          </child>
          <child>
@@ -2393,7 +2403,7 @@ index c376e1f..1448447 100644
        </object>
      </child>
 diff --git a/data/ui/PreferencesDialog.ui b/data/ui/PreferencesDialog.ui
-index f81844c..f117952 100644
+index f81844c..29433e8 100644
 --- a/data/ui/PreferencesDialog.ui
 +++ b/data/ui/PreferencesDialog.ui
 @@ -1,4 +1,4 @@
@@ -2477,7 +2487,7 @@ index f81844c..f117952 100644
                      <property name="visible">True</property>
                      <property name="spacing">6</property>
                      <child>
-@@ -128,37 +134,33 @@
+@@ -128,37 +134,34 @@
                          <property name="visible">True</property>
                          <property name="can_focus">True</property>
                          <child>
@@ -2518,6 +2528,7 @@ index f81844c..f117952 100644
 -                                  </packing>
 -                                </child>
 +                                <property name="icon-name">document-open</property>
++            <property name="icon_size">3</property>
                                </object>
 +                              <packing>
 +                                <property name="expand">False</property>
@@ -2538,7 +2549,7 @@ index f81844c..f117952 100644
                              </child>
                            </object>
                          </child>
-@@ -210,7 +212,8 @@
+@@ -210,7 +213,8 @@
        </packing>
      </child>
      <child>
@@ -2548,7 +2559,7 @@ index f81844c..f117952 100644
          <property name="visible">True</property>
          <property name="spacing">6</property>
          <child>
-@@ -226,7 +229,8 @@
+@@ -226,7 +230,8 @@
            </packing>
          </child>
          <child>
@@ -2558,7 +2569,7 @@ index f81844c..f117952 100644
              <property name="visible">True</property>
              <child>
                <object class="GtkLabel" id="label55">
-@@ -239,14 +243,13 @@
+@@ -239,14 +244,13 @@
                </packing>
              </child>
              <child>
@@ -2576,16 +2587,17 @@ index f81844c..f117952 100644
                      <property name="visible">True</property>
                      <child>
                        <object class="GtkEntry" id="TempDirEntry">
-@@ -259,7 +262,7 @@
+@@ -259,7 +263,8 @@
                          <child>
                            <object class="GtkImage" id="image7">
                              <property name="visible">True</property>
 -                            <property name="stock">gtk-open</property>
 +                            <property name="icon-name">document-open</property>
++            <property name="icon_size">3</property>
                            </object>
                          </child>
                        </object>
-@@ -270,10 +273,8 @@
+@@ -270,10 +275,8 @@
                      </child>
                    </object>
                    <packing>
@@ -2593,34 +2605,34 @@ index f81844c..f117952 100644
 -                    <property name="right_attach">2</property>
 -                    <property name="top_attach">1</property>
 -                    <property name="bottom_attach">2</property>
-+                    <property name="column">1</property>
-+                    <property name="row">1</property>
++                    <property name="left-attach">1</property>
++                    <property name="top-attach">1</property>
                    </packing>
                  </child>
                  <child>
-@@ -283,8 +284,8 @@
+@@ -283,8 +286,8 @@
                      <property name="label" translatable="yes">Temporary Directory:</property>
                    </object>
                    <packing>
 -                    <property name="top_attach">1</property>
 -                    <property name="bottom_attach">2</property>
-+                    <property name="column">0</property>
-+                    <property name="row">1</property>
++                    <property name="left-attach">0</property>
++                    <property name="top-attach">1</property>
                    </packing>
                  </child>
                  <child>
-@@ -295,8 +296,8 @@
+@@ -295,8 +298,8 @@
                      <property name="use_underline">True</property>
                    </object>
                    <packing>
 -                    <property name="x_options">GTK_FILL</property>
 -                    <property name="y_options"/>
-+                    <property name="column">0</property>
-+                    <property name="row">0</property>
++                    <property name="left-attach">0</property>
++                    <property name="top-attach">0</property>
                    </packing>
                  </child>
                  <child>
-@@ -304,17 +305,15 @@
+@@ -304,17 +307,15 @@
                      <property name="visible">True</property>
                      <property name="model">model5</property>
                      <child>
@@ -2636,12 +2648,12 @@ index f81844c..f117952 100644
 -                    <property name="right_attach">2</property>
 -                    <property name="x_options">GTK_FILL</property>
 -                    <property name="y_options">GTK_FILL</property>
-+                    <property name="column">1</property>
-+                    <property name="row">0</property>
++                    <property name="left-attach">1</property>
++                    <property name="top-attach">0</property>
                    </packing>
                  </child>
                </object>
-@@ -339,7 +338,8 @@
+@@ -339,7 +340,8 @@
        </packing>
      </child>
    </object>
@@ -2651,7 +2663,7 @@ index f81844c..f117952 100644
      <property name="visible">True</property>
      <property name="border_width">12</property>
      <property name="spacing">6</property>
-@@ -358,7 +358,8 @@
+@@ -358,7 +360,8 @@
        </packing>
      </child>
      <child>
@@ -2661,7 +2673,7 @@ index f81844c..f117952 100644
          <property name="visible">True</property>
          <child>
            <object class="GtkLabel" id="label46">
-@@ -371,7 +372,8 @@
+@@ -371,7 +374,8 @@
            </packing>
          </child>
          <child>
@@ -2671,7 +2683,7 @@ index f81844c..f117952 100644
              <property name="visible">True</property>
              <property name="spacing">6</property>
              <child>
-@@ -432,12 +434,14 @@
+@@ -432,12 +436,14 @@
        </packing>
      </child>
    </object>
@@ -2688,7 +2700,7 @@ index f81844c..f117952 100644
          <property name="visible">True</property>
          <property name="spacing">6</property>
          <child>
-@@ -453,7 +457,8 @@
+@@ -453,7 +459,8 @@
            </packing>
          </child>
          <child>
@@ -2698,7 +2710,7 @@ index f81844c..f117952 100644
              <property name="visible">True</property>
              <child>
                <object class="GtkLabel" id="label51">
-@@ -466,11 +471,13 @@
+@@ -466,11 +473,13 @@
                </packing>
              </child>
              <child>
@@ -2714,7 +2726,7 @@ index f81844c..f117952 100644
                      <property name="visible">True</property>
                      <property name="spacing">6</property>
                      <child>
-@@ -493,7 +500,7 @@
+@@ -493,7 +502,7 @@
                          <property name="adjustment">adjustment1</property>
                          <property name="climb_rate">1</property>
                          <property name="numeric">True</property>
@@ -2723,7 +2735,7 @@ index f81844c..f117952 100644
                        </object>
                        <packing>
                          <property name="expand">False</property>
-@@ -553,7 +560,8 @@
+@@ -553,7 +562,8 @@
        </packing>
      </child>
      <child>
@@ -2733,7 +2745,7 @@ index f81844c..f117952 100644
          <property name="visible">True</property>
          <property name="spacing">6</property>
          <child>
-@@ -569,7 +577,8 @@
+@@ -569,7 +579,8 @@
            </packing>
          </child>
          <child>
@@ -2743,7 +2755,7 @@ index f81844c..f117952 100644
              <property name="visible">True</property>
              <child>
                <object class="GtkLabel" id="label13">
-@@ -582,7 +591,8 @@
+@@ -582,7 +593,8 @@
                </packing>
              </child>
              <child>
@@ -2815,7 +2827,7 @@ index 49d6bf0..b44198e 100644
        <packing>
          <property name="expand">False</property>
 diff --git a/data/ui/SelectRangePlugin.ui b/data/ui/SelectRangePlugin.ui
-index 729cc10..69e815b 100644
+index 729cc10..86e5502 100644
 --- a/data/ui/SelectRangePlugin.ui
 +++ b/data/ui/SelectRangePlugin.ui
 @@ -1,6 +1,7 @@
@@ -2859,12 +2871,12 @@ index 729cc10..69e815b 100644
        </object>
        <packing>
          <property name="position">3</property>
-@@ -52,41 +53,37 @@
+@@ -52,41 +53,38 @@
        <object class="GtkButton" id="SelectButton">
          <property name="visible">True</property>
          <property name="can_focus">True</property>
 -        <property name="relief">GTK_RELIEF_NONE</property>
-+        <property name="relief">relief_none</property>
++        <property name="relief">none</property>
          <property name="focus_on_click">False</property>
 -        <signal handler="OnSelectButtonClicked" name="clicked"/>
 +        <signal handler="OnSelectButtonClicked" name="clicked" />
@@ -2906,6 +2918,7 @@ index 729cc10..69e815b 100644
 -                  </packing>
 -                </child>
 +                <property name="icon-name">emblem-default</property>
++            <property name="icon_size">3</property>
                </object>
 +              <packing>
 +                <property name="expand">False</property>
@@ -2926,12 +2939,12 @@ index 729cc10..69e815b 100644
              </child>
            </object>
          </child>
-@@ -101,14 +98,14 @@
+@@ -101,14 +99,14 @@
        <object class="GtkButton" id="CloseButton">
          <property name="visible">True</property>
          <property name="can_focus">True</property>
 -        <property name="relief">GTK_RELIEF_NONE</property>
-+        <property name="relief">relief_none</property>
++        <property name="relief">none</property>
          <property name="focus_on_click">False</property>
 -        <signal handler="OnCloseButtonClicked" name="clicked"/>
 +        <signal handler="OnCloseButtonClicked" name="clicked" />
@@ -2960,7 +2973,7 @@ index c0c9929..fb05eb1 100644
  subdir('src')
  subdir('data')
 diff --git a/src/gui/DataBook.cs b/src/gui/DataBook.cs
-index 4d84e34..dafa51a 100644
+index 4d84e34..993c6c6 100644
 --- a/src/gui/DataBook.cs
 +++ b/src/gui/DataBook.cs
 @@ -218,7 +218,7 @@ public class DataBook : Gtk.Notebook
@@ -2985,15 +2998,19 @@ index 4d84e34..dafa51a 100644
  		label.UseUnderline = false;
  
 -		Gtk.Image img = new Gtk.Image(Gtk.Stock.Close, Gtk.IconSize.Menu);
-+		Gtk.Image img = new Gtk.Image("window-close", Gtk.IconSize.Menu);
++		Gtk.Image img = new Gtk.Image("window-close", Gtk.IconSize.Button);
  		img.SetSizeRequest(8, 8);
  
  		// This doesn't compile in 1.0.2 and older,
 diff --git a/src/gui/DataViewControl.cs b/src/gui/DataViewControl.cs
-index 590bcac..e008cc7 100644
+index 590bcac..f33605e 100644
 --- a/src/gui/DataViewControl.cs
 +++ b/src/gui/DataViewControl.cs
-@@ -278,8 +278,13 @@ public class DataViewControl
+@@ -274,12 +274,16 @@ public class DataViewControl
+ 	internal void OnMotionNotify(object o, MotionNotifyEventArgs args)
+ 	{
+ 		Gdk.EventMotion e = args.Event;
+-		Gtk.DrawingArea da = (Gtk.DrawingArea)o;
  		int x, y;
  		Gdk.ModifierType state;
  
@@ -3009,8 +3026,66 @@ index 590bcac..e008cc7 100644
  		else {
  			x = (int)e.X;
  			y = (int)e.Y;
+@@ -479,23 +483,45 @@ public class DataViewControl
+ 		// do nothing
+ 	}
+ 
++	// Accumulated fractional scroll delta for smooth/touchpad scrolling.
++	double smoothScrollAccum = 0.0;
++
+ 	internal void OnMouseWheel(object o, ScrollEventArgs args)
+ 	{
+ 		Gdk.EventScroll e = args.Event;
+-
+-		if (e.Direction == Gdk.ScrollDirection.Down) {
+-			double newValue = dvDisplay.VScroll.Value + dvDisplay.VScroll.Adjustment.StepIncrement;
+-			if (newValue <= dvDisplay.VScroll.Adjustment.Upper - dvDisplay.VScroll.Adjustment.PageSize)
+-				dvDisplay.VScroll.Value = newValue;
+-			else
+-				dvDisplay.VScroll.Value = dvDisplay.VScroll.Adjustment.Upper - dvDisplay.VScroll.Adjustment.PageSize;
++		Gtk.Adjustment adj = dvDisplay.VScroll.Adjustment;
++		double step = adj.StepIncrement;
++		double lower = adj.Lower;
++		double upper = adj.Upper - adj.PageSize;
++
++		double delta = 0.0;
++
++		if (e.Direction == Gdk.ScrollDirection.Smooth) {
++			// GTK3 smooth scrolling (touchpads, hi-res mice).
++			// delta_y > 0 means scroll down; < 0 means scroll up.
++			double dx, dy;
++			e.GetScrollDeltas(out dx, out dy);
++			smoothScrollAccum += dy * step;
++			// Consume whole-row increments from the accumulator.
++			double whole = System.Math.Truncate(smoothScrollAccum);
++			if (System.Math.Abs(whole) >= 1.0) {
++				delta = whole;
++				smoothScrollAccum -= whole;
++			}
++		}
++		else if (e.Direction == Gdk.ScrollDirection.Down) {
++			delta = step;
++			smoothScrollAccum = 0.0;
+ 		}
+ 		else if (e.Direction == Gdk.ScrollDirection.Up) {
+-			double newValue = dvDisplay.VScroll.Value - dvDisplay.VScroll.Adjustment.StepIncrement;
+-			if (newValue >= dvDisplay.VScroll.Adjustment.Lower)
+-				dvDisplay.VScroll.Value = newValue;
+-			else
+-				dvDisplay.VScroll.Value = dvDisplay.VScroll.Adjustment.Lower;
++			delta = -step;
++			smoothScrollAccum = 0.0;
++		}
++
++		if (delta != 0.0) {
++			double newValue = System.Math.Max(lower,
++				System.Math.Min(upper, dvDisplay.VScroll.Value + delta));
++			dvDisplay.VScroll.Value = newValue;
+ 		}
+ 	}
+ 
 diff --git a/src/gui/DataViewDisplay.cs b/src/gui/DataViewDisplay.cs
-index 39d17ae..e5b656e 100644
+index 39d17ae..92e499e 100644
 --- a/src/gui/DataViewDisplay.cs
 +++ b/src/gui/DataViewDisplay.cs
 @@ -29,13 +29,13 @@ using Bless.Util;
@@ -3053,7 +3128,12 @@ index 39d17ae..e5b656e 100644
  
  		// add events that we want to handle
  		drawingArea.AddEvents((int)Gdk.EventMask.ButtonPressMask);
-@@ -138,12 +142,12 @@ public class DataViewDisplay : Gtk.VBox {
+@@ -135,15 +139,17 @@ public class DataViewDisplay : Gtk.VBox {
+ 		drawingArea.AddEvents((int)Gdk.EventMask.PointerMotionHintMask);
+ 		drawingArea.AddEvents((int)Gdk.EventMask.KeyPressMask);
+ 		drawingArea.AddEvents((int)Gdk.EventMask.KeyReleaseMask);
++		drawingArea.AddEvents((int)Gdk.EventMask.ScrollMask);
++		drawingArea.AddEvents((int)Gdk.EventMask.SmoothScrollMask);
  
  		drawingArea.CanFocus = true; // needed to catch key events
  
@@ -3068,7 +3148,7 @@ index 39d17ae..e5b656e 100644
  	}
  
  	///<summary>Force a complete redraw of the view</summary>
-@@ -228,37 +232,22 @@ public class DataViewDisplay : Gtk.VBox {
+@@ -228,37 +234,22 @@ public class DataViewDisplay : Gtk.VBox {
  		return bestBpr;
  	}
  
@@ -3108,7 +3188,7 @@ index 39d17ae..e5b656e 100644
  	}
  
  	private void SetupScrollbarRange()
-@@ -345,9 +334,12 @@ public class DataViewDisplay : Gtk.VBox {
+@@ -345,9 +336,12 @@ public class DataViewDisplay : Gtk.VBox {
  		MakeOffsetVisible(dataView.Offset, ShowType.Start);
  	}
  
@@ -3188,6 +3268,25 @@ index ae1c190..5d7768f 100644
  
  
  		// create the widget groups that hold utility widgets
+diff --git a/src/gui/WidgetGroup.cs b/src/gui/WidgetGroup.cs
+index 90a317b..578f7e6 100644
+--- a/src/gui/WidgetGroup.cs
++++ b/src/gui/WidgetGroup.cs
+@@ -23,12 +23,10 @@ using Gtk;
+ namespace Bless.Gui
+ {
+ 
+-public class WidgetGroup : HBox
++public class WidgetGroup : Gtk.Box
+ {
++	public WidgetGroup() : base(Gtk.Orientation.Horizontal, 0) {}
+ 
+-	public WidgetGroup()
+-	{
+-	}
+ 
+ 	protected override void OnAdded(Widget w)
+ 	{
 diff --git a/src/gui/areas/Area.cs b/src/gui/areas/Area.cs
 index 65f7758..05ae7f6 100644
 --- a/src/gui/areas/Area.cs
@@ -5282,22 +5381,32 @@ index 405e2fd..e5f57d0 100644
 \ No newline at end of file
 +} // namespace
 diff --git a/src/gui/plugins/BitwiseOperationsPlugin.cs b/src/gui/plugins/BitwiseOperationsPlugin.cs
-index f18eabc..9a98e17 100644
+index f18eabc..2f716ae 100644
 --- a/src/gui/plugins/BitwiseOperationsPlugin.cs
 +++ b/src/gui/plugins/BitwiseOperationsPlugin.cs
-@@ -90,9 +90,9 @@ public class BitwiseOperationsPlugin : GuiPlugin
+@@ -78,6 +78,9 @@ public class BitwiseOperationsPlugin : GuiPlugin
+ 		WidgetGroup wgroup = (WidgetGroup)GetWidgetGroup(mainWindow, 0);
+ 		wgroup.Add(widget);
+ 
++		group.GetAction("BitwiseOperationsAction").IconName = "media-playback-start";
++		group.GetAction("PerformBitwiseOperationAction").IconName = "media-playback-start";
++
+ 
+ 		dataBook.PageAdded += new DataView.DataViewEventHandler(OnDataViewAdded);
+ 		dataBook.Removed += new RemovedHandler(OnDataViewRemoved);
+@@ -90,9 +93,9 @@ public class BitwiseOperationsPlugin : GuiPlugin
  	private void AddMenuItems(UIManager uim)
  	{
  		ActionEntry[] actionEntries = new ActionEntry[] {
 -										  new ActionEntry ("BitwiseOperationsAction", Stock.Execute, Catalog.GetString("_Bitwise Operations"), "<control>B", null,
-+										  new ActionEntry ("BitwiseOperationsAction", "media-playback-start", Catalog.GetString("_Bitwise Operations"), "<control>B", null,
++										  new ActionEntry ("BitwiseOperationsAction", null, Catalog.GetString("_Bitwise Operations"), "<control>B", null,
  														   new EventHandler(OnBitwiseOperationsActivated)),
 -										  new ActionEntry ("PerformBitwiseOperationAction", Stock.Execute, Catalog.GetString("Perform Operation"), "<control><shift>B", null,
-+										  new ActionEntry ("PerformBitwiseOperationAction", "media-playback-start", Catalog.GetString("Perform Operation"), "<control><shift>B", null,
++										  new ActionEntry ("PerformBitwiseOperationAction", null, Catalog.GetString("Perform Operation"), "<control><shift>B", null,
  														   new EventHandler(OnPerformBitwiseOperation)),
  									  };
  
-@@ -191,9 +191,9 @@ public class BitwiseOperationsPlugin : GuiPlugin
+@@ -191,9 +194,9 @@ public class BitwiseOperationsPlugin : GuiPlugin
  ///<summary>
  /// A widget for bitwise operations
  ///</summary>
@@ -5309,7 +5418,7 @@ index f18eabc..9a98e17 100644
  	[Gtk.Builder.Object] Gtk.Label SourceLabel;
  	[Gtk.Builder.Object] Gtk.EventBox SourceLabelEB;
  	[Gtk.Builder.Object] Gtk.Button DoOperationButton;
-@@ -230,6 +230,7 @@ public class BitwiseOperationsWidget : Gtk.HBox
+@@ -230,6 +233,7 @@ public class BitwiseOperationsWidget : Gtk.HBox
  	}
  
  	public BitwiseOperationsWidget(DataBook db, Gtk.Action action)
@@ -5343,19 +5452,27 @@ index a37c04f..3e6de72 100644
  		Gtk.Builder builder = new Gtk.Builder();
  		builder.AddFromFile(FileResourcePath.GetDataPath("ui", "ConversionTablePlugin.ui"));
 diff --git a/src/gui/plugins/CopyOffsetPlugin.cs b/src/gui/plugins/CopyOffsetPlugin.cs
-index 4e2da5e..7ee1ce9 100644
+index 4e2da5e..a5616ea 100644
 --- a/src/gui/plugins/CopyOffsetPlugin.cs
 +++ b/src/gui/plugins/CopyOffsetPlugin.cs
-@@ -90,7 +90,7 @@ public class CopyOffsetPlugin : GuiPlugin
+@@ -90,13 +90,15 @@ public class CopyOffsetPlugin : GuiPlugin
  	private void AddActions(UIManager uim)
  	{
  		ActionEntry[] actionEntries = new ActionEntry[] {
 -			new ActionEntry("CopyOffsetAction", Stock.Copy, Catalog.GetString("Copy Offset(s)"),
-+			new ActionEntry("CopyOffsetAction", "edit-copy", Catalog.GetString("Copy Offset(s)"),
++			new ActionEntry("CopyOffsetAction", null, Catalog.GetString("Copy Offset(s)"),
  							 "<Shift><Ctrl>C", null, new EventHandler(OnCopyOffsetActivated))
  			};
  
-@@ -190,9 +190,9 @@ class CopyOffsetPreferences : IPluginPreferences
+ 		ActionGroup group = new ActionGroup("CopyOffsetActions");
+ 		group.Add (actionEntries);
+ 
++		group.GetAction("CopyOffsetAction").IconName = "edit-copy";
++
+ 		uim.InsertActionGroup(group, 0);
+ 		uim.AddUiFromString(uiXml);
+ 
+@@ -190,9 +192,9 @@ class CopyOffsetPreferences : IPluginPreferences
  	}
  }
  
@@ -5367,7 +5484,7 @@ index 4e2da5e..7ee1ce9 100644
  
  	int BaseToActiveIndex(int number_base) {
  		switch (number_base) {
-@@ -204,7 +204,7 @@ class CopyOffsetPreferencesWidget : Gtk.VBox
+@@ -204,7 +206,7 @@ class CopyOffsetPreferencesWidget : Gtk.VBox
  		}
  	}
  
@@ -5376,7 +5493,7 @@ index 4e2da5e..7ee1ce9 100644
  		get { return numberBaseCombo; }
  	}
  
-@@ -216,11 +216,12 @@ class CopyOffsetPreferencesWidget : Gtk.VBox
+@@ -216,11 +218,12 @@ class CopyOffsetPreferencesWidget : Gtk.VBox
  	}
  
  	public CopyOffsetPreferencesWidget()
@@ -5392,7 +5509,7 @@ index 4e2da5e..7ee1ce9 100644
  		numberBaseCombo.AppendText("8");
  		numberBaseCombo.AppendText("10");
 diff --git a/src/gui/plugins/EditOperationsPlugin.cs b/src/gui/plugins/EditOperationsPlugin.cs
-index b4a6fcd..032f81a 100644
+index b4a6fcd..f06210a 100644
 --- a/src/gui/plugins/EditOperationsPlugin.cs
 +++ b/src/gui/plugins/EditOperationsPlugin.cs
 @@ -182,21 +182,21 @@ public class EditOperationsPlugin : GuiPlugin
@@ -5400,62 +5517,76 @@ index b4a6fcd..032f81a 100644
  	{
  		ActionEntry[] actionEntries = new ActionEntry[] {
 -										  new ActionEntry ("CutAction", Stock.Cut, null, "<control>X", null,
-+										  new ActionEntry ("CutAction", "edit-cut", null, "<control>X", null,
++										  new ActionEntry ("CutAction", null, Catalog.GetString("Cu_t"), "<control>X", null,
  														   new EventHandler(OnCutActivated)),
 -										  new ActionEntry ("CopyAction", Stock.Copy, null, "<control>C", "Copy",
-+										  new ActionEntry ("CopyAction", "edit-copy", null, "<control>C", "Copy",
++										  new ActionEntry ("CopyAction", null, Catalog.GetString("_Copy"), "<control>C", "Copy",
  														   new EventHandler(OnCopyActivated)),
 -										  new ActionEntry ("PasteAction", Stock.Paste, null, "<control>V", "Paste",
-+										  new ActionEntry ("PasteAction", "edit-paste", null, "<control>V", "Paste",
++										  new ActionEntry ("PasteAction", null, Catalog.GetString("_Paste"), "<control>V", "Paste",
  														   new EventHandler(OnPasteActivated)),
 -										  new ActionEntry ("DeleteAction", Stock.Delete, null, "Delete", "Delete",
-+										  new ActionEntry ("DeleteAction", "edit-delete", null, "Delete", "Delete",
++										  new ActionEntry ("DeleteAction", null, Catalog.GetString("_Delete"), "Delete", "Delete",
  														   new EventHandler(OnDeleteActivated))
  									  };
  		ActionEntry[] miscActionEntries = new ActionEntry[] {
 -											  new ActionEntry ("UndoAction", Stock.Undo, null, "<control>Z", "Undo",
-+											  new ActionEntry ("UndoAction", "edit-undo", null, "<control>Z", "Undo",
++											  new ActionEntry ("UndoAction", null, Catalog.GetString("_Undo"), "<control>Z", "Undo",
  															   new EventHandler(OnUndoActivated)),
 -											  new ActionEntry ("RedoAction", Stock.Redo, null, "<shift><control>Z", "Redo",
-+											  new ActionEntry ("RedoAction", "edit-redo", null, "<shift><control>Z", "Redo",
++											  new ActionEntry ("RedoAction", null, Catalog.GetString("_Redo"), "<shift><control>Z", "Redo",
  															   new EventHandler(OnRedoActivated)),
 -											  new ActionEntry ("PreferencesAction", Stock.Preferences, null, null, "Preferences",
-+											  new ActionEntry ("PreferencesAction", "preferences-system", null, null, "Preferences",
++											  new ActionEntry ("PreferencesAction", null, Catalog.GetString("_Preferences..."), null, "Preferences",
  															   new EventHandler(OnPreferencesActivated))
  										  };
  
 diff --git a/src/gui/plugins/FileOperationsPlugin.cs b/src/gui/plugins/FileOperationsPlugin.cs
-index 45319d7..4e8f1af 100644
+index 45319d7..067e052 100644
 --- a/src/gui/plugins/FileOperationsPlugin.cs
 +++ b/src/gui/plugins/FileOperationsPlugin.cs
-@@ -140,19 +140,19 @@ public class FileOperationsPlugin : GuiPlugin
+@@ -140,25 +140,33 @@ public class FileOperationsPlugin : GuiPlugin
  	private void AddActions(UIManager uim)
  	{
  		ActionEntry[] actionEntries = new ActionEntry[] {
 -										  new ActionEntry ("NewAction", Stock.New, null, "<control>N", "New File",
-+										  new ActionEntry ("NewAction", "document-new", null, "<control>N", "New File",
++										  new ActionEntry ("NewAction", null, Catalog.GetString("_New"), "<control>N", "New File",
  														   new EventHandler(OnNewActivated)),
 -										  new ActionEntry ("OpenAction", Stock.Open, null, "<control>O", "Open File",
-+										  new ActionEntry ("OpenAction", "document-open", null, "<control>O", "Open File",
++										  new ActionEntry ("OpenAction", null, Catalog.GetString("_Open..."), "<control>O", "Open File",
  														   new EventHandler(OnOpenActivated)),
 -										  new ActionEntry ("SaveAction", Stock.Save, null, "<control>S", "Save File",
-+										  new ActionEntry ("SaveAction", "document-save", null, "<control>S", "Save File",
++										  new ActionEntry ("SaveAction", null, Catalog.GetString("_Save"), "<control>S", "Save File",
  														   new EventHandler(OnSaveActivated)),
 -										  new ActionEntry ("SaveAsAction", Stock.SaveAs, null, "<shift><control>S", "Save File As",
-+										  new ActionEntry ("SaveAsAction", "document-save-as", null, "<shift><control>S", "Save File As",
++										  new ActionEntry ("SaveAsAction", null, Catalog.GetString("Save _As..."), "<shift><control>S", "Save File As",
  														   new EventHandler(OnSaveAsActivated)),
 -										  new ActionEntry ("RevertAction", Stock.RevertToSaved, null, null, "Revert File",
-+										  new ActionEntry ("RevertAction", "document-revert", null, null, "Revert File",
++										  new ActionEntry ("RevertAction", null, Catalog.GetString("_Revert"), null, "Revert File",
  														   new EventHandler(OnRevertActivated)),
 -										  new ActionEntry ("CloseAction", Stock.Close, null, "<control>W", "Close File",
-+										  new ActionEntry ("CloseAction", "window-close", null, "<control>W", "Close File",
++										  new ActionEntry ("CloseAction", null, Catalog.GetString("_Close"), "<control>W", "Close File",
  														   new EventHandler(OnCloseActivated)),
 -										  new ActionEntry ("QuitAction", Stock.Quit, null, "<control>Q", "Quit Application",
-+										  new ActionEntry ("QuitAction", "application-exit", null, "<control>Q", "Quit Application",
++										  new ActionEntry ("QuitAction", null, Catalog.GetString("_Quit"), "<control>Q", "Quit Application",
  														   new EventHandler(OnQuitActivated))
  									  };
  
-@@ -187,8 +187,8 @@ public class FileOperationsPlugin : GuiPlugin
+ 		ActionGroup group = new ActionGroup ("FileActions");
+ 		group.Add (actionEntries);
+ 
++		group.GetAction("NewAction").IconName = "document-new";
++		group.GetAction("OpenAction").IconName = "document-open";
++		group.GetAction("SaveAction").IconName = "document-save";
++		group.GetAction("SaveAsAction").IconName = "document-save-as";
++		group.GetAction("RevertAction").IconName = "document-revert";
++		group.GetAction("CloseAction").IconName = "window-close";
++		group.GetAction("QuitAction").IconName = "application-exit";
++
+ 		uim.InsertActionGroup(group, 0);
+ 		uim.AddUiFromString(uiXml);
+ 		SaveAction = (Gtk.Action)uim.GetAction("/menubar/File/Save");
+@@ -187,8 +195,8 @@ public class FileOperationsPlugin : GuiPlugin
  	{
  		// Get path of file(s) to open
  		Gtk.FileChooserDialog fs = new Gtk.FileChooserDialog(Catalog.GetString("Open File(s)"), mainWindow, FileChooserAction.Open,
@@ -5467,26 +5598,36 @@ index 45319d7..4e8f1af 100644
  		fs.SelectMultiple = true;
  		ResponseType result = (ResponseType)fs.Run();
 diff --git a/src/gui/plugins/FindReplacePlugin.cs b/src/gui/plugins/FindReplacePlugin.cs
-index 77e3a29..bdbc752 100644
+index 77e3a29..1db45c9 100644
 --- a/src/gui/plugins/FindReplacePlugin.cs
 +++ b/src/gui/plugins/FindReplacePlugin.cs
-@@ -148,13 +148,13 @@ public class FindReplacePlugin : GuiPlugin
+@@ -91,6 +91,9 @@ public class FindReplacePlugin : GuiPlugin
+ 		WidgetGroup wgroup = (WidgetGroup)GetWidgetGroup(mainWindow, 0);
+ 		wgroup.Add(widget);
+ 
++		group.GetAction("FindAction").IconName = "edit-find";
++		group.GetAction("ReplaceAction").IconName = "edit-find-replace";
++
+ 		// add the menu items
+ 		AddActions(uiManager);
+ 
+@@ -148,13 +151,13 @@ public class FindReplacePlugin : GuiPlugin
  	private void AddActions(UIManager uim)
  	{
  		ActionEntry[] actionEntries = new ActionEntry[] {
 -										  new ActionEntry ("FindAction", Stock.Find, null, "<control>F", "Find",
-+										  new ActionEntry ("FindAction", "edit-find", null, "<control>F", "Find",
++										  new ActionEntry ("FindAction", null, Catalog.GetString("_Find..."), "<control>F", "Find",
  														   new EventHandler(OnFindActivated)),
  										  new ActionEntry ("FindNextAction", null, Catalog.GetString("Find _Next"), "F3", null,
  														   new EventHandler(OnFindNextActivated)),
  										  new ActionEntry ("FindPreviousAction", null, Catalog.GetString("Find _Previous"), "<shift>F3", null,
  														   new EventHandler(OnFindPreviousActivated)),
 -										  new ActionEntry ("ReplaceAction", Stock.FindAndReplace, null, "<control>R", "Replace",
-+										  new ActionEntry ("ReplaceAction", "edit-find-replace", null, "<control>R", "Replace",
++										  new ActionEntry ("ReplaceAction", null, Catalog.GetString("_Replace..."), "<control>R", "Replace",
  														   new EventHandler(OnReplaceActivated))
  									  };
  
-@@ -266,7 +266,7 @@ public class FindReplacePlugin : GuiPlugin
+@@ -266,7 +269,7 @@ public class FindReplacePlugin : GuiPlugin
  ///<summary>
  /// A widget for find and replace operations
  ///</summary>
@@ -5495,7 +5636,7 @@ index 77e3a29..bdbc752 100644
  {
  	DataBook dataBook;
  	IFinder finder;
-@@ -276,7 +276,7 @@ public class FindReplaceWidget : Gtk.HBox
+@@ -276,7 +279,7 @@ public class FindReplaceWidget : Gtk.HBox
  
  	byte[] replacePattern;
  
@@ -5504,7 +5645,7 @@ index 77e3a29..bdbc752 100644
  	[Gtk.Builder.Object] Gtk.Button FindNextButton;
  	[Gtk.Builder.Object] Gtk.Button FindPreviousButton;
  	[Gtk.Builder.Object] Gtk.Button ReplaceButton;
-@@ -331,6 +331,7 @@ public class FindReplaceWidget : Gtk.HBox
+@@ -331,6 +334,7 @@ public class FindReplaceWidget : Gtk.HBox
  	}
  
  	public FindReplaceWidget(DataBook db, IFinder iFinder)
@@ -5513,19 +5654,28 @@ index 77e3a29..bdbc752 100644
  		finder = iFinder;
  		dataBook = db;
 diff --git a/src/gui/plugins/GotoOffsetPlugin.cs b/src/gui/plugins/GotoOffsetPlugin.cs
-index 6fc1b18..fbb3d96 100644
+index 6fc1b18..d0053d0 100644
 --- a/src/gui/plugins/GotoOffsetPlugin.cs
 +++ b/src/gui/plugins/GotoOffsetPlugin.cs
-@@ -74,7 +74,7 @@ public class GotoOffsetPlugin : GuiPlugin
+@@ -64,6 +64,8 @@ public class GotoOffsetPlugin : GuiPlugin
+ 		WidgetGroup wgroup = (WidgetGroup)GetWidgetGroup(mainWindow, 0);
+ 		wgroup.Add(widget);
+ 
++		group.GetAction("GotoOffsetAction").IconName = "go-jump";
++
+ 		// add the menu items
+ 		AddMenuItems(uiManager);
+ 
+@@ -74,7 +76,7 @@ public class GotoOffsetPlugin : GuiPlugin
  	private void AddMenuItems(UIManager uim)
  	{
  		ActionEntry[] actionEntries = new ActionEntry[] {
 -										  new ActionEntry ("GotoOffsetAction", Stock.JumpTo, Catalog.GetString("_Goto Offset"), "<control>G", null,
-+										  new ActionEntry ("GotoOffsetAction", "go-jump", Catalog.GetString("_Goto Offset"), "<control>G", null,
++										  new ActionEntry ("GotoOffsetAction", null, Catalog.GetString("_Goto Offset"), "<control>G", null,
  														   new EventHandler(OnGotoOffsetActivated)),
  									  };
  
-@@ -98,9 +98,9 @@ public class GotoOffsetPlugin : GuiPlugin
+@@ -98,9 +100,9 @@ public class GotoOffsetPlugin : GuiPlugin
  ///<summary>
  /// A widget for go to offset operation
  ///</summary>
@@ -5537,7 +5687,7 @@ index 6fc1b18..fbb3d96 100644
  	[Gtk.Builder.Object] Gtk.Button GotoOffsetButton;
  	[Gtk.Builder.Object] Gtk.Entry OffsetEntry;
  	[Gtk.Builder.Object] Gtk.Button CloseButton;
-@@ -109,6 +109,7 @@ public class GotoOffsetWidget : Gtk.HBox
+@@ -109,6 +111,7 @@ public class GotoOffsetWidget : Gtk.HBox
  
  
  	public GotoOffsetWidget(DataBook db)
@@ -5546,7 +5696,7 @@ index 6fc1b18..fbb3d96 100644
  		dataBook = db;
  
 diff --git a/src/gui/plugins/HelpOperationsPlugin.cs b/src/gui/plugins/HelpOperationsPlugin.cs
-index 81aac8d..435c48a 100644
+index 81aac8d..b883c93 100644
 --- a/src/gui/plugins/HelpOperationsPlugin.cs
 +++ b/src/gui/plugins/HelpOperationsPlugin.cs
 @@ -65,7 +65,7 @@ public class HelpOperationsPlugin : GuiPlugin
@@ -5554,14 +5704,32 @@ index 81aac8d..435c48a 100644
  	{
  		ActionEntry[] actionEntries = new ActionEntry[] {
 -										  new ActionEntry ("ContentsAction", Stock.Help, Catalog.GetString("_Contents"), "F1", null,
-+										  new ActionEntry ("ContentsAction", "help-contents", Catalog.GetString("_Contents"), "F1", null,
++										  new ActionEntry ("ContentsAction", null, Catalog.GetString("_Contents"), "F1", null,
  														   new EventHandler(OnContentsActivated)),
  										  new ActionEntry ("AboutAction", null, Catalog.GetString("_About"), null, null,
  														   new EventHandler(OnAboutActivated)),
+@@ -74,6 +74,8 @@ public class HelpOperationsPlugin : GuiPlugin
+ 		ActionGroup group = new ActionGroup ("HelpActions");
+ 		group.Add (actionEntries);
+ 
++		group.GetAction("ContentsAction").IconName = "help-contents";
++
+ 		uim.InsertActionGroup(group, 0);
+ 		uim.AddUiFromString(uiXml);
+ 
 diff --git a/src/gui/plugins/InfobarPlugin.cs b/src/gui/plugins/InfobarPlugin.cs
-index f5545ff..0af3cd7 100644
+index f5545ff..9563e54 100644
 --- a/src/gui/plugins/InfobarPlugin.cs
 +++ b/src/gui/plugins/InfobarPlugin.cs
+@@ -73,7 +73,7 @@ public class InfobarPlugin : GuiPlugin
+ 
+ 		Services.UI.Info = widget;
+ 
+-		((VBox)mainWindow.Child).PackEnd(widget, false, false, 0);
++		((Gtk.Box)mainWindow.Child).PackEnd(widget, false, false, 0);
+ 
+ 		AddMenuItems(uiManager);
+ 
 @@ -250,7 +250,7 @@ public class InfobarPlugin : GuiPlugin
  ///<summary>
  /// An advanced statusbar for Bless
@@ -5601,9 +5769,18 @@ index 98b34d3..cc647d5 100644
  		enableHighlightCheckButton = new Gtk.CheckButton("Highlight matches of selection pattern");
  		this.PackStart(enableHighlightCheckButton, false, false, 6);
 diff --git a/src/gui/plugins/ProgressDisplayPlugin.cs b/src/gui/plugins/ProgressDisplayPlugin.cs
-index f3936d2..f62e6c7 100644
+index f3936d2..760d972 100644
 --- a/src/gui/plugins/ProgressDisplayPlugin.cs
 +++ b/src/gui/plugins/ProgressDisplayPlugin.cs
+@@ -55,7 +55,7 @@ public class ProgressDisplayPlugin : GuiPlugin
+ 		// register the service
+ 		Services.UI.Progress = widget;
+ 
+-		((VBox)mainWindow.Child).PackEnd(widget, false, false, 0);
++		((Gtk.Box)mainWindow.Child).PackEnd(widget, false, false, 0);
+ 
+ 		loaded = true;
+ 		return true;
 @@ -66,10 +66,11 @@ public class ProgressDisplayPlugin : GuiPlugin
  ///<summary>
  /// Widget that displays a series of progress bars
@@ -5646,19 +5823,28 @@ index f3936d2..f62e6c7 100644
  		Gtk.Builder builder = new Gtk.Builder();
  		builder.AddFromFile(FileResourcePath.GetDataPath("ui", "ProgressDisplayPlugin.ui"));
 diff --git a/src/gui/plugins/SelectRangePlugin.cs b/src/gui/plugins/SelectRangePlugin.cs
-index a791bfe..b0f2895 100644
+index a791bfe..3031ad7 100644
 --- a/src/gui/plugins/SelectRangePlugin.cs
 +++ b/src/gui/plugins/SelectRangePlugin.cs
-@@ -79,7 +79,7 @@ public class SelectRangePlugin : GuiPlugin
+@@ -68,6 +68,8 @@ public class SelectRangePlugin : GuiPlugin
+ 		WidgetGroup wgroup = (WidgetGroup)GetWidgetGroup(mainWindow, 0);
+ 		wgroup.Add(widget);
+ 
++		group.GetAction("SelectRangeAction").IconName = "go-jump";
++
+ 		AddMenuItems(uiManager);
+ 
+ 		loaded = true;
+@@ -79,7 +81,7 @@ public class SelectRangePlugin : GuiPlugin
  		ActionEntry[] actionEntries = new ActionEntry[] {
  										  new ActionEntry ("SelectAllAction", null, Catalog.GetString("Select _All"), "<control>A", null,
  														   new EventHandler(OnSelectAllActivated)),
 -										  new ActionEntry ("SelectRangeAction", Stock.JumpTo, Catalog.GetString("_Select Range"), "<shift><control>R", null,
-+										  new ActionEntry ("SelectRangeAction", "go-jump", Catalog.GetString("_Select Range"), "<shift><control>R", null,
++										  new ActionEntry ("SelectRangeAction", null, Catalog.GetString("_Select Range"), "<shift><control>R", null,
  														   new EventHandler(OnSelectRangeActivated)),
  									  };
  
-@@ -118,9 +118,9 @@ public class SelectRangePlugin : GuiPlugin
+@@ -118,9 +120,9 @@ public class SelectRangePlugin : GuiPlugin
  ///<summary>
  /// A widget for the select range operation
  ///</summary>
@@ -5670,7 +5856,7 @@ index a791bfe..b0f2895 100644
  	[Gtk.Builder.Object] Gtk.Button SelectButton;
  	[Gtk.Builder.Object] Gtk.Entry FromEntry;
  	[Gtk.Builder.Object] Gtk.Entry ToEntry;
-@@ -130,6 +130,7 @@ public class SelectRangeWidget : Gtk.HBox
+@@ -130,6 +132,7 @@ public class SelectRangeWidget : Gtk.HBox
  
  
  	public SelectRangeWidget(DataBook db)
@@ -5881,18 +6067,117 @@ index 5e51b67..e6ccfed 100644
      link_with: [
          buffers_lib,
 diff --git a/src/plugins/GuiPlugin.cs b/src/plugins/GuiPlugin.cs
-index 418ae4c..a3e8362 100644
+index 418ae4c..50f8ef7 100644
 --- a/src/plugins/GuiPlugin.cs
 +++ b/src/plugins/GuiPlugin.cs
-@@ -85,7 +85,7 @@ public class GuiPlugin : Plugin
+@@ -33,39 +33,35 @@ public class GuiPlugin : Plugin
  
- 		foreach (Widget child in vbox.Children) {
- 			System.Console.WriteLine("Child: {0}", child.GetType().ToString());
--			if (child.GetType().ToString() == "Gtk.HBox") {
-+			if (child.GetType().ToString() == "Gtk.Box") {
- 				hbox = (HBox)child;
- 				break;
+ 	protected Widget GetDataBook(Window win)
+ 	{
+-		VBox vbox = (VBox)win.Child;
+-		foreach (Widget child in vbox.Children) {
+-			//System.Console.WriteLine("Child: {0}", child.GetType().ToString());
+-			if (child.GetType() == typeof(HBox)) {
+-				foreach (Widget child1 in ((HBox)child).Children) {
+-					if (child1.GetType().ToString() == "Bless.Gui.DataBook")
+-						return child1;
+-				}
+-			}
++		// In GTK3, Gtk.VBox/HBox are both Gtk.Box. Walk the window child tree
++		// recursively looking for the DataBook widget.
++		return FindWidgetByTypeName(win.Child, "Bless.Gui.DataBook");
++	}
+ 
++	static Widget FindWidgetByTypeName(Widget root, string typeName)
++	{
++		if (root == null) return null;
++		if (root.GetType().ToString() == typeName) return root;
++		if (root is Gtk.Container) {
++			foreach (Widget child in ((Gtk.Container)root).Children) {
++				Widget found = FindWidgetByTypeName(child, typeName);
++				if (found != null) return found;
++			}
+ 		}
+ 		return null;
+ 	}
+ 
+ 	protected Widget GetMenuBar(Window win)
+ 	{
+-		VBox vbox = (VBox)win.Child;
+-		foreach (Widget child in vbox.Children) {
+-			//System.Console.WriteLine("Child: {0}", child.GetType().ToString());
+-			if (child.GetType() == typeof(MenuBar)) {
+-				return child;
+-			}
+-		}
+-
+-		return null;
++		return FindWidgetByTypeName(win.Child, "Gtk.MenuBar");
+ 	}
+ 
+ 	protected Widget GetWidgetGroup(Window win, int n)
+ 	{
+-		VBox vbox = (VBox)win.Child;
++		// WidgetGroups are direct children of MainVBox (a Gtk.Box)
++		if (!(win.Child is Gtk.Container)) return null;
+ 		int i = 0;
+-		foreach (Widget child in vbox.Children) {
+-			//System.Console.WriteLine("Child: {0}", child.GetType().ToString());
++		foreach (Widget child in ((Gtk.Container)win.Child).Children) {
+ 			if (child.GetType().ToString() == "Bless.Gui.WidgetGroup") {
+ 				if (i == n)
+ 					return child;
+@@ -73,36 +69,28 @@ public class GuiPlugin : Plugin
+ 					i++;
  			}
+ 		}
+-
+ 		return null;
+ 	}
+ 
+ 	protected Widget GetSideWidgetGroup(Window win, int n)
+ 	{
+-		VBox vbox = (VBox)win.Child;
++		// Side WidgetGroups live inside the DataViewBox (the inner horizontal Gtk.Box).
++		// Walk all Gtk.Box children of the main VBox looking for one that
++		// contains WidgetGroup children.
++		if (!(win.Child is Gtk.Container)) return null;
+ 		int i = 0;
+-		HBox hbox = null;
+-
+-		foreach (Widget child in vbox.Children) {
+-			System.Console.WriteLine("Child: {0}", child.GetType().ToString());
+-			if (child.GetType().ToString() == "Gtk.HBox") {
+-				hbox = (HBox)child;
+-				break;
+-			}
+-		}
+-		if (hbox == null)
+-			return null;
+-
+-		foreach (Widget child in hbox.Children) {
+-			System.Console.WriteLine("Child: {0}", child.GetType().ToString());
+-			if (child.GetType().ToString() == "Bless.Gui.WidgetGroup") {
+-				if (i == n)
+-					return child;
+-				else
+-					i++;
++		foreach (Widget child in ((Gtk.Container)win.Child).Children) {
++			if (child is Gtk.Box) {
++				foreach (Widget child1 in ((Gtk.Box)child).Children) {
++					if (child1.GetType().ToString() == "Bless.Gui.WidgetGroup") {
++						if (i == n)
++							return child1;
++						else
++							i++;
++					}
++				}
+ 			}
+ 		}
+-
+ 		return null;
+ 	}
+ 
 -- 
 2.43.0
 

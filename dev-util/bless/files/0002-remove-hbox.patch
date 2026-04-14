@@ -1,0 +1,68 @@
+diff --git a/src/gui/MainWindow.cs b/src/gui/MainWindow.cs
+index f01b5a0..5d7768f 100644
+--- a/src/gui/MainWindow.cs
++++ b/src/gui/MainWindow.cs
+@@ -36,9 +36,9 @@ using Mono.Unix;
+ 
+ public class BlessMain
+ {
+-	[Gtk.Builder.Object] Gtk.HBox DataViewBox;
++	[Gtk.Builder.Object] Gtk.Box DataViewBox;
+ 	[Gtk.Builder.Object] Gtk.Window MainWindow;
+-	[Gtk.Builder.Object] Gtk.VBox MainVBox;
++	[Gtk.Builder.Object] Gtk.Box MainVBox;
+ 
+ 	const string uiXml =
+ 		"<menubar>" +
+diff --git a/src/gui/plugins/BitwiseOperationsPlugin.cs b/src/gui/plugins/BitwiseOperationsPlugin.cs
+index 2d38ef7..2fd9d17 100644
+--- a/src/gui/plugins/BitwiseOperationsPlugin.cs
++++ b/src/gui/plugins/BitwiseOperationsPlugin.cs
+@@ -193,7 +193,7 @@ public class BitwiseOperationsPlugin : GuiPlugin
+ ///</summary>
+ public class BitwiseOperationsWidget : Gtk.Box
+ {
+-	[Gtk.Builder.Object] Gtk.HBox BitwiseOperationsHBox;
++	[Gtk.Builder.Object] Gtk.Box BitwiseOperationsHBox;
+ 	[Gtk.Builder.Object] Gtk.Label SourceLabel;
+ 	[Gtk.Builder.Object] Gtk.EventBox SourceLabelEB;
+ 	[Gtk.Builder.Object] Gtk.Button DoOperationButton;
+diff --git a/src/gui/plugins/GotoOffsetPlugin.cs b/src/gui/plugins/GotoOffsetPlugin.cs
+index cd78ac0..1bed212 100644
+--- a/src/gui/plugins/GotoOffsetPlugin.cs
++++ b/src/gui/plugins/GotoOffsetPlugin.cs
+@@ -100,7 +100,7 @@ public class GotoOffsetPlugin : GuiPlugin
+ ///</summary>
+ public class GotoOffsetWidget : Gtk.Box
+ {
+-	[Gtk.Builder.Object] Gtk.HBox GotoOffsetHBox;
++	[Gtk.Builder.Object] Gtk.Box GotoOffsetHBox;
+ 	[Gtk.Builder.Object] Gtk.Button GotoOffsetButton;
+ 	[Gtk.Builder.Object] Gtk.Entry OffsetEntry;
+ 	[Gtk.Builder.Object] Gtk.Button CloseButton;
+diff --git a/src/gui/plugins/ProgressDisplayPlugin.cs b/src/gui/plugins/ProgressDisplayPlugin.cs
+index 5ca0b23..fdc68e4 100644
+--- a/src/gui/plugins/ProgressDisplayPlugin.cs
++++ b/src/gui/plugins/ProgressDisplayPlugin.cs
+@@ -100,7 +100,7 @@ public class ProgressDisplayWidget : Gtk.Box, IProgressDisplay
+ 
+ public class ProgressDisplayBar : Gtk.Box {
+ 
+-	[Gtk.Builder.Object] Gtk.HBox ProgressBarHBox;
++	[Gtk.Builder.Object] Gtk.Box ProgressBarHBox;
+ 	[Gtk.Builder.Object] Gtk.Button CancelButton;
+ 	[Gtk.Builder.Object] Gtk.ProgressBar ProgressBar;
+ 
+diff --git a/src/gui/plugins/SelectRangePlugin.cs b/src/gui/plugins/SelectRangePlugin.cs
+index f738cea..64debad 100644
+--- a/src/gui/plugins/SelectRangePlugin.cs
++++ b/src/gui/plugins/SelectRangePlugin.cs
+@@ -120,7 +120,7 @@ public class SelectRangePlugin : GuiPlugin
+ ///</summary>
+ public class SelectRangeWidget : Gtk.Box
+ {
+-	[Gtk.Builder.Object] Gtk.HBox SelectRangeHBox;
++	[Gtk.Builder.Object] Gtk.Box SelectRangeHBox;
+ 	[Gtk.Builder.Object] Gtk.Button SelectButton;
+ 	[Gtk.Builder.Object] Gtk.Entry FromEntry;
+ 	[Gtk.Builder.Object] Gtk.Entry ToEntry;
