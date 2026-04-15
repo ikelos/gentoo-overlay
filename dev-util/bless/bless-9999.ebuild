@@ -27,7 +27,9 @@ DEPEND="${RDEPEND}
 "
 
 PATCHES=("${FILESDIR}/0001-port-to-gtksharp-3.0.patch"
-         "${FILESDIR}/0002-gtk322-runtime-fixes.patch")
+         "${FILESDIR}/0002-gtk322-runtime-fixes.patch"
+         "${FILESDIR}/0003-fix-dataview-expand.patch"
+         "${FILESDIR}/0004-fix-highlight-colours.patch")
 
 # See bug 278162
 # Waiting on nunit ebuild entering the tree

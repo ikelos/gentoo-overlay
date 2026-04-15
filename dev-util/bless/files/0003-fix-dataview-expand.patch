@@ -1,0 +1,29 @@
+From 41234e2df4377252809862c1cd049022403c8ca3 Mon Sep 17 00:00:00 2001
+From: P <p@b>
+Date: Wed, 15 Apr 2026 07:06:15 +0000
+Subject: [PATCH] 0003: Fix data view not expanding to fill available space
+
+DataViewBox lacked expand=True and fill=True in its GtkBox packing
+inside MainWindow.ui. In GTK2, a VBox child without explicit expand
+defaulted to True; in GTK3's unified GtkBox the default is False,
+causing the data pane to collapse to minimum height (~2 rows).
+---
+ data/ui/MainWindow.ui | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/data/ui/MainWindow.ui b/data/ui/MainWindow.ui
+index 9d4c0c2..750591f 100644
+--- a/data/ui/MainWindow.ui
++++ b/data/ui/MainWindow.ui
+@@ -31,6 +31,8 @@
+             </child>
+           </object>
+           <packing>
++            <property name="expand">True</property>
++            <property name="fill">True</property>
+             <property name="position">2</property>
+           </packing>
+         </child>
+-- 
+2.43.0
+

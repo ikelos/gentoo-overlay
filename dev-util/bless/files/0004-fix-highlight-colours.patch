@@ -1,0 +1,203 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Bless GTK3 port <bless@example.com>
+Date: Wed, 15 Apr 2026 00:00:00 +0000
+Subject: [PATCH] Fix data-pane highlight colours to match original Bless appearance
+
+The GTK3 port's SetupHighlight() derives selection colours from the
+widget's StyleContext, but a plain GtkDrawingArea carries none of the
+CSS classes that cause the "selected" pseudo-class to resolve to
+text-selection colours.  In practice:
+
+  * StyleContext.GetColor(StateFlags.Selected) returns the widget's
+    normal foreground colour (black) rather than the selected-state
+    foreground (white), so selected bytes are rendered with black text
+    on a blue background instead of white text.
+
+  * LookupColor("theme_selected_bg_color") silently fails on several
+    common GTK3 themes, causing the hard-coded fallback value
+    (0.2, 0.4, 0.8) = #3366cc to be used in place of the intended
+    classic Clearlooks blue #3465a4.
+
+  * Pattern-match colours are derived from the selection colours and
+    are therefore also wrong whenever the selection colours are wrong.
+
+Fix: start from hardcoded defaults that exactly reproduce the original
+GTK2/Clearlooks look, then apply a best-effort GTK3-theme override
+only when the theme result passes a luminance sanity check.
+
+  selection background = #3465a4  (Tango "sky blue 3", the standard
+                                   GNOME 2 / Clearlooks selected-item bg)
+  selection foreground = #ffffff  (white)
+  pattern-match bg     = MakeColorLighter(#3465a4, 0.6) ≈ #aabdd9
+  pattern-match fg     = MakeColorDarker (#ffffff, 0.4) ≈ #999999
+
+The theme-override path is retained so that users on a GTK3 theme
+that explicitly advertises a selection colour still get it.  The
+luminance gate (0.03 < L < 0.90) prevents near-black or near-white
+entries from producing invisible text.
+
+Also fix the Bookmark highlight (was never initialised)
+-------------------------------------------------------
+Neither the original GTK2 code nor the GTK3 port initialised the
+Bookmark highlight surfaces or backColor entries.  This causes:
+  - NullReferenceException in DrawHighlight() on the first bookmarked byte
+    (surfacesHighlight[*, Bookmark] is null)
+  - Solid-black background fills for bookmarked bytes
+    (backColor[*, Bookmark] == default(Gdk.Color) == black)
+
+Bookmark colours are set to amber (#f7e269 bg, black fg), which is
+visually distinct from the blue selection/pattern-match family and
+consistent with the priority ordering
+  Normal < Bookmark < PatternMatch < Selection.
+---
+ src/gui/drawers/Drawer.cs | 73 +++++++++++++++++++++++++++++++++------
+ 1 file changed, 62 insertions(+), 11 deletions(-)
+
+diff --git a/src/gui/drawers/Drawer.cs b/src/gui/drawers/Drawer.cs
+--- a/src/gui/drawers/Drawer.cs
++++ b/src/gui/drawers/Drawer.cs
+@@ -111,24 +111,60 @@ public abstract class Drawer {
+ 
+ 		/// <summary>Make a color darker while keeping its hue</summary>
+ 		Gdk.Color MakeColorDarker(Gdk.Color col, double factor)
+ 		{
+ 			Gdk.Color dark = new Gdk.Color();
+ 			dark.Red   = (ushort)(col.Red   * factor);
+ 			dark.Blue  = (ushort)(col.Blue  * factor);
+ 			dark.Green = (ushort)(col.Green * factor);
+ 			return dark;
+ 		}
+ 
+-		/// <summary>Setup unspecified highlight colors using theme default colors</summary>
++		/// <summary>Setup unspecified highlight colors, defaulting to the original Bless appearance</summary>
+ 		public void SetupHighlight(Gtk.Widget widget)
+ 		{
+-			Gdk.Color selFg, selBg, patMatchFg, patMatchBg;
+-
+-			// Use StyleContext (GTK3) to get theme selection colors
+-			Gdk.RGBA selFgRgba = widget.StyleContext.GetColor(Gtk.StateFlags.Selected);
+-			selFg = RGBAToGdkColor(selFgRgba);
+-
+-			// Try to get the selection background from theme; fall back to a blue if missing
+-			Gdk.RGBA selBgRgba;
+-			if (!widget.StyleContext.LookupColor("theme_selected_bg_color", out selBgRgba)) {
+-				selBgRgba = new Gdk.RGBA();
+-				selBgRgba.Red = 0.2; selBgRgba.Green = 0.4; selBgRgba.Blue = 0.8; selBgRgba.Alpha = 1.0;
+-			}
+-			selBg = RGBAToGdkColor(selBgRgba);
+-
+-			patMatchBg = MakeColorLighter(selBg, 0.6);
+-			patMatchFg = MakeColorDarker(selFg, 0.4);
++			// Hardcoded defaults matching the original GTK2/Clearlooks appearance:
++			//   selBg #3465a4 = Tango "sky blue 3", the GNOME 2 selected-item bg colour
++			//   selFg #ffffff = white
++			// These reproduce the dark-blue selection highlight and the lighter
++			// powder-blue pattern-match tint visible in the original GTK2 application.
++			Gdk.Color selFg = new Gdk.Color(0xff, 0xff, 0xff);
++			Gdk.Color selBg = new Gdk.Color(0x34, 0x65, 0xa4);
++
++			// Best-effort GTK3 theme override.
++			// A plain GtkDrawingArea has no "view" CSS class, so
++			// StyleContext.GetColor(StateFlags.Selected) returns the normal foreground
++			// colour rather than the selection-state foreground.  We therefore only
++			// query the named colour variables themes advertise explicitly and fall
++			// back silently to the Clearlooks defaults when they are absent.
++			// The luminance gate (0.03 < L < 0.90) rejects near-black and near-white
++			// entries that would produce invisible text.
++			try {
++				Gdk.RGBA bgRgba;
++				if (widget.StyleContext.LookupColor("theme_selected_bg_color", out bgRgba)
++				    || widget.StyleContext.LookupColor("selected_bg_color", out bgRgba)) {
++					Gdk.Color themeBg = RGBAToGdkColor(bgRgba);
++					double luma = 0.2126 * (themeBg.Red   / 65535.0)
++					            + 0.7152 * (themeBg.Green / 65535.0)
++					            + 0.0722 * (themeBg.Blue  / 65535.0);
++					if (luma > 0.03 && luma < 0.90) {
++						selBg = themeBg;
++						selFg = RGBAToGdkColor(
++						    widget.StyleContext.GetColor(Gtk.StateFlags.Selected));
++					}
++				}
++			}
++			catch { /* keep Clearlooks defaults on any StyleContext failure */ }
++
++			Gdk.Color patMatchBg = MakeColorLighter(selBg, 0.6);
++			Gdk.Color patMatchFg = MakeColorDarker(selFg, 0.4);
++
++			// Bookmark: amber bg, distinct from the blue selection/pattern-match family.
++			// Initialised here because neither the original GTK2 code nor the initial
++			// GTK3 port ever set these; the omission causes NullReferenceException in
++			// DrawHighlight and solid-black background fills for bookmarked bytes.
++			Gdk.Color bookmarkFg = new Gdk.Color(0x00, 0x00, 0x00);
++			Gdk.Color bookmarkBg = new Gdk.Color(0xf7, 0xe2, 0x69);
+ 
+ 			// Selection
+ 			if (fgHighlight[(int)RowType.Even, (int)HighlightType.Selection] == null)
+@@ -137,14 +173,29 @@ public abstract class Drawer {
+ 			if (fgHighlight[(int)RowType.Odd, (int)HighlightType.Selection] == null)
+ 				fgHighlight[(int)RowType.Odd, (int)HighlightType.Selection] = new Drawer.Color(selFg);
+ 			if (bgHighlight[(int)RowType.Odd, (int)HighlightType.Selection] == null)
+ 				bgHighlight[(int)RowType.Odd, (int)HighlightType.Selection] = new Drawer.Color(selBg);
+ 
+-			// Pattern match (secondary selection)
++			// PatternMatch (secondary selection)
+ 			if (fgHighlight[(int)RowType.Even, (int)HighlightType.PatternMatch] == null)
+ 				fgHighlight[(int)RowType.Even, (int)HighlightType.PatternMatch] = new Drawer.Color(patMatchFg);
+ 			if (bgHighlight[(int)RowType.Even, (int)HighlightType.PatternMatch] == null)
+ 				bgHighlight[(int)RowType.Even, (int)HighlightType.PatternMatch] = new Drawer.Color(patMatchBg);
+ 			if (fgHighlight[(int)RowType.Odd, (int)HighlightType.PatternMatch] == null)
+ 				fgHighlight[(int)RowType.Odd, (int)HighlightType.PatternMatch] = new Drawer.Color(patMatchFg);
+ 			if (bgHighlight[(int)RowType.Odd, (int)HighlightType.PatternMatch] == null)
+ 				bgHighlight[(int)RowType.Odd, (int)HighlightType.PatternMatch] = new Drawer.Color(patMatchBg);
++
++			// Bookmark
++			if (fgHighlight[(int)RowType.Even, (int)HighlightType.Bookmark] == null)
++				fgHighlight[(int)RowType.Even, (int)HighlightType.Bookmark] = new Drawer.Color(bookmarkFg);
++			if (bgHighlight[(int)RowType.Even, (int)HighlightType.Bookmark] == null)
++				bgHighlight[(int)RowType.Even, (int)HighlightType.Bookmark] = new Drawer.Color(bookmarkBg);
++			if (fgHighlight[(int)RowType.Odd, (int)HighlightType.Bookmark] == null)
++				fgHighlight[(int)RowType.Odd, (int)HighlightType.Bookmark] = new Drawer.Color(bookmarkFg);
++			if (bgHighlight[(int)RowType.Odd, (int)HighlightType.Bookmark] == null)
++				bgHighlight[(int)RowType.Odd, (int)HighlightType.Bookmark] = new Drawer.Color(bookmarkBg);
+ 		}
+ 	}
+ 
+@@ -210,12 +261,16 @@ public abstract class Drawer {
+ 		colorFg = info.fgHighlight[(int)RowType.Even, (int)HighlightType.PatternMatch];
+ 		colorBg = info.bgHighlight[(int)RowType.Even, (int)HighlightType.PatternMatch];
+ 		surfacesHighlight[(int)RowType.Even, (int)HighlightType.PatternMatch] = CreateWrapper(colorFg, colorBg);
+ 
++		colorFg = info.fgHighlight[(int)RowType.Even, (int)HighlightType.Bookmark];
++		colorBg = info.bgHighlight[(int)RowType.Even, (int)HighlightType.Bookmark];
++		surfacesHighlight[(int)RowType.Even, (int)HighlightType.Bookmark] = CreateWrapper(colorFg, colorBg);
++
+ 		// Odd rows
+ 		colorFg = info.fgNormal[(int)RowType.Odd, (int)ColumnType.Even];
+ 		colorBg = info.bgNormal[(int)RowType.Odd, (int)ColumnType.Even];
+ 		surfacesNormal[(int)RowType.Odd, (int)ColumnType.Even] = CreateWrapper(colorFg, colorBg);
+@@ -226,11 +281,15 @@ public abstract class Drawer {
+ 		colorFg = info.fgHighlight[(int)RowType.Odd, (int)HighlightType.PatternMatch];
+ 		colorBg = info.bgHighlight[(int)RowType.Odd, (int)HighlightType.PatternMatch];
+ 		surfacesHighlight[(int)RowType.Odd, (int)HighlightType.PatternMatch] = CreateWrapper(colorFg, colorBg);
++
++		colorFg = info.fgHighlight[(int)RowType.Odd, (int)HighlightType.Bookmark];
++		colorBg = info.bgHighlight[(int)RowType.Odd, (int)HighlightType.Bookmark];
++		surfacesHighlight[(int)RowType.Odd, (int)HighlightType.Bookmark] = CreateWrapper(colorFg, colorBg);
+ 	}
+ 
+ 	void InitializeBackgroundColors()
+@@ -252,5 +311,13 @@ public abstract class Drawer {
+ 		// PatternMatch
+ 		col = info.bgHighlight[(int)RowType.Even, (int)HighlightType.PatternMatch];
+ 		backColor[(int)RowType.Even, (int)HighlightType.PatternMatch] = col.GdkColor;
+ 
+ 		col = info.bgHighlight[(int)RowType.Odd, (int)HighlightType.PatternMatch];
+ 		backColor[(int)RowType.Odd, (int)HighlightType.PatternMatch] = col.GdkColor;
++
++		// Bookmark
++		col = info.bgHighlight[(int)RowType.Even, (int)HighlightType.Bookmark];
++		backColor[(int)RowType.Even, (int)HighlightType.Bookmark] = col.GdkColor;
++
++		col = info.bgHighlight[(int)RowType.Odd, (int)HighlightType.Bookmark];
++		backColor[(int)RowType.Odd, (int)HighlightType.Bookmark] = col.GdkColor;
+ 	}
