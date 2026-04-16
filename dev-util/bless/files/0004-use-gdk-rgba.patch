@@ -1,0 +1,633 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Author <author@example.com>
+Date: Thu, 16 Apr 2026 00:00:00 +0000
+Subject: [PATCH] 0004: Replace Gdk.Color with Gdk.RGBA throughout the drawing pipeline
+
+All internal colour representations in the Drawer/Area rendering pipeline
+now use Gdk.RGBA (double components 0.0-1.0) instead of Gdk.Color (ushort
+components 0-65535).  Gdk.RGBA is the GTK 3 native colour type, maps
+directly to Cairo's double-based colour model, and removes the lossy
+round-trips that Gdk.Color required.
+
+Summary of changes
+------------------
+src/gui/drawers/Drawer.cs
+  - Drawer.Color: field GdkColor (Gdk.Color) -> RgbaColor (Gdk.RGBA);
+    constructor takes Gdk.RGBA.
+  - Information.ParseRGBA() new public static helper (replaces
+    Gdk.Color.Parse(ref ...)).
+  - RGBAToGdkColor() removed (no longer needed).
+  - MakeColorLighter/Darker(Gdk.Color) replaced by
+    MakeRgbaLighter/Darker(Gdk.RGBA) using native [0,1] doubles.
+  - SetupHighlight(): works entirely in Gdk.RGBA.
+  - backColor field: Gdk.Color[,] -> Gdk.RGBA[,].
+  - GetBackgroundColor(): return type Gdk.Color -> Gdk.RGBA.
+  - Create() abstract: (Gdk.Color,Gdk.Color) -> (Gdk.RGBA,Gdk.RGBA).
+  - CreateWrapper(): passes RgbaColor instead of GdkColor.
+  - InitializeBackgroundColors(): uses Gdk.RGBA.
+
+src/gui/drawers/{Ascii,Binary,Decimal,Hex,Octal}Drawer.cs
+  - Create() overrides: signature Gdk.Color -> Gdk.RGBA.
+  - Gdk.CairoHelper.SetSourceColor(cr,...) -> cr.SetSourceRGBA(...).
+
+src/gui/drawers/PixmapManager.cs
+  - GetPixmapId(): fg/bg params Gdk.Color -> Gdk.RGBA.
+
+src/gui/areas/Area.cs
+  - activeCursorColor, inactiveCursorColor: Gdk.Color -> Gdk.RGBA.
+  - Realize(): Gdk.Color.Parse(ref...) -> Drawer.Information.ParseRGBA().
+  - FillRect(): Gdk.Color param -> Gdk.RGBA; SetSourceColor -> SetSourceRGBA.
+  - ParseDisplayType(): Gdk.Color local removed; uses ParseRGBA().
+  - All local colour variables in RenderHighlight, BlankOffset,
+    BlankBackground, BlankEof, RenderCursor -> Gdk.RGBA.
+
+src/gui/areas/SeparatorArea.cs
+  - lineColor: Gdk.Color -> Gdk.RGBA; .GdkColor -> .RgbaColor;
+    SetSourceColor -> SetSourceRGBA.
+
+src/gui/areas/{Ascii,Grouped,Offset}Area.cs
+  - backEvenColor / backOddColor locals: Gdk.Color -> Gdk.RGBA.
+---
+diff --git a/src/gui/areas/Area.cs b/src/gui/areas/Area.cs
+index 6d820ff..6fe7abc 100644
+--- a/src/gui/areas/Area.cs
++++ b/src/gui/areas/Area.cs
+@@ -50,9 +50,9 @@ public abstract class Area
+ 	protected Cairo.Context backCr;
+ 	protected bool isAreaRealized;
+ 
+-	// Cursor colors (replaces Gdk.GC)
+-	protected Gdk.Color activeCursorColor;
+-	protected Gdk.Color inactiveCursorColor;
++	// Cursor colours
++	protected Gdk.RGBA activeCursorColor;
++	protected Gdk.RGBA inactiveCursorColor;
+ 	protected bool isActive;
+ 
+ 	protected int cursorDigit;
+@@ -176,16 +176,10 @@ public abstract class Area
+ 		bg = null;
+ 		XmlNodeList childNodes = parentNode.ChildNodes;
+ 		foreach (XmlNode node in childNodes) {
+-			Gdk.Color col = new Gdk.Color();
+-			if (node.Name == "foreground") {
+-				Gdk.Color.Parse(node.InnerText, ref col);
+-				// Gdk.Colormap.System.AllocColor removed in GTK3; not needed
+-				fg = new Drawer.Color(col);
+-			}
+-			if (node.Name == "background") {
+-				Gdk.Color.Parse(node.InnerText, ref col);
+-				bg = new Drawer.Color(col);
+-			}
++			if (node.Name == "foreground")
++				fg = new Drawer.Color(Drawer.Information.ParseRGBA(node.InnerText));
++			if (node.Name == "background")
++				bg = new Drawer.Color(Drawer.Information.ParseRGBA(node.InnerText));
+ 		}
+ 	}
+ 
+@@ -198,10 +192,10 @@ public abstract class Area
+ 	/// <summary>Realize the area (called once the DrawingArea is mapped).</summary>
+ 	public virtual void Realize()
+ 	{
+-		Gdk.Color.Parse("red",  ref activeCursorColor);
+-		Gdk.Color.Parse("gray", ref inactiveCursorColor);
+-		isActive        = true;
+-		isAreaRealized  = true;
++		activeCursorColor   = Drawer.Information.ParseRGBA("red");
++		inactiveCursorColor = Drawer.Information.ParseRGBA("gray");
++		isActive       = true;
++		isAreaRealized = true;
+ 	}
+ 
+ 	// Properties
+@@ -256,9 +250,9 @@ public abstract class Area
+ 	}
+ 
+ 	///<summary>Fill a rectangle with the given color using Cairo</summary>
+-	protected void FillRect(Gdk.Color color, int rx, int ry, int rw, int rh)
++	protected void FillRect(Gdk.RGBA color, int rx, int ry, int rw, int rh)
+ 	{
+-		Gdk.CairoHelper.SetSourceColor(backCr, color);
++		backCr.SetSourceRGBA(color.Red, color.Green, color.Blue, color.Alpha);
+ 		backCr.Rectangle(rx, ry, rw, rh);
+ 		backCr.Fill();
+ 	}
+@@ -271,11 +265,11 @@ public abstract class Area
+ 		int rstart, bstart, xstart, ystart;
+ 		int rend, bend, xend, yend;
+ 		bool odd;
+-		Gdk.Color gc;
+-		Gdk.Color oddColor;
+-		Gdk.Color evenColor;
+-		Gdk.Color leftColor;
+-		Gdk.Color rightColor;
++		Gdk.RGBA gc;
++		Gdk.RGBA oddColor;
++		Gdk.RGBA evenColor;
++		Gdk.RGBA leftColor;
++		Gdk.RGBA rightColor;
+ 
+ 		oddColor  = drawer.GetBackgroundColor(Drawer.RowType.Odd,  h.Type);
+ 		evenColor = drawer.GetBackgroundColor(Drawer.RowType.Even, h.Type);
+@@ -392,7 +386,7 @@ public abstract class Area
+ 		if (offs >= areaGroup.Offset && offs < areaGroup.Offset + bytesInView) {
+ 			int pcRow, pcByte, pcX, pcY;
+ 			GetDisplayInfoByOffset(offs, out pcRow, out pcByte, out pcX, out pcY);
+-			Gdk.Color backEvenColor = drawer.GetBackgroundColor(Drawer.RowType.Even, Drawer.HighlightType.Normal);
++			Gdk.RGBA backEvenColor = drawer.GetBackgroundColor(Drawer.RowType.Even, Drawer.HighlightType.Normal);
+ 			FillRect(backEvenColor, x + pcX, y + pcY, drawer.Width * dpb, drawer.Height);
+ 		}
+ 	}
+@@ -406,7 +400,7 @@ public abstract class Area
+ 		int cRow, cByte, cX, cY;
+ 		GetDisplayInfoByOffset(areaGroup.CursorOffset, out cRow, out cByte, out cX, out cY);
+ 
+-		Gdk.Color cursorColor = isActive ? activeCursorColor : inactiveCursorColor;
++		Gdk.RGBA cursorColor = isActive ? activeCursorColor : inactiveCursorColor;
+ 
+ 		// Underline
+ 		FillRect(cursorColor, x + cX, y + cY + drawer.Height - 2, drawer.Width * dpb, 2);
+@@ -427,7 +421,7 @@ public abstract class Area
+ 
+ 	internal virtual void BlankBackground()
+ 	{
+-		Gdk.Color backEvenColor = drawer.GetBackgroundColor(Drawer.RowType.Even, Drawer.HighlightType.Normal);
++		Gdk.RGBA backEvenColor = drawer.GetBackgroundColor(Drawer.RowType.Even, Drawer.HighlightType.Normal);
+ 		FillRect(backEvenColor, x, y, width, height);
+ 	}
+ 
+@@ -435,7 +429,7 @@ public abstract class Area
+ 	{
+ 		int pcRow, pcByte, pcX, pcY;
+ 		GetDisplayInfoByOffset(areaGroup.Buffer.Size, out pcRow, out pcByte, out pcX, out pcY);
+-		Gdk.Color backEvenColor = drawer.GetBackgroundColor(Drawer.RowType.Even, Drawer.HighlightType.Normal);
++		Gdk.RGBA backEvenColor = drawer.GetBackgroundColor(Drawer.RowType.Even, Drawer.HighlightType.Normal);
+ 		FillRect(backEvenColor, x + pcX, y + pcY, drawer.Width * dpb, drawer.Height);
+ 	}
+ 
+diff --git a/src/gui/areas/AsciiArea.cs b/src/gui/areas/AsciiArea.cs
+index 053d231..9d565ea 100644
+--- a/src/gui/areas/AsciiArea.cs
++++ b/src/gui/areas/AsciiArea.cs
+@@ -41,8 +41,8 @@ public class AsciiArea : Area {
+ 		int ry = i * drawer.Height + y;
+ 		long roffset = areaGroup.Offset + i * bpr + p;
+ 		bool odd;
+-		Gdk.Color backEvenColor = drawer.GetBackgroundColor(Drawer.RowType.Even, Drawer.HighlightType.Normal);
+-		Gdk.Color backOddColor  = drawer.GetBackgroundColor(Drawer.RowType.Odd,  Drawer.HighlightType.Normal);
++		Gdk.RGBA backEvenColor = drawer.GetBackgroundColor(Drawer.RowType.Even, Drawer.HighlightType.Normal);
++		Gdk.RGBA backOddColor  = drawer.GetBackgroundColor(Drawer.RowType.Odd,  Drawer.HighlightType.Normal);
+ 
+ 		odd = (((roffset / bpr) % 2) == 1);
+ 
+@@ -70,8 +70,8 @@ public class AsciiArea : Area {
+ 		int ry = i * drawer.Height + y;
+ 		long roffset = areaGroup.Offset + i * bpr + p;
+ 		bool odd;
+-		Gdk.Color backEvenColor = drawer.GetBackgroundColor(Drawer.RowType.Even, Drawer.HighlightType.Normal);
+-		Gdk.Color backOddColor  = drawer.GetBackgroundColor(Drawer.RowType.Odd,  Drawer.HighlightType.Normal);
++		Gdk.RGBA backEvenColor = drawer.GetBackgroundColor(Drawer.RowType.Even, Drawer.HighlightType.Normal);
++		Gdk.RGBA backOddColor  = drawer.GetBackgroundColor(Drawer.RowType.Odd,  Drawer.HighlightType.Normal);
+ 
+ 		odd = (((roffset / bpr) % 2) == 1);
+ 
+diff --git a/src/gui/areas/GroupedArea.cs b/src/gui/areas/GroupedArea.cs
+index e843aa6..9f18300 100644
+--- a/src/gui/areas/GroupedArea.cs
++++ b/src/gui/areas/GroupedArea.cs
+@@ -48,8 +48,8 @@ abstract public class GroupedArea : Area {
+ 		int ry = i * drawer.Height + y;
+ 		long roffset = areaGroup.Offset + i * bpr + p;
+ 		bool odd;
+-		Gdk.Color backEvenColor = drawer.GetBackgroundColor(Drawer.RowType.Even, Drawer.HighlightType.Normal);
+-		Gdk.Color backOddColor  = drawer.GetBackgroundColor(Drawer.RowType.Odd,  Drawer.HighlightType.Normal);
++		Gdk.RGBA backEvenColor = drawer.GetBackgroundColor(Drawer.RowType.Even, Drawer.HighlightType.Normal);
++		Gdk.RGBA backOddColor  = drawer.GetBackgroundColor(Drawer.RowType.Odd,  Drawer.HighlightType.Normal);
+ 
+ 		odd = (((roffset / bpr) % 2) == 1);
+ 
+@@ -79,8 +79,8 @@ abstract public class GroupedArea : Area {
+ 		int ry = i * drawer.Height + y;
+ 		long roffset = areaGroup.Offset + i * bpr + p;
+ 		bool odd;
+-		Gdk.Color backEvenColor = drawer.GetBackgroundColor(Drawer.RowType.Even, Drawer.HighlightType.Normal);
+-		Gdk.Color backOddColor  = drawer.GetBackgroundColor(Drawer.RowType.Odd,  Drawer.HighlightType.Normal);
++		Gdk.RGBA backEvenColor = drawer.GetBackgroundColor(Drawer.RowType.Even, Drawer.HighlightType.Normal);
++		Gdk.RGBA backOddColor  = drawer.GetBackgroundColor(Drawer.RowType.Odd,  Drawer.HighlightType.Normal);
+ 
+ 		odd = (((roffset / bpr) % 2) == 1);
+ 
+diff --git a/src/gui/areas/OffsetArea.cs b/src/gui/areas/OffsetArea.cs
+index f002c34..47133cf 100644
+--- a/src/gui/areas/OffsetArea.cs
++++ b/src/gui/areas/OffsetArea.cs
+@@ -75,8 +75,8 @@ public class OffsetArea : Area {
+ 		int ry = i * drawer.Height + y;
+ 		long roffset = areaGroup.Offset + i * bpr;
+ 		bool odd;
+-		Gdk.Color backEvenColor = drawer.GetBackgroundColor(Drawer.RowType.Even, Drawer.HighlightType.Normal);
+-		Gdk.Color backOddColor  = drawer.GetBackgroundColor(Drawer.RowType.Odd,  Drawer.HighlightType.Normal);
++		Gdk.RGBA backEvenColor = drawer.GetBackgroundColor(Drawer.RowType.Even, Drawer.HighlightType.Normal);
++		Gdk.RGBA backOddColor  = drawer.GetBackgroundColor(Drawer.RowType.Odd,  Drawer.HighlightType.Normal);
+ 
+ 		odd = (((roffset / bpr) % 2) == 1);
+ 
+diff --git a/src/gui/areas/SeparatorArea.cs b/src/gui/areas/SeparatorArea.cs
+index 25fbc81..69c8f19 100644
+--- a/src/gui/areas/SeparatorArea.cs
++++ b/src/gui/areas/SeparatorArea.cs
+@@ -28,7 +28,7 @@ public class SeparatorAreaPlugin : AreaPlugin
+ ///<summary>An area that shows a vertical separator line</summary>
+ public class SeparatorArea : Area
+ {
+-	Gdk.Color lineColor;
++	Gdk.RGBA lineColor;
+ 
+ 	public SeparatorArea(AreaGroup ag)
+ 			: base(ag)
+@@ -40,7 +40,7 @@ public class SeparatorArea : Area
+ 	{
+ 		Gtk.DrawingArea da = areaGroup.DrawingArea;
+ 		drawer    = new DummyDrawer(da, drawerInformation);
+-		lineColor = drawer.Info.fgNormal[(int)Drawer.RowType.Even, (int)Drawer.ColumnType.Even].GdkColor;
++		lineColor = drawer.Info.fgNormal[(int)Drawer.RowType.Even, (int)Drawer.ColumnType.Even].RgbaColor;
+ 		base.Realize();
+ 	}
+ 
+@@ -81,7 +81,7 @@ public class SeparatorArea : Area
+ 			return;
+ 
+ 		// Draw the vertical separator line using Cairo
+-		Gdk.CairoHelper.SetSourceColor(backCr, lineColor);
++		backCr.SetSourceRGBA(lineColor.Red, lineColor.Green, lineColor.Blue, lineColor.Alpha);
+ 		backCr.LineWidth = 1;
+ 		backCr.MoveTo(x + drawer.Width / 2, 0);
+ 		backCr.LineTo(x + drawer.Width / 2, drawer.Height * rfull);
+diff --git a/src/gui/drawers/AsciiDrawer.cs b/src/gui/drawers/AsciiDrawer.cs
+index 365dccd..17e4846 100644
+--- a/src/gui/drawers/AsciiDrawer.cs
++++ b/src/gui/drawers/AsciiDrawer.cs
+@@ -24,17 +24,17 @@ public class AsciiDrawer : Drawer {
+ 		BlitSurface(cr, surf, b * width, 0, x, y, width, height);
+ 	}
+ 
+-	protected override Cairo.ImageSurface Create(Gdk.Color fg, Gdk.Color bg)
++	protected override Cairo.ImageSurface Create(Gdk.RGBA fg, Gdk.RGBA bg)
+ 	{
+ 		Cairo.ImageSurface surf = new Cairo.ImageSurface(Cairo.Format.Argb32, 256 * width, height);
+ 		using (Cairo.Context cr = new Cairo.Context(surf)) {
+ 			Pango.CairoHelper.UpdateLayout(cr, pangoLayout);
+ 
+-			Gdk.CairoHelper.SetSourceColor(cr, bg);
++			cr.SetSourceRGBA(bg.Red, bg.Green, bg.Blue, bg.Alpha);
+ 			cr.Paint();
+ 
+ 			pangoLayout.SetText(AsciiTable);
+-			Gdk.CairoHelper.SetSourceColor(cr, fg);
++			cr.SetSourceRGBA(fg.Red, fg.Green, fg.Blue, fg.Alpha);
+ 			cr.MoveTo(0, 0);
+ 			Pango.CairoHelper.ShowLayout(cr, pangoLayout);
+ 		}
+diff --git a/src/gui/drawers/BinaryDrawer.cs b/src/gui/drawers/BinaryDrawer.cs
+index f6b5cd4..2c068f2 100644
+--- a/src/gui/drawers/BinaryDrawer.cs
++++ b/src/gui/drawers/BinaryDrawer.cs
+@@ -26,18 +26,18 @@ public class BinaryDrawer : Drawer {
+ 		}
+ 	}
+ 
+-	protected override Cairo.ImageSurface Create(Gdk.Color fg, Gdk.Color bg)
++	protected override Cairo.ImageSurface Create(Gdk.RGBA fg, Gdk.RGBA bg)
+ 	{
+ 		// Surface contains "00011011" (4 * 2-char entries for bit-pairs 00,01,10,11)
+ 		Cairo.ImageSurface surf = new Cairo.ImageSurface(Cairo.Format.Argb32, 4 * 2 * width, height);
+ 		using (Cairo.Context cr = new Cairo.Context(surf)) {
+ 			Pango.CairoHelper.UpdateLayout(cr, pangoLayout);
+ 
+-			Gdk.CairoHelper.SetSourceColor(cr, bg);
++			cr.SetSourceRGBA(bg.Red, bg.Green, bg.Blue, bg.Alpha);
+ 			cr.Paint();
+ 
+ 			pangoLayout.SetText("00011011");
+-			Gdk.CairoHelper.SetSourceColor(cr, fg);
++			cr.SetSourceRGBA(fg.Red, fg.Green, fg.Blue, fg.Alpha);
+ 			cr.MoveTo(0, 0);
+ 			Pango.CairoHelper.ShowLayout(cr, pangoLayout);
+ 		}
+diff --git a/src/gui/drawers/DecimalDrawer.cs b/src/gui/drawers/DecimalDrawer.cs
+index 2c9e0b7..78d55de 100644
+--- a/src/gui/drawers/DecimalDrawer.cs
++++ b/src/gui/drawers/DecimalDrawer.cs
+@@ -30,17 +30,17 @@ public class DecimalDrawer : Drawer {
+ 		BlitSurface(cr, surf, b * 3 * width, 0, x, y, 3 * width, height);
+ 	}
+ 
+-	protected override Cairo.ImageSurface Create(Gdk.Color fg, Gdk.Color bg)
++	protected override Cairo.ImageSurface Create(Gdk.RGBA fg, Gdk.RGBA bg)
+ 	{
+ 		Cairo.ImageSurface surf = new Cairo.ImageSurface(Cairo.Format.Argb32, 256 * 3 * width, height);
+ 		using (Cairo.Context cr = new Cairo.Context(surf)) {
+ 			Pango.CairoHelper.UpdateLayout(cr, pangoLayout);
+ 
+-			Gdk.CairoHelper.SetSourceColor(cr, bg);
++			cr.SetSourceRGBA(bg.Red, bg.Green, bg.Blue, bg.Alpha);
+ 			cr.Paint();
+ 
+ 			pangoLayout.SetText(DecimalTable);
+-			Gdk.CairoHelper.SetSourceColor(cr, fg);
++			cr.SetSourceRGBA(fg.Red, fg.Green, fg.Blue, fg.Alpha);
+ 			cr.MoveTo(0, 0);
+ 			Pango.CairoHelper.ShowLayout(cr, pangoLayout);
+ 		}
+diff --git a/src/gui/drawers/Drawer.cs b/src/gui/drawers/Drawer.cs
+index 6881d6a..5c2aed0 100644
+--- a/src/gui/drawers/Drawer.cs
++++ b/src/gui/drawers/Drawer.cs
+@@ -31,12 +31,12 @@ namespace Bless.Gui.Drawers {
+ public abstract class Drawer {
+ 
+ 	public class Color {
+-		public Color(Gdk.Color color)
++		public Color(Gdk.RGBA color)
+ 		{
+-			this.GdkColor = color;
++			this.RgbaColor = color;
+ 		}
+ 
+-		public Gdk.Color GdkColor;
++		public Gdk.RGBA RgbaColor;
+ 	}
+ 
+ 	public class Information {
+@@ -62,25 +62,17 @@ public abstract class Drawer {
+ 			fgHighlight = new Drawer.Color[2, (int)HighlightType.Sentinel];
+ 			bgHighlight = new Drawer.Color[2, (int)HighlightType.Sentinel];
+ 
+-			for (int i = 0; i < 2; i++) {
+-				fgNormal[0, i] = new Drawer.Color(Gdk.Color.Zero);
+-				fgNormal[1, i] = new Drawer.Color(Gdk.Color.Zero);
+-				bgNormal[0, i] = new Drawer.Color(Gdk.Color.Zero);
+-				bgNormal[1, i] = new Drawer.Color(Gdk.Color.Zero);
+-			}
+-
+-			// initialize default colors
+-			Gdk.Color.Parse("black", ref fgNormal[(int)RowType.Even, (int)ColumnType.Even].GdkColor);
+-			Gdk.Color.Parse("white", ref bgNormal[(int)RowType.Even, (int)ColumnType.Even].GdkColor);
++			fgNormal[(int)RowType.Even, (int)ColumnType.Even] = new Drawer.Color(ParseRGBA("black"));
++			bgNormal[(int)RowType.Even, (int)ColumnType.Even] = new Drawer.Color(ParseRGBA("white"));
+ 
+-			Gdk.Color.Parse("blue", ref fgNormal[(int)RowType.Even, (int)ColumnType.Odd].GdkColor);
+-			Gdk.Color.Parse("white", ref bgNormal[(int)RowType.Even, (int)ColumnType.Odd].GdkColor);
++			fgNormal[(int)RowType.Even, (int)ColumnType.Odd]  = new Drawer.Color(ParseRGBA("blue"));
++			bgNormal[(int)RowType.Even, (int)ColumnType.Odd]  = new Drawer.Color(ParseRGBA("white"));
+ 
+-			Gdk.Color.Parse("black", ref fgNormal[(int)RowType.Odd, (int)ColumnType.Even].GdkColor);
+-			Gdk.Color.Parse("white", ref bgNormal[(int)RowType.Odd, (int)ColumnType.Even].GdkColor);
++			fgNormal[(int)RowType.Odd,  (int)ColumnType.Even] = new Drawer.Color(ParseRGBA("black"));
++			bgNormal[(int)RowType.Odd,  (int)ColumnType.Even] = new Drawer.Color(ParseRGBA("white"));
+ 
+-			Gdk.Color.Parse("blue", ref fgNormal[(int)RowType.Odd, (int)ColumnType.Odd].GdkColor);
+-			Gdk.Color.Parse("white", ref bgNormal[(int)RowType.Odd, (int)ColumnType.Odd].GdkColor);
++			fgNormal[(int)RowType.Odd,  (int)ColumnType.Odd]  = new Drawer.Color(ParseRGBA("blue"));
++			bgNormal[(int)RowType.Odd,  (int)ColumnType.Odd]  = new Drawer.Color(ParseRGBA("white"));
+ 
+ 			// leave unspecified - will be set up using theme defaults
+ 			for (int i = 0; i < (int)HighlightType.Sentinel; i++) {
+@@ -93,55 +85,47 @@ public abstract class Drawer {
+ 			Uppercase = false;
+ 		}
+ 
+-		/// <summary>Convert Gdk.RGBA to Gdk.Color</summary>
+-		static Gdk.Color RGBAToGdkColor(Gdk.RGBA rgba)
++		/// <summary>Parse a CSS colour name or spec into a Gdk.RGBA value.</summary>
++		public static Gdk.RGBA ParseRGBA(string name)
+ 		{
+-			return new Gdk.Color(
+-				(byte)(rgba.Red   * 255),
+-				(byte)(rgba.Green * 255),
+-				(byte)(rgba.Blue  * 255)
+-			);
++			var c = new Gdk.RGBA();
++			c.Parse(name);
++			return c;
+ 		}
+ 
+-		/// <summary>Make a color lighter while keeping its hue</summary>
+-		Gdk.Color MakeColorLighter(Gdk.Color col, double factor)
++		/// <summary>Make a colour lighter while keeping its hue</summary>
++		static Gdk.RGBA MakeRgbaLighter(Gdk.RGBA col, double factor)
+ 		{
+-			Gdk.Color light = new Gdk.Color();
+-			light.Red   = (ushort)(col.Red   + (ushort.MaxValue - col.Red)   * factor);
+-			light.Blue  = (ushort)(col.Blue  + (ushort.MaxValue - col.Blue)  * factor);
+-			light.Green = (ushort)(col.Green + (ushort.MaxValue - col.Green) * factor);
+-			return light;
++			return new Gdk.RGBA {
++				Red   = col.Red   + (1.0 - col.Red)   * factor,
++				Green = col.Green + (1.0 - col.Green) * factor,
++				Blue  = col.Blue  + (1.0 - col.Blue)  * factor,
++				Alpha = col.Alpha
++			};
+ 		}
+ 
+-		/// <summary>Make a color darker while keeping its hue</summary>
+-		Gdk.Color MakeColorDarker(Gdk.Color col, double factor)
++		/// <summary>Make a colour darker while keeping its hue</summary>
++		static Gdk.RGBA MakeRgbaDarker(Gdk.RGBA col, double factor)
+ 		{
+-			Gdk.Color dark = new Gdk.Color();
+-			dark.Red   = (ushort)(col.Red   * factor);
+-			dark.Blue  = (ushort)(col.Blue  * factor);
+-			dark.Green = (ushort)(col.Green * factor);
+-			return dark;
++			return new Gdk.RGBA {
++				Red   = col.Red   * factor,
++				Green = col.Green * factor,
++				Blue  = col.Blue  * factor,
++				Alpha = col.Alpha
++			};
+ 		}
+ 
+-		/// <summary>Setup unspecified highlight colors using theme default colors</summary>
++		/// <summary>Setup unspecified highlight colours using theme default colours</summary>
+ 		public void SetupHighlight(Gtk.Widget widget)
+ 		{
+-			Gdk.Color selFg, selBg, patMatchFg, patMatchBg;
++			Gdk.RGBA selFg = widget.StyleContext.GetColor(Gtk.StateFlags.Selected);
+ 
+-			// Use StyleContext (GTK3) to get theme selection colors
+-			Gdk.RGBA selFgRgba = widget.StyleContext.GetColor(Gtk.StateFlags.Selected);
+-			selFg = RGBAToGdkColor(selFgRgba);
+-
+-			// Try to get the selection background from theme; fall back to a blue if missing
+-			Gdk.RGBA selBgRgba;
+-			if (!widget.StyleContext.LookupColor("theme_selected_bg_color", out selBgRgba)) {
+-				selBgRgba = new Gdk.RGBA();
+-				selBgRgba.Red = 0.2; selBgRgba.Green = 0.4; selBgRgba.Blue = 0.8; selBgRgba.Alpha = 1.0;
+-			}
+-			selBg = RGBAToGdkColor(selBgRgba);
++			Gdk.RGBA selBg;
++			if (!widget.StyleContext.LookupColor("theme_selected_bg_color", out selBg))
++				selBg = new Gdk.RGBA { Red = 0.2, Green = 0.4, Blue = 0.8, Alpha = 1.0 };
+ 
+-			patMatchBg = MakeColorLighter(selBg, 0.6);
+-			patMatchFg = MakeColorDarker(selFg, 0.4);
++			Gdk.RGBA patMatchBg = MakeRgbaLighter(selBg, 0.6);
++			Gdk.RGBA patMatchFg = MakeRgbaDarker(selFg, 0.4);
+ 
+ 			// Selection
+ 			if (fgHighlight[(int)RowType.Even, (int)HighlightType.Selection] == null)
+@@ -181,8 +165,8 @@ public abstract class Drawer {
+ 
+ 	protected Pango.Layout pangoLayout;
+ 
+-	// Background colors (replaces Gdk.GC)
+-	protected Gdk.Color[,] backColor;
++	// Background colours
++	protected Gdk.RGBA[,] backColor;
+ 
+ 	protected int width;
+ 	protected int height;
+@@ -258,40 +242,40 @@ public abstract class Drawer {
+ 
+ 	void InitializeBackgroundColors()
+ 	{
+-		backColor = new Gdk.Color[2, (int)Drawer.HighlightType.Sentinel];
++		backColor = new Gdk.RGBA[2, (int)Drawer.HighlightType.Sentinel];
+ 
+ 		Drawer.Color col;
+ 
+ 		// Normal even/odd
+ 		col = info.bgNormal[(int)RowType.Even, (int)ColumnType.Even];
+-		backColor[(int)RowType.Even, (int)HighlightType.Normal] = col.GdkColor;
++		backColor[(int)RowType.Even, (int)HighlightType.Normal] = col.RgbaColor;
+ 
+ 		col = info.bgNormal[(int)RowType.Odd, (int)ColumnType.Even];
+-		backColor[(int)RowType.Odd, (int)HighlightType.Normal] = col.GdkColor;
++		backColor[(int)RowType.Odd, (int)HighlightType.Normal] = col.RgbaColor;
+ 
+ 		// Selection
+ 		col = info.bgHighlight[(int)RowType.Even, (int)HighlightType.Selection];
+-		backColor[(int)RowType.Even, (int)HighlightType.Selection] = col.GdkColor;
++		backColor[(int)RowType.Even, (int)HighlightType.Selection] = col.RgbaColor;
+ 
+ 		col = info.bgHighlight[(int)RowType.Odd, (int)HighlightType.Selection];
+-		backColor[(int)RowType.Odd, (int)HighlightType.Selection] = col.GdkColor;
++		backColor[(int)RowType.Odd, (int)HighlightType.Selection] = col.RgbaColor;
+ 
+ 		// PatternMatch
+ 		col = info.bgHighlight[(int)RowType.Even, (int)HighlightType.PatternMatch];
+-		backColor[(int)RowType.Even, (int)HighlightType.PatternMatch] = col.GdkColor;
++		backColor[(int)RowType.Even, (int)HighlightType.PatternMatch] = col.RgbaColor;
+ 
+ 		col = info.bgHighlight[(int)RowType.Odd, (int)HighlightType.PatternMatch];
+-		backColor[(int)RowType.Odd, (int)HighlightType.PatternMatch] = col.GdkColor;
++		backColor[(int)RowType.Odd, (int)HighlightType.PatternMatch] = col.RgbaColor;
+ 	}
+ 
+ 	///<summary>Wrapper that avoids creating duplicate surfaces for the same fg/bg combination</summary>
+ 	private Cairo.ImageSurface CreateWrapper(Drawer.Color fg, Drawer.Color bg)
+ 	{
+-		string id = PixmapManager.Instance.GetPixmapId(this.GetType(), info, fg.GdkColor, bg.GdkColor);
++		string id = PixmapManager.Instance.GetPixmapId(this.GetType(), info, fg.RgbaColor, bg.RgbaColor);
+ 
+ 		Cairo.ImageSurface surf = PixmapManager.Instance.GetPixmap(id);
+ 		if (surf == null) {
+-			surf = Create(fg.GdkColor, bg.GdkColor); // may return null for DummyDrawer
++			surf = Create(fg.RgbaColor, bg.RgbaColor); // may return null for DummyDrawer
+ 			if (surf != null) {
+ 				PixmapManager.Instance.AddPixmap(id, surf);
+ 				PixmapManager.Instance.ReferencePixmap(id);
+@@ -307,7 +291,7 @@ public abstract class Drawer {
+ 	}
+ 
+ 	///<summary>Creates a Cairo.ImageSurface with the pre-rendered character strip</summary>
+-	abstract protected Cairo.ImageSurface Create(Gdk.Color fg, Gdk.Color bg);
++	abstract protected Cairo.ImageSurface Create(Gdk.RGBA fg, Gdk.RGBA bg);
+ 
+ 	///<summary>Draws a single byte at (x,y) using the provided surface strip and Cairo context</summary>
+ 	abstract protected void Draw(Cairo.Context cr, int x, int y, byte b, Cairo.ImageSurface surf);
+@@ -335,7 +319,7 @@ public abstract class Drawer {
+ 		Draw(cr, x, y, b, surfacesHighlight[(int)rowType, (int)ht]);
+ 	}
+ 
+-	public Gdk.Color GetBackgroundColor(RowType rowType, HighlightType ht)
++	public Gdk.RGBA GetBackgroundColor(RowType rowType, HighlightType ht)
+ 	{
+ 		return backColor[(int)rowType, (int)ht];
+ 	}
+@@ -365,7 +349,7 @@ public class DummyDrawer : Drawer {
+ 	{
+ 	}
+ 
+-	protected override Cairo.ImageSurface Create(Gdk.Color fg, Gdk.Color bg)
++	protected override Cairo.ImageSurface Create(Gdk.RGBA fg, Gdk.RGBA bg)
+ 	{
+ 		return null;
+ 	}
+diff --git a/src/gui/drawers/HexDrawer.cs b/src/gui/drawers/HexDrawer.cs
+index 281b711..2aec235 100644
+--- a/src/gui/drawers/HexDrawer.cs
++++ b/src/gui/drawers/HexDrawer.cs
+@@ -23,7 +23,7 @@ public class HexDrawer : Drawer {
+ 		BlitSurface(cr, surf, b * 2 * width, 0, x, y, 2 * width, height);
+ 	}
+ 
+-	protected override Cairo.ImageSurface Create(Gdk.Color fg, Gdk.Color bg)
++	protected override Cairo.ImageSurface Create(Gdk.RGBA fg, Gdk.RGBA bg)
+ 	{
+ 		string s = info.Uppercase ? HexTableUpper : HexTableLower;
+ 
+@@ -36,11 +36,11 @@ public class HexDrawer : Drawer {
+ 			Pango.CairoHelper.UpdateLayout(cr, pangoLayout);
+ 
+ 			// Fill background
+-			Gdk.CairoHelper.SetSourceColor(cr, bg);
++			cr.SetSourceRGBA(bg.Red, bg.Green, bg.Blue, bg.Alpha);
+ 			cr.Paint();
+ 
+ 			// Render text
+-			Gdk.CairoHelper.SetSourceColor(cr, fg);
++			cr.SetSourceRGBA(fg.Red, fg.Green, fg.Blue, fg.Alpha);
+ 
+ 			// First 256 printable chars (0x00–0x7f)
+ 			pangoLayout.SetText(s.Substring(0, 256));
+diff --git a/src/gui/drawers/OctalDrawer.cs b/src/gui/drawers/OctalDrawer.cs
+index 4b9bc17..3dd160e 100644
+--- a/src/gui/drawers/OctalDrawer.cs
++++ b/src/gui/drawers/OctalDrawer.cs
+@@ -29,17 +29,17 @@ public class OctalDrawer : Drawer {
+ 		BlitSurface(cr, surf, b * 3 * width, 0, x, y, 3 * width, height);
+ 	}
+ 
+-	protected override Cairo.ImageSurface Create(Gdk.Color fg, Gdk.Color bg)
++	protected override Cairo.ImageSurface Create(Gdk.RGBA fg, Gdk.RGBA bg)
+ 	{
+ 		Cairo.ImageSurface surf = new Cairo.ImageSurface(Cairo.Format.Argb32, 256 * 3 * width, height);
+ 		using (Cairo.Context cr = new Cairo.Context(surf)) {
+ 			Pango.CairoHelper.UpdateLayout(cr, pangoLayout);
+ 
+-			Gdk.CairoHelper.SetSourceColor(cr, bg);
++			cr.SetSourceRGBA(bg.Red, bg.Green, bg.Blue, bg.Alpha);
+ 			cr.Paint();
+ 
+ 			pangoLayout.SetText(OctalTable);
+-			Gdk.CairoHelper.SetSourceColor(cr, fg);
++			cr.SetSourceRGBA(fg.Red, fg.Green, fg.Blue, fg.Alpha);
+ 			cr.MoveTo(0, 0);
+ 			Pango.CairoHelper.ShowLayout(cr, pangoLayout);
+ 		}
+diff --git a/src/gui/drawers/PixmapManager.cs b/src/gui/drawers/PixmapManager.cs
+index da87866..03ef823 100644
+--- a/src/gui/drawers/PixmapManager.cs
++++ b/src/gui/drawers/PixmapManager.cs
+@@ -36,7 +36,7 @@ class PixmapManager
+ 		references = new Dictionary<string, int>();
+ 	}
+ 
+-	public string GetPixmapId(System.Type type, Drawer.Information info, Gdk.Color fg, Gdk.Color bg)
++	public string GetPixmapId(System.Type type, Drawer.Information info, Gdk.RGBA fg, Gdk.RGBA bg)
+ 	{
+ 		return string.Format("{0}{1}{2}{3}{4}{5}",
+ 		                     type, info.FontName, info.FontLanguage,
