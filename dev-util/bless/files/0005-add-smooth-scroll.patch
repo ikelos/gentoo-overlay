@@ -1,0 +1,165 @@
+diff --git a/src/gui/DataViewControl.cs b/src/gui/DataViewControl.cs
+index 5434cd6..0e2d5be 100644
+--- a/src/gui/DataViewControl.cs
++++ b/src/gui/DataViewControl.cs
+@@ -23,6 +23,7 @@ using Gtk;
+ using Bless.Buffers;
+ using Bless.Gui.Areas;
+ using Bless.Util;
++using System;
+ 
+ namespace Bless.Gui {
+ 
+@@ -173,7 +174,7 @@ public class DataViewControl
+ 		// selection with start pos <= end pos
+ 		else if (selStartPos.Second <= selEndPos.First) {
+ 			// set end position between bytes
+-			// this is done so that selections performed with 
++			// this is done so that selections performed with
+ 			// the mouse can be continued with the keyboard
+ 			// (keyboard selections always set positions between bytes)
+ 			selEndPos.Second = selEndPos.First + 1;
+@@ -197,7 +198,7 @@ public class DataViewControl
+ 		// selection with start pos > end pos
+ 		else {
+ 			// set start position between bytes
+-			// this is done so that selections performed with 
++			// this is done so that selections performed with
+ 			// the mouse can be continued with the keyboard
+ 			// (keyboard selections always set positions between bytes)
+ 			// TODO: This is currently disabled because it breaks mouse
+@@ -262,11 +263,11 @@ public class DataViewControl
+ 				selEndPos = pos;
+ 			}
+ 		}
+-		
++
+ 		// give the focus to the appropriate area
+ 		// do this before setting the new cursor/selection
+ 		UpdateFocus(clickArea);
+-		
++
+ 		EvaluateSelection(DataViewDisplay.ShowType.Closest);
+ 	}
+ 
+@@ -310,7 +311,7 @@ public class DataViewControl
+ 		// give the focus to the appropriate area
+ 		// do this before setting the new cursor/selection
+ 		UpdateFocus(clickArea);
+-		
++
+ 		EvaluateSelection(DataViewDisplay.ShowType.Closest);
+ 	}
+ 
+@@ -346,14 +347,14 @@ public class DataViewControl
+ 		// for better visual result
+ 		selEndPos = pos;
+ 		//System.Console.WriteLine("Start: {0},{1},{2} End: {3},{4},{5}", selStartPos.First, selStartPos.Second, selStartPos.Digit, selEndPos.First, selEndPos.Second, selEndPos.Digit);
+-		
++
+ 		// give the focus to the appropriate area
+ 		// do this before setting the new cursor/selection
+ 		UpdateFocus(clickArea);
+-		
++
+ 		EvaluateSelection(DataViewDisplay.ShowType.Closest);
+ 	}
+-	
++
+ 	// variables that are shared by OnKeyPress and OnKey* handler methods
+ 	Area okp_focusArea;
+ 	int okp_bpr;
+@@ -381,7 +382,7 @@ public class DataViewControl
+ 		// if still no area got the focus give up
+ 		if (okp_focusArea == null)
+ 			return;
+-		
++
+ 		okp_bpr = okp_focusArea.BytesPerRow;
+ 		okp_dpb = okp_focusArea.DigitsPerByte;
+ 		okp_showType = DataViewDisplay.ShowType.Closest;
+@@ -482,22 +483,24 @@ public class DataViewControl
+ 	internal void OnMouseWheel(object o, ScrollEventArgs args)
+ 	{
+ 		Gdk.EventScroll e = args.Event;
++		double scrollDelta = 0;
+ 
+-		if (e.Direction == Gdk.ScrollDirection.Down) {
+-			double newValue = dvDisplay.VScroll.Value + dvDisplay.VScroll.Adjustment.StepIncrement;
+-			if (newValue <= dvDisplay.VScroll.Adjustment.Upper - dvDisplay.VScroll.Adjustment.PageSize)
+-				dvDisplay.VScroll.Value = newValue;
+-			else
+-				dvDisplay.VScroll.Value = dvDisplay.VScroll.Adjustment.Upper - dvDisplay.VScroll.Adjustment.PageSize;
+-		}
+-		else if (e.Direction == Gdk.ScrollDirection.Up) {
+-			double newValue = dvDisplay.VScroll.Value - dvDisplay.VScroll.Adjustment.StepIncrement;
+-			if (newValue >= dvDisplay.VScroll.Adjustment.Lower)
+-				dvDisplay.VScroll.Value = newValue;
+-			else
+-				dvDisplay.VScroll.Value = dvDisplay.VScroll.Adjustment.Lower;
++
++
++		if (e.Direction == Gdk.ScrollDirection.Down)
++			scrollDelta = dvDisplay.VScroll.Adjustment.StepIncrement;
++		else if (e.Direction == Gdk.ScrollDirection.Up)
++			scrollDelta = -dvDisplay.VScroll.Adjustment.StepIncrement;
++		// else if (e.Direction == Gdk.ScrollDirection.Smooth)
++		//	scrollDelta = e.DeltaY * dvDisplay.VScroll.Adjustment.StepIncrement;
++
++		if (scrollDelta != 0) {
++			double upper = dvDisplay.VScroll.Adjustment.Upper - dvDisplay.VScroll.Adjustment.PageSize;
++			double newValue = dvDisplay.VScroll.Value + scrollDelta;
++			dvDisplay.VScroll.Value = Math.Max(dvDisplay.VScroll.Adjustment.Lower,
++			                                   Math.Min(upper, newValue));
+ 		}
+-	}
++ 	}
+ 
+ 	///<summary>
+ 	/// Handle DataView focus gain
+@@ -688,13 +691,13 @@ public class DataViewControl
+ 			specialKey = true;
+ 			return;
+ 		}
+-		
++
+ 		// if the buffer isn't resizable, ignore non-overwriting keypresses
+ 		if (!dataView.Buffer.IsResizable && !dataView.Overwrite) {
+ 			specialKey = true;
+ 			return;
+ 		}
+-		
++
+ 		if (dataView.Selection.IsEmpty()) {
+ 			if (imContext.FilterKeypress(e) && okp_focusArea.HandleKey(e.Key, dataView.Overwrite) == true) {
+ 				OnKeyRight(ref cur, ref next);
+@@ -715,7 +718,7 @@ public class DataViewControl
+ 			if (imContext.FilterKeypress(e) && okp_focusArea.HandleKey(e.Key, false) == true) {
+ 				Util.Range curSel = dataView.Selection;
+ 				long curOffset = dataView.CursorOffset;
+-				
++
+ 				// move cursor to the right
+ 				OnKeyRight(ref cur, ref next);
+ 
+@@ -723,7 +726,7 @@ public class DataViewControl
+ 				selEndPos = selStartPos = next;
+ 
+ 				// the new data could have been inserted either just after the end
+-				// or at the beginning of the selection. Handle each case 
++				// or at the beginning of the selection. Handle each case
+ 				// and delete the old data.
+ 				if (curOffset > curSel.End) { // new data just after end
+ 					dataView.Delete();
+diff --git a/src/gui/DataViewDisplay.cs b/src/gui/DataViewDisplay.cs
+index 8a43929..922f230 100644
+--- a/src/gui/DataViewDisplay.cs
++++ b/src/gui/DataViewDisplay.cs
+@@ -113,6 +113,7 @@ public class DataViewDisplay : Gtk.Box {
+ 		drawingArea.AddEvents((int)Gdk.EventMask.PointerMotionHintMask);
+ 		drawingArea.AddEvents((int)Gdk.EventMask.KeyPressMask);
+ 		drawingArea.AddEvents((int)Gdk.EventMask.KeyReleaseMask);
++		drawingArea.AddEvents((int)Gdk.EventMask.ScrollMask);
+ 
+ 		drawingArea.CanFocus = true;
+ 

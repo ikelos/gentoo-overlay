@@ -225,8 +225,8 @@ index 22974b2..ab677cb 100644
  
 -gtk_sharp_2_dep = dependency('gtk-sharp-3.0')
 -glib_sharp_2_dep = dependency('glib-sharp-3.0')
-+gtk_sharp_2_dep = dependency('gtk-sharp-3.0', version: '>= 2.99.1')
-+glib_sharp_2_dep = dependency('glib-sharp-3.0', version: '>= 2.99.1')
++gtk_sharp_2_dep = dependency('gtk-sharp-3.0', version: '>= 3.22.0')
++glib_sharp_2_dep = dependency('glib-sharp-3.0', version: '>= 3.22.0')
 +
 +# Verify the underlying GTK+ C library is >= 3.22 when headers are available.
 +# On systems where gtk+-3.0 is not on the default PKG_CONFIG_PATH this is a
