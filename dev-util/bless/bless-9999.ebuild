@@ -30,7 +30,8 @@ PATCHES=("${FILESDIR}/0001-port-to-gtksharp-3.0.patch"
          "${FILESDIR}/0002-gtk322-runtime-fixes.patch"
          "${FILESDIR}/0003-fix-dataview-expand.patch"
 		 "${FILESDIR}/0004-use-gdk-rgba.patch"
-		 "${FILESDIR}/0005-add-smooth-scroll.patch")
+		 "${FILESDIR}/0005-add-scrolling.patch"
+		 "${FILESDIR}/0006-turn-on-smooth-scrolling.patch")
 
 # See bug 278162
 # Waiting on nunit ebuild entering the tree

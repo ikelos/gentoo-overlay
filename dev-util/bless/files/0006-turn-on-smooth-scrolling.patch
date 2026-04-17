@@ -1,0 +1,36 @@
+diff --git a/src/gui/DataViewControl.cs b/src/gui/DataViewControl.cs
+index 0e2d5be..9b2b2fc 100644
+--- a/src/gui/DataViewControl.cs
++++ b/src/gui/DataViewControl.cs
+@@ -485,14 +485,15 @@ public class DataViewControl
+ 		Gdk.EventScroll e = args.Event;
+ 		double scrollDelta = 0;
+ 
+-
+-
+ 		if (e.Direction == Gdk.ScrollDirection.Down)
+ 			scrollDelta = dvDisplay.VScroll.Adjustment.StepIncrement;
+ 		else if (e.Direction == Gdk.ScrollDirection.Up)
+ 			scrollDelta = -dvDisplay.VScroll.Adjustment.StepIncrement;
+-		// else if (e.Direction == Gdk.ScrollDirection.Smooth)
+-		//	scrollDelta = e.DeltaY * dvDisplay.VScroll.Adjustment.StepIncrement;
++		else if (e.Direction == Gdk.ScrollDirection.Smooth) {
++		    double dx, dy;
++			Gdk.EventHelper.GetScrollDeltas(e, out dx, out dy);
++		    scrollDelta = dy * dvDisplay.VScroll.Adjustment.StepIncrement;
++		}
+ 
+ 		if (scrollDelta != 0) {
+ 			double upper = dvDisplay.VScroll.Adjustment.Upper - dvDisplay.VScroll.Adjustment.PageSize;
+diff --git a/src/gui/DataViewDisplay.cs b/src/gui/DataViewDisplay.cs
+index 185aa7d..922f230 100644
+--- a/src/gui/DataViewDisplay.cs
++++ b/src/gui/DataViewDisplay.cs
+@@ -114,6 +114,7 @@ public class DataViewDisplay : Gtk.Box {
+ 		drawingArea.AddEvents((int)Gdk.EventMask.KeyPressMask);
+ 		drawingArea.AddEvents((int)Gdk.EventMask.KeyReleaseMask);
+ 		drawingArea.AddEvents((int)Gdk.EventMask.ScrollMask);
++		drawingArea.AddEvents((int)Gdk.EventMask.SmoothScrollMask);
+ 
+ 		drawingArea.CanFocus = true;
+ 
