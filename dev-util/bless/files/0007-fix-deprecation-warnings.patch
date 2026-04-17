@@ -1,0 +1,205 @@
+diff --git a/src/gui/DataViewDisplay.cs b/src/gui/DataViewDisplay.cs
+index 922f230..4acf181 100644
+--- a/src/gui/DataViewDisplay.cs
++++ b/src/gui/DataViewDisplay.cs
+@@ -103,9 +103,11 @@ public class DataViewDisplay : Gtk.Box {
+ 		drawingArea.Drawn         += OnDrawn;
+ 		drawingArea.ConfigureEvent += OnConfigured;
+ 
+-		// White background using GTK3 override (non-deprecated)
+-		drawingArea.OverrideBackgroundColor(Gtk.StateFlags.Normal,
+-			new Gdk.RGBA { Red = 1.0, Green = 1.0, Blue = 1.0, Alpha = 1.0 });
++        // White background via CSS provider
++        var cssProvider = new Gtk.CssProvider();
++        cssProvider.LoadFromData("* { background-color: white; }");
++        // 600 = GTK_STYLE_PROVIDER_PRIORITY_APPLICATION
++        drawingArea.StyleContext.AddProvider(cssProvider, 600);
+ 
+ 		drawingArea.AddEvents((int)Gdk.EventMask.ButtonPressMask);
+ 		drawingArea.AddEvents((int)Gdk.EventMask.ButtonReleaseMask);
+@@ -195,11 +197,11 @@ public class DataViewDisplay : Gtk.Box {
+ 		for (int i = 0; i < 100; i++) {
+ 			t1 = System.DateTime.Now;
+ 
+-			drawingArea.Window.BeginPaintRect(rect1);
+-			using (Cairo.Context cr = Gdk.CairoHelper.Create(drawingArea.Window)) {
++            var benchSurf = new Cairo.ImageSurface(Cairo.Format.Argb32, rect1.Width, rect1.Height);
++            using (Cairo.Context cr = new Cairo.Context(benchSurf)) {
+ 				layout.AreaGroup.Render(true, cr);
+ 			}
+-			drawingArea.Window.EndPaint();
++			benchSurf.Dispose();
+ 
+ 			t2 = System.DateTime.Now;
+ 			sum += (t2 - t1).Milliseconds;
+diff --git a/src/gui/areas/AreaGroup.cs b/src/gui/areas/AreaGroup.cs
+index 196c671..8195165 100644
+--- a/src/gui/areas/AreaGroup.cs
++++ b/src/gui/areas/AreaGroup.cs
+@@ -234,31 +234,10 @@ public class AreaGroup
+ 			if (drawingArea == null || drawingArea.Window == null)
+ 				return;
+ 
+-			if (HasChanged(Changes.Offset)) {
+-				Gdk.Rectangle view = drawingArea.Allocation;
+-				view.X = 0; view.Y = 0;
+-				drawingArea.Window.BeginPaintRect(view);
+-				using (Cairo.Context cr = Gdk.CairoHelper.Create(drawingArea.Window)) {
+-					Render(false, cr);
+-				}
+-				drawingArea.Window.EndPaint();
+-			}
+-			else {
+-				ExposeManually();
+-			}
++            drawingArea.QueueDraw();
+ 		});
+ 	}
+ 
+-	/// <summary>Manually trigger a render (cursor/highlight-only changes).</summary>
+-	private void ExposeManually()
+-	{
+-		if (drawingArea == null || drawingArea.Window == null)
+-			return;
+-		using (Cairo.Context cr = Gdk.CairoHelper.Create(drawingArea.Window)) {
+-			Render(false, cr);
+-		}
+-	}
+-
+ 	public void Invalidate()   { changes |= Changes.Offset; }
+ 	public void RedrawNow()    { SetChanged(Changes.Offset); }
+ 
+diff --git a/src/gui/dialogs/ErrorAlert.cs b/src/gui/dialogs/ErrorAlert.cs
+index c734b0d..32c5b37 100644
+--- a/src/gui/dialogs/ErrorAlert.cs
++++ b/src/gui/dialogs/ErrorAlert.cs
+@@ -30,7 +30,7 @@ public class ErrorAlert : Alert
+ 	public ErrorAlert(string primary, string secondary, Gtk.Window parent)
+ 			: base(primary, secondary, parent)
+ 	{
+-		image.SetFromStock(Gtk.Stock.DialogError, Gtk.IconSize.Dialog);
++		image.SetFromIconName("dialog-error", Gtk.IconSize.Dialog);
+ 		this.AddButton(Gtk.Stock.Ok, ResponseType.Ok);
+ 
+ 		this.ShowAll();
+@@ -40,4 +40,4 @@ public class ErrorAlert : Alert
+ 
+ 
+ 
+-}
+\ No newline at end of file
++}
+diff --git a/src/gui/dialogs/FileOverwriteAlert.cs b/src/gui/dialogs/FileOverwriteAlert.cs
+index 8ecb6ce..7b7709b 100644
+--- a/src/gui/dialogs/FileOverwriteAlert.cs
++++ b/src/gui/dialogs/FileOverwriteAlert.cs
+@@ -33,7 +33,7 @@ public class FileOverwriteAlert : Alert
+ 	public FileOverwriteAlert(string primary, Gtk.Window parent)
+ 			: base(string.Format(msg1, primary), msg2, parent)
+ 	{
+-		image.SetFromStock(Gtk.Stock.DialogWarning, Gtk.IconSize.Dialog);
++		image.SetFromIconName("dialog-warning", Gtk.IconSize.Dialog);
+ 
+ 		this.AddButton(Gtk.Stock.Cancel, ResponseType.Cancel);
+ 		this.AddButton(Catalog.GetString("Replace"), ResponseType.Ok);
+@@ -47,4 +47,4 @@ public class FileOverwriteAlert : Alert
+ 
+ 
+ 
+-}
+\ No newline at end of file
++}
+diff --git a/src/gui/dialogs/InformationAlert.cs b/src/gui/dialogs/InformationAlert.cs
+index e67ecf3..849cb94 100644
+--- a/src/gui/dialogs/InformationAlert.cs
++++ b/src/gui/dialogs/InformationAlert.cs
+@@ -30,7 +30,7 @@ public class InformationAlert : Alert
+ 	public InformationAlert(string primary, string secondary, Gtk.Window parent)
+ 			: base(primary, secondary, parent)
+ 	{
+-		image.SetFromStock(Gtk.Stock.DialogInfo, Gtk.IconSize.Dialog);
++		image.SetFromIconName("dialog-warning", Gtk.IconSize.Dialog);
+ 		this.AddButton(Gtk.Stock.Ok, ResponseType.Ok);
+ 
+ 		this.ShowAll();
+diff --git a/src/gui/dialogs/RevertConfirmationAlert.cs b/src/gui/dialogs/RevertConfirmationAlert.cs
+index 1eaef05..fc13271 100644
+--- a/src/gui/dialogs/RevertConfirmationAlert.cs
++++ b/src/gui/dialogs/RevertConfirmationAlert.cs
+@@ -32,7 +32,7 @@ public class RevertConfirmationAlert : Alert
+ 			: base(string.Format(Catalog.GetString("Revert file '{0}' to its last saved state?"), primary),
+ 				   Catalog.GetString("If you revert, all changes made since the last save will be lost."), parent)
+ 	{
+-		image.SetFromStock(Gtk.Stock.DialogWarning, Gtk.IconSize.Dialog);
++		image.SetFromIconName("dialog-warning", Gtk.IconSize.Dialog);
+ 
+ 		this.AddButton(Gtk.Stock.Cancel, ResponseType.Cancel);
+ 		this.AddButton(Gtk.Stock.RevertToSaved, ResponseType.Ok);
+diff --git a/src/gui/dialogs/SaveConfirmationAlert.cs b/src/gui/dialogs/SaveConfirmationAlert.cs
+index f544adf..9efc3ed 100644
+--- a/src/gui/dialogs/SaveConfirmationAlert.cs
++++ b/src/gui/dialogs/SaveConfirmationAlert.cs
+@@ -31,7 +31,7 @@ public class SaveConfirmationAlert : Alert
+ 			: base(string.Format(Catalog.GetString("Save changes to file '{0}' before closing?"), primary),
+ 				   Catalog.GetString("If you don't save, all changes made since the last save will be lost."), parent)
+ 	{
+-		image.SetFromStock(Gtk.Stock.DialogWarning, Gtk.IconSize.Dialog);
++		image.SetFromIconName("dialog-warning", Gtk.IconSize.Dialog);
+ 
+ 		this.AddButton(Catalog.GetString("Close without Saving"), ResponseType.No);
+ 		this.AddButton(Gtk.Stock.Cancel, ResponseType.Cancel);
+@@ -46,4 +46,4 @@ public class SaveConfirmationAlert : Alert
+ 
+ 
+ 
+-}
+\ No newline at end of file
++}
+diff --git a/src/gui/dialogs/SaveConfirmationMultiAlert.cs b/src/gui/dialogs/SaveConfirmationMultiAlert.cs
+index a8b3023..cf8d6d2 100644
+--- a/src/gui/dialogs/SaveConfirmationMultiAlert.cs
++++ b/src/gui/dialogs/SaveConfirmationMultiAlert.cs
+@@ -48,7 +48,7 @@ public class SaveConfirmationMultiAlert : Alert
+ 	{
+ 		fileList = list;
+ 
+-		image.SetFromStock(Gtk.Stock.DialogWarning, Gtk.IconSize.Dialog);
++		image.SetFromIconName("dialog-warning", Gtk.IconSize.Dialog);
+ 
+ 		Label label = new Label(Catalog.GetString("\nSelect the files you want to save:\n"));
+ 		label.Xalign = 0.0f;
+diff --git a/src/gui/dialogs/WarningAlert.cs b/src/gui/dialogs/WarningAlert.cs
+index adb9221..81dca0b 100644
+--- a/src/gui/dialogs/WarningAlert.cs
++++ b/src/gui/dialogs/WarningAlert.cs
+@@ -30,7 +30,7 @@ public class WarningAlert : Alert
+ 	public WarningAlert(string primary, string secondary, Gtk.Window parent)
+ 			: base(primary, secondary, parent)
+ 	{
+-		image.SetFromStock(Gtk.Stock.DialogWarning, Gtk.IconSize.Dialog);
++		image.SetFromIconName("dialog-warning", Gtk.IconSize.Dialog);
+ 
+ 		this.AddButton(Gtk.Stock.Cancel, ResponseType.Cancel);
+ 		this.AddButton(Gtk.Stock.Ok, ResponseType.Ok);
+diff --git a/src/gui/plugins/InfobarPlugin.cs b/src/gui/plugins/InfobarPlugin.cs
+index 9563e54..0eab950 100644
+--- a/src/gui/plugins/InfobarPlugin.cs
++++ b/src/gui/plugins/InfobarPlugin.cs
+@@ -309,7 +309,7 @@ public class Infobar : Gtk.Box, IInfoDisplay
+ 
+ 		MessageLabel = new Label();
+ 		MessageLabel.Ellipsize = Pango.EllipsizeMode.End;
+-		MessageLabel.SetAlignment(0.0f, 0.5f);
++		MessageLabel.Xalign = 0.0f;
+ 		OffsetLabel = new Label();
+ 		SelectionLabel = new Label();
+ 		OverwriteLabel = new Label();
+@@ -403,7 +403,7 @@ public class Infobar : Gtk.Box, IInfoDisplay
+ 			return;
+ 
+ 		Bless.Util.Range sel = dv.Selection;
+-		
++
+ 		string str;
+ 
+ 		if (sel.IsEmpty() == true)
